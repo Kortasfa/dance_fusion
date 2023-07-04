@@ -1,17 +1,14 @@
 package main
 
-/*
 import (
-	"fmt"
+	"github.com/gorilla/websocket"
 	"html/template"
 	"log"
 	"net/http"
-	//"github.com/jmoiron/sqlx"
-	"github.com/gorilla/websocket"
 )
 
-func index(w http.ResponseWriter, r *http.Request) {
-	tmpl, err := template.ParseFiles("pages/index.html")
+func gyrPage(w http.ResponseWriter, r *http.Request) {
+	tmpl, err := template.ParseFiles("pages/gyr_page.html")
 	if err != nil {
 		http.Error(w, "Internal Server Error", 500)
 		log.Println(err.Error())
@@ -26,50 +23,44 @@ func index(w http.ResponseWriter, r *http.Request) {
 		log.Println(err.Error())
 		return
 	}
-
-	log.Println("index.html Request completed successfully")
+	log.Println("gyr_page.html Request completed successfully")
 }
 
-func reader(conn *websocket.Conn) {
+var upgrader = websocket.Upgrader{} // use default options
+
+func echo(w http.ResponseWriter, r *http.Request) {
+	c, err := upgrader.Upgrade(w, r, nil)
+	if err != nil {
+		log.Print("upgrade:", err)
+		return
+	}
+	defer c.Close()
 	for {
-		// read in a message
-		messageType, p, err := conn.ReadMessage()
+		mt, message, err := c.ReadMessage()
 		if err != nil {
-			log.Println(err)
-			return
+			log.Println("read:", err)
+			break
 		}
-		// print out that message for clarity
-		fmt.Println(string(p))
-
-		if err := conn.WriteMessage(messageType, p); err != nil {
-			log.Println(err)
-			return
+		log.Printf("recv: %s", message)
+		err = c.WriteMessage(mt, message)
+		if err != nil {
+			log.Println("write:", err)
+			break
 		}
-
 	}
 }
 
-var upgrader = websocket.Upgrader{
-	ReadBufferSize:  1024,
-	WriteBufferSize: 1024,
+func home(w http.ResponseWriter, r *http.Request) {
+	tmpl, err := template.ParseFiles("pages/index.html")
+	if err != nil {
+		http.Error(w, "Internal Server Error", 500)
+		log.Println(err.Error())
+		return
+	}
+	err = tmpl.Execute(w, "wss://"+r.Host+"/echo")
+	if err != nil {
+		http.Error(w, "Internal Server Error", 500)
+		log.Println(err.Error())
+		return
+	}
 }
-
-func wsEndpoint(w http.ResponseWriter, r *http.Request) {
-	upgrader.CheckOrigin = func(r *http.Request) bool { return true }
-
-	// upgrade this connection to a WebSocket
-	// connection
-	ws, err := upgrader.Upgrade(w, r, nil)
-	if err != nil {
-		log.Println(err)
-	}
-
-	log.Println("Client Connected")
-	err = ws.WriteMessage(1, []byte("Hi Client!"))
-	if err != nil {
-		log.Println(err)
-	}
-	// listen indefinitely for new messages coming
-	// through on our WebSocket connection
-	reader(ws)
-}*/
