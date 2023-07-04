@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Отклонение устройства</title>
+</head>
+<body>
+<h1>Отклонение устройства</h1>
+
+<div id="gyro-data">
+    <p>Угол крена (Roll): <span id="roll-value">0</span></p>
+    <p>Угол тангажа (Pitch): <span id="pitch-value">0</span></p>
+    <p>Угол рысканья (Yaw): <span id="yaw-value">0</span></p>
+</div>
+
+<script>
+    // Проверяем, поддерживает ли устройство гироскоп
+    if (window.DeviceOrientationEvent) {
+        window.addEventListener('deviceorientation', handleOrientation, false);
+    } else {
+        alert("Гироскоп не поддерживается на вашем устройстве.");
+    }
+
+    // Обработчик события изменения ориентации устройства
+    function handleOrientation(event) {
+        var roll = event.beta;  // Угол крена
+        var pitch = event.gamma;  // Угол тангажа
+        var yaw = event.alpha;  // Угол рысканья
+
+        // Обновляем значения на странице
+        document.getElementById("roll-value").innerHTML = roll.toFixed(2);
+        document.getElementById("pitch-value").innerHTML = pitch.toFixed(2);
+        document.getElementById("yaw-value").innerHTML = yaw.toFixed(2);
+    }
+</script>
+</body>
+</html>
