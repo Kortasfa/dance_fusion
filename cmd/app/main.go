@@ -1,18 +1,25 @@
 package main
 
 import (
-	"flag"
+	"fmt"
+	"github.com/gorilla/mux"
 	"log"
 	"net/http"
 )
 
-var addr = flag.String("addr", "192.168.138.39:3000", "http service address")
-
 func main() {
-	flag.Parse()
-	log.SetFlags(0)
-	http.HandleFunc("/echo", echo)
-	http.HandleFunc("/", home)
-	http.HandleFunc("/gyroscope", gyrPage)
-	log.Fatal(http.ListenAndServe(*addr, nil))
+	r := mux.NewRouter()
+	r.HandleFunc("/echo", echo)
+	r.HandleFunc("/", home)
+	r.HandleFunc("/gyroscope", gyrPage)
+
+	r.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir("./static"))))
+
+	fmt.Println("Start server")
+	srv := &http.Server{
+		Handler: r,
+		Addr:    "192.168.138.39:3000",
+	}
+
+	log.Fatal(srv.ListenAndServe())
 }
