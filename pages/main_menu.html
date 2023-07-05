@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">    
+<head>
+  <meta charset="UTF-8" />
+  <title>Let's dance</title>
+  <script src="../static/js/dance.js" defer></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="../static/css/danceStyle.css"  type="text/css" rel="stylesheet" />
+</head>
+<body class="page content">  
+  <img class="btn-back" id="return-button" src="../static/svg/Group 6.svg" onclick="closeSong()">
+  <div  class="dance-style" id="list-genry">
+    {{ range .Styles }}
+      <div class="dance-style__button" id="{{ .StyleID }}" onclick="openSong(this)">
+        <a href="#" class="button__text">{{ .StyleName }}</a>
+      </div>
+    {{ end }}
+  </div>
+  <div id="list-song" class="songs none">
+    {{ range .Songs }}
+      <div class="song__section none" id="{{ .StyleID }}">
+        <img src="{{ .ImageSrc }}" class="section__img">
+        <div class="section__name">
+          <div class="name__title">{{ .SongName }}</div>
+          <div class="name__subtitle">{{ .SongAuthor }}</div>
+        </div>
+      </div>
+    {{ end }}
+  </div>
+  <div class="game-menu">
+    <div class="game-menu__party">
+        <div class="party__user">
+          <div class="user__avatar"></div>
+          <div class="user__name">Kirill</div>
+        </div>  
+        <div class="party__user">
+          <div class="user__avatar"></div>
+          <div class="user__name">Zachar</div>
+        </div> 
+        <div class="party__user">
+          <div class="user__avatar"></div>
+          <div class="user__name">Maksim</div>  
+        </div> 
+        <div class="party__user">
+          <div class="user__avatar"></div>  
+          <div class="user__name">Valeryan</div>
+        </div> 
+    </div>
+    <div class="game-menu__line"></div>
+    <div class="game-menu__guide">
+      <a class="guide__text">Ты должен подключиться</a>
+    </div>
+    <div class="game-menu__play-button" id="Play"><a class="play-button" href="#" onclick="startGame">Play</a></div>
+  </div>
+</body>
+</html>
