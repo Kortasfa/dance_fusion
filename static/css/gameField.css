@@ -104,6 +104,7 @@
 }
 
 .pop-up-box__start-btn{
+    margin: 0;
     width: 270px;
     height: 76px;
     border-radius: 10px;

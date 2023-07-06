@@ -10,15 +10,23 @@ function closeModalElem() {
     isBtnClicked = true;
     console.log(isBtnClicked);
     modalElem.classList.remove("open");
-
 }
 
 function playVideo() {
     modalElem.classList.remove("open");
     setTimeout(() => {
         danceVideo.play();
-    }, 2000);
+    }, 500);
 }
 
 window.onload = openModalElem();
-btnGo.addEventListener("click", playVideo);
+
+async function play() {
+    const response = await fetch("/api/start");
+    if (response.ok) {
+        playVideo();
+    }
+}
+
+//btnGo.addEventListener("click", playVideo);
+

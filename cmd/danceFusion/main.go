@@ -24,6 +24,9 @@ func main() {
 
 	mux := mux.NewRouter()
 	mux.HandleFunc("/home", gameField)
+	mux.HandleFunc("/start", gamePhone)
+	mux.HandleFunc("/api/start", checkButton).Methods(http.MethodPost)
+	//mux.HandleFunc("/api/play", start)
 	mux.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir("./static"))))
 
 	fmt.Println("Start server")

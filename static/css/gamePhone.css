@@ -1,0 +1,19 @@
+.page {
+    background-color: #0DF2BF;
+    height: 100vh;
+    display: flex;
+    overflow: hidden;
+    justify-content: center;
+    align-items: center;
+
+}
+
+.page__btn-go{
+    width: 270px;
+    max-height: 76px;
+    border-radius: 10px;
+    background: #F20D40;
+    border-color: #F20D40;
+    font: 400 64px Roboto, sans-serif;
+    color: #FAFCF6;
+}
