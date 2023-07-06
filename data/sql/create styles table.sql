@@ -8,6 +8,6 @@ COLLATE utf8mb4_unicode_ci;
 
 INSERT INTO styles(name)
 VALUES
-	("Hip-hop"),
-    ("Latin music"),
-    ("Russian music");
+	("Pop"),
+    ("Dance Pop"),
+    ("Neosoul");
