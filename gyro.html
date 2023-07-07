@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Gyroscope and Accelerometer Data Recorder</title>
+</head>
+<body>
+<h1>Gyroscope and Accelerometer Data Recorder</h1>
+<button id="startBtn">Start Recording</button>
+<button id="stopBtn" disabled>Stop Recording</button>
+<button id="sendBtn" disabled>Send Data to Server</button>
+
+<script>
+  let gyroData = [];
+  let accelData = [];
+  let isRecording = false;
+  let time1 = 0;
+  let time2 = 0;
+
+
+  if ('DeviceOrientationEvent' in window && 'DeviceMotionEvent' in window) {
+    document.getElementById('startBtn').addEventListener('click', function() {
+      document.getElementById('startBtn').disabled = true;
+      document.getElementById('stopBtn').disabled = false;
+
+      isRecording = true;
+
+      window.addEventListener('deviceorientation', handleGyroscope, true);
+
+      window.addEventListener('devicemotion', handleAccelerometer, true);
+
+    });
+
+    document.getElementById('stopBtn').addEventListener('click', function() {
+
+      document.getElementById('startBtn').disabled = false;
+      document.getElementById('stopBtn').disabled = true;
+      document.getElementById('sendBtn').disabled = false;
+
+      isRecording = false;
+
+      window.removeEventListener('deviceorientation', handleGyroscope, true);
+
+      window.removeEventListener('devicemotion', handleAccelerometer, true);
+
+
+    });
+
+    document.getElementById('sendBtn').addEventListener('click', function() {
+      sendDataToServer();
+    });
+  } else {
+    alert('This browser does not support the necessary features for recording gyroscope and accelerometer data.');
+  }
+
+  function handleGyroscope(event) {
+    if (isRecording) {
+      // Schedule the data recording at approximately 60 frames per second
+      window.requestAnimationFrame(function() {
+        gyroData.push({
+          alpha: MyRound10(event.alpha),
+          beta: MyRound10(event.beta),
+          gamma: MyRound10(event.gamma),
+          time: time1
+        });
+        time1 = time1 + 1
+      });
+    }
+  }
+
+  function MyRound10(val) {
+    return Math.round(val * 10) / 10;
+  }
+
+  function handleAccelerometer(event) {
+    if (isRecording) {
+      // Schedule the data recording at approximately 60 frames per second
+      window.requestAnimationFrame(function() {
+        accelData.push({
+          x: MyRound10(event.accelerationIncludingGravity.x),
+          y: MyRound10(event.accelerationIncludingGravity.y),
+          z: MyRound10(event.accelerationIncludingGravity.z),
+          time: time2
+        });
+        time2 = time2 + 1
+      });
+    }
+  }
+
+  function sendDataToServer() {
+    // Replace the URL with the appropriate endpoint to handle the data on your server
+    var url = 'api/post';
+    var data = {
+      gyroData: gyroData,
+      accelData: accelData
+    };
+
+// Send the data to the server using an HTTP request (e.g., XMLHttpRequest, fetch)
+// Replace the code below with the appropriate method based on your server and requirements
+
+// Example using fetch API
+    fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(data)
+    })
+            .then(function(response) {
+              if (response.ok) {
+                console.log('Data sent successfully.');
+              } else {
+                console.log('Error sending data. Status:', response.status);
+              }
+            })
+            .catch(function(error) {
+              console.log('Error sending data:', error);
+            });
+  }
+</script>
+</body>
+</html>
