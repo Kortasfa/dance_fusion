@@ -1,7 +1,7 @@
 const btnGo = document.getElementById("btn-join")
 
 function sendMessage() {
-    let IDField = document.getElementById("id-field");
+    let IDField = document.querySelector('.entrance__entrance-id-room');
     let postInfo = {
         "userID": userID,
         "roomID": IDField.value

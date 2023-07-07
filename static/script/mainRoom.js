@@ -52,7 +52,7 @@ function showVideo(videoID) {
   videoPlayer.src = video.innerText;
 }
 
-let socket = new WebSocket("{{ .WssURL }}");
+let socket = new WebSocket(WssURL);
 
 socket.onopen = function(event) {
   console.log("WebSocket connection established.");

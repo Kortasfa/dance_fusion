@@ -139,7 +139,7 @@ func handleRoom(db *sqlx.DB) func(w http.ResponseWriter, r *http.Request) {
 			Styles:  styles,
 			Songs:   songs,
 			RoomKey: roomID,
-			WssURL:  "wss://" + r.Host + "/roomWS/{id}",
+			WssURL:  "wss://" + r.Host + "/roomWS/" + roomID,
 		}
 
 		err = tmpl.Execute(w, data)
