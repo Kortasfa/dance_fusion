@@ -1,0 +1,53 @@
+.page {
+    background-color: #0DF2BF;
+    height: 100vh;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.message-user {
+    font: 400 30px Roboto, sans-serif;
+    color: #FAFCF6;
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+.entrance {
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+}
+
+.entrance__btn-join {
+    width: 270px;
+    max-height: 76px;
+    border-radius: 10px;
+    background: #F20D40;
+    border-color: #F20D40;
+    font: 400 64px Roboto, sans-serif;
+    color: #FAFCF6;
+}
+
+.entrance__entrance-id-room {
+    width: 270px;
+    height: 76px;
+    border-radius: 10px;
+    background: #FAFCF6;
+    border-color: #FAFCF6;
+    outline: none;
+    font: 400 48px Roboto, sans-serif;
+    color: rgba(0, 0, 0, 0.70);
+}
+
+.connection {
+    font: 400 48px Roboto, sans-serif;
+    color: #F20D40;
+}
+
+.hidden {
+    display: none;
+}
+

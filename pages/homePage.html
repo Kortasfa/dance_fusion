@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Dance Fusion</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="static/css/homePage.css" type="text/css" rel="stylesheet"/>
+    <script src="/static/script/homePage.js" defer></script>
+</head>
+<body>
+<div class="video-background">
+    <video autoplay loop muted>
+        <source src="{{ .BackgroundVideoSrc }}" type="video/mp4">
+    </video>
+</div>
+<div class="content">
+    <div class="logo">Dance Fusion</div>
+    <button class="button">Play Now</button>
+</div>
+</body>
+</html>
