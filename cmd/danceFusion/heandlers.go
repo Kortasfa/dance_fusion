@@ -1,15 +1,67 @@
 package main
 
 import (
-	"encoding/json"
+	"github.com/gorilla/websocket"
 	"html/template"
-	"io"
 	"log"
 	"net/http"
 )
 
+var clients = make(map[*websocket.Conn]bool)
+var broadcast = make(chan string)
+
+var upgrader = websocket.Upgrader{
+	ReadBufferSize:  1024,
+	WriteBufferSize: 1024,
+}
+
 type buttonRequest struct {
-	isBtnClicked bool `json:"button"`
+	IsBtnClicked string `json:"button"`
+}
+
+/*func gameFieldWs(w http.ResponseWriter, r *http.Request) {
+	conn, err := upgrader.Upgrade(w, r, nil)
+	if err != nil {
+		log.Println("Failed to upgrade websocket connection:", err)
+		return
+	}
+	defer conn.Close()
+
+	err = conn.WriteMessage(websocket.TextMessage, []byte(""))
+	if err != nil {
+		log.Println("Failed to send welcome message:", err)
+	}
+}*/
+
+/*func handleMessages() {
+	for _ = range broadcast {
+		for client := range clients {
+			err := client.WriteMessage(websocket.TextMessage, []byte("True"))
+			if err != nil {
+				client.Close()
+				delete(clients, client)
+			}
+		}
+	}
+}*/
+
+func gameFieldWs(w http.ResponseWriter, r *http.Request) {
+	conn, err := upgrader.Upgrade(w, r, nil)
+	if err != nil {
+		log.Println("Failed to upgrade websocket connection:", err)
+		return
+	}
+	defer conn.Close()
+
+	clients[conn] = true
+
+	for {
+		_, _, err := conn.ReadMessage()
+		if err != nil {
+			delete(clients, conn)
+			break
+		}
+	}
 }
 
 func gameField(w http.ResponseWriter, r *http.Request) {
@@ -19,8 +71,12 @@ func gameField(w http.ResponseWriter, r *http.Request) {
 		log.Println(err.Error())
 		return
 	}
-
-	err = ts.Execute(w, nil)
+	data := struct {
+		WssURL string
+	}{
+		WssURL: "wss://" + r.Host + "/start/ws",
+	}
+	err = ts.Execute(w, data)
 	if err != nil {
 		http.Error(w, "Internal Server Error", 500)
 		log.Println(err.Error())
@@ -45,23 +101,14 @@ func gamePhone(w http.ResponseWriter, r *http.Request) {
 }
 
 func checkButton(w http.ResponseWriter, r *http.Request) {
-	reqData, err := io.ReadAll(r.Body)
-	if err != nil {
-		http.Error(w, "Internal Server Error", 500)
-		log.Println(err.Error())
-		return
-	}
-
-	var req buttonRequest
-
-	err = json.Unmarshal(reqData, &req)
-	if err != nil {
-		http.Error(w, "Internal Server Error", 500)
-		log.Println(err.Error())
-		return
-	}
 	w.WriteHeader(200)
-
+	for client := range clients {
+		err := client.WriteMessage(websocket.TextMessage, []byte("True"))
+		if err != nil {
+			client.Close()
+			delete(clients, client)
+		}
+	}
 }
 
 /*func start(w http.ResponseWriter, r *http.Request) {

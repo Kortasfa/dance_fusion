@@ -11,6 +11,11 @@
     <script src="/static/script/gamePhone.js " defer></script>
 </head>
 <body class="page">
-    <button id="btn-go" class="page__btn-go">GO!</button>
+    <span class="message-user">Send Message from {{ .UserID }}</span>
+    <div class="entrance">
+        <input class="entrance__entrance-id-room" type="number">
+        <button id="btn-join" class="entrance__btn-join">GO!</button>
+    </div>
+    <span class="connection hidden">You are joined!</span>
 </body>
 
