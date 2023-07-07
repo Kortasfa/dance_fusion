@@ -25,11 +25,13 @@ func main() {
 
 	r := mux.NewRouter()
 	r.HandleFunc("/join", joinPageHandler).Methods("GET")
+	r.HandleFunc("/home", homePageHandler)
 	r.HandleFunc("/room", handleCreateRoom)
-	r.HandleFunc("/room/{id}", handleRoom)
+	r.HandleFunc("/room/{id}", handleRoom(dbx))
 	r.HandleFunc("/api/join_to_room", getJoinedUserData).Methods("POST")
 	r.HandleFunc("/roomWS/{id}", roomWSHandler)
-	r.HandleFunc("/menu", menuPage(dbx))
+	r.HandleFunc("/game_field/id", gameField)
+	//r.HandleFunc("/menu", menuPage(dbx))
 
 	go handleRoomWSMessages()
 

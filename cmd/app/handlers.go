@@ -39,8 +39,30 @@ type songsData struct {
 }
 
 type menuPageData struct {
-	Styles []stylesData
-	Songs  []songsData
+	Styles  []stylesData
+	Songs   []songsData
+	RoomKey string
+	WssURL  string
+}
+
+func homePageHandler(w http.ResponseWriter, r *http.Request) {
+	tmpl, err := template.ParseFiles("pages/homePage.html")
+	if err != nil {
+		http.Error(w, "Internal Server Error", 500)
+		log.Println(err.Error())
+		return
+	}
+	var data = struct {
+		BackgroundVideoSrc string
+	}{
+		BackgroundVideoSrc: "static/video/JDN_Landing_Video.mp4",
+	}
+	err = tmpl.Execute(w, data)
+	if err != nil {
+		http.Error(w, "Internal Server Error", 500)
+		log.Println(err.Error())
+		return
+	}
 }
 
 func getStylesData(db *sqlx.DB) ([]stylesData, error) {
@@ -85,9 +107,16 @@ func getSongsData(db *sqlx.DB) ([]songsData, error) {
 	return data, nil
 }
 
-func menuPage(db *sqlx.DB) func(w http.ResponseWriter, r *http.Request) {
+func handleRoom(db *sqlx.DB) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
-		tmpl, err := template.ParseFiles("pages/main_menu.html")
+		vars := mux.Vars(r)
+		roomID := vars["id"]
+		_, exists := roomIDDict[roomID]
+		if !exists {
+			w.WriteHeader(404)
+			return
+		}
+		tmpl, err := template.ParseFiles("pages/mainRoom.html")
 		if err != nil {
 			http.Error(w, "Internal Server Error", 500)
 			log.Println(err.Error())
@@ -107,10 +136,12 @@ func menuPage(db *sqlx.DB) func(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		data := menuPageData{
-			Styles: styles,
-			Songs:  songs,
+			Styles:  styles,
+			Songs:   songs,
+			RoomKey: roomID,
+			WssURL:  "wss://" + r.Host + "/roomWS/{id}",
 		}
-		//err = tmpl.Execute(w, "wss://"+r.Host+"/preview_video")
+
 		err = tmpl.Execute(w, data)
 		if err != nil {
 			http.Error(w, "Internal Server Error", 500)
@@ -134,37 +165,8 @@ func handleCreateRoom(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, fmt.Sprintf("/room/%d", roomID), http.StatusFound)
 }
 
-func handleRoom(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	roomID := vars["id"]
-	_, exists := roomIDDict[roomID]
-	if !exists {
-		w.WriteHeader(404)
-		return
-	}
-	tmpl, err := template.ParseFiles("pages/room.html")
-	if err != nil {
-		http.Error(w, "Internal Server Error", 500)
-		log.Println(err.Error())
-		return
-	}
-	data := struct {
-		RoomKey string
-		WssURL  string
-	}{
-		RoomKey: roomID,
-		WssURL:  "wss://" + r.Host + "/roomWS/" + roomID,
-	}
-	err = tmpl.Execute(w, data)
-	if err != nil {
-		http.Error(w, "Internal Server Error", 500)
-		log.Println(err.Error())
-		return
-	}
-}
-
 func joinPageHandler(w http.ResponseWriter, r *http.Request) {
-	tmpl, err := template.ParseFiles("pages/join.html")
+	tmpl, err := template.ParseFiles("pages/gamePhone.html")
 	if err != nil {
 		http.Error(w, "Internal Server Error", 500)
 		log.Println(err.Error())
@@ -249,5 +251,25 @@ func roomWSHandler(w http.ResponseWriter, r *http.Request) {
 			delete(roomWSDict, conn)
 			break
 		}
+	}
+}
+
+func gameField(w http.ResponseWriter, r *http.Request) {
+	ts, err := template.ParseFiles("pages/gameField.html")
+	if err != nil {
+		http.Error(w, "Internal Server Error", 500)
+		log.Println(err.Error())
+		return
+	}
+	data := struct {
+		WssURL string
+	}{
+		WssURL: "wss://" + r.Host + "/start/ws",
+	}
+	err = ts.Execute(w, data)
+	if err != nil {
+		http.Error(w, "Internal Server Error", 500)
+		log.Println(err.Error())
+		return
 	}
 }
