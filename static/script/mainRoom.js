@@ -60,7 +60,13 @@ socket.onopen = function(event) {
 
 socket.onmessage = function(event) {
   let message = event.data;
-  console.log('Пользователь присоединился: ' + message);
+  let parts = message.split('|');
+  let userID = parts[0];
+  let userName = parts[1];
+  let imgSrc = parts[2];
+  console.log('Пользователь присоединился: ' + userID);
+  console.log('Его имя: ' + userName);
+  console.log('Его фотка: ' + imgSrc);
 };
 
 socket.onclose = function(event) {

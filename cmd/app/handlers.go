@@ -38,6 +38,12 @@ type songsData struct {
 	StyleID         int    `db:"style_id"`
 }
 
+type userData struct {
+	UserID   int    `db:"id"`
+	UserName string `db:"name"`
+	ImgSrc   string `db:"img_src"`
+}
+
 type menuPageData struct {
 	Styles  []stylesData
 	Songs   []songsData
@@ -175,7 +181,7 @@ func joinPageHandler(w http.ResponseWriter, r *http.Request) {
 	data := struct {
 		UserID string
 	}{
-		UserID: "123",
+		UserID: "1",
 	}
 	err = tmpl.Execute(w, data)
 	if err != nil {
@@ -185,36 +191,58 @@ func joinPageHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func getJoinedUserData(w http.ResponseWriter, r *http.Request) {
-	reqData, err := io.ReadAll(r.Body)
+func getUserInfo(db *sqlx.DB, userID string) (string, string, error) {
+	const query = `
+		SELECT
+			name,
+			img_src
+		FROM
+			users
+		WHERE
+		   id=?
+	`
+	row := db.QueryRow(query, userID)
+	data := new(userData)
+	err := row.Scan(&data.UserName, &data.ImgSrc)
 	if err != nil {
-		http.Error(w, "Parsing error", 500)
-		log.Println(err.Error())
-		return
+		return "", "", err
 	}
-	var data struct {
-		UserID string
-		RoomID string
+	return data.UserName, data.ImgSrc, nil
+}
+
+func getJoinedUserData(db *sqlx.DB) func(w http.ResponseWriter, r *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
+		reqData, err := io.ReadAll(r.Body)
+		if err != nil {
+			http.Error(w, "Parsing error", 500)
+			log.Println(err.Error())
+			return
+		}
+		var data struct {
+			UserID string
+			RoomID string
+		}
+		err = json.Unmarshal(reqData, &data)
+		if err != nil {
+			http.Error(w, "JSON parsing error", 500)
+			log.Println(err.Error())
+			return
+		}
+		_, exists := roomIDDict[data.RoomID]
+		if !exists {
+			w.WriteHeader(404)
+			return
+		}
+		if roomIDDict[data.RoomID] >= maxUsers {
+			w.WriteHeader(409)
+			return
+		}
+		roomIDDict[data.RoomID] = roomIDDict[data.RoomID] + 1
+		w.WriteHeader(200)
+		userName, imgSrc, _ := getUserInfo(db, data.UserID)
+		broadcastJoiningUserID <- []string{data.RoomID, data.UserID, userName, imgSrc}
+		fmt.Fprintf(w, "Message sent: %s", data.UserID)
 	}
-	err = json.Unmarshal(reqData, &data)
-	if err != nil {
-		http.Error(w, "JSON parsing error", 500)
-		log.Println(err.Error())
-		return
-	}
-	_, exists := roomIDDict[data.RoomID]
-	if !exists {
-		w.WriteHeader(404)
-		return
-	}
-	if roomIDDict[data.RoomID] >= maxUsers {
-		w.WriteHeader(409)
-		return
-	}
-	roomIDDict[data.RoomID] = roomIDDict[data.RoomID] + 1
-	w.WriteHeader(200)
-	broadcastJoiningUserID <- []string{data.RoomID, data.UserID}
-	fmt.Fprintf(w, "Message sent: %s", data.UserID)
 }
 
 func handleRoomWSMessages() {
@@ -222,8 +250,11 @@ func handleRoomWSMessages() {
 		for wsConnect := range roomWSDict {
 			roomID := mesArr[0]
 			userID := mesArr[1]
+			userName := mesArr[2]
+			imgSrc := mesArr[3]
 			if roomWSDict[wsConnect] == roomID {
-				err := wsConnect.WriteMessage(websocket.TextMessage, []byte(userID))
+				message := userID + "|" + userName + "|" + imgSrc
+				err := wsConnect.WriteMessage(websocket.TextMessage, []byte(message))
 				if err != nil {
 					wsConnect.Close()
 					delete(roomWSDict, wsConnect)
