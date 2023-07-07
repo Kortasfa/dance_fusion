@@ -1,0 +1,49 @@
+package main
+
+import (
+	"database/sql"
+	"fmt"
+	_ "github.com/go-sql-driver/mysql"
+	"github.com/gorilla/mux"
+	"github.com/jmoiron/sqlx"
+	"log"
+	"net/http"
+)
+
+const (
+	port         = ":3306"
+	dbDriverName = "mysql"
+)
+
+func main() {
+	db, err := openDB()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	dbx := sqlx.NewDb(db, dbDriverName)
+
+	r := mux.NewRouter()
+	r.HandleFunc("/join", joinPageHandler).Methods("GET")
+	r.HandleFunc("/room", handleCreateRoom)
+	r.HandleFunc("/room/{id}", handleRoom)
+	r.HandleFunc("/api/join_to_room", getJoinedUserData).Methods("POST")
+	r.HandleFunc("/roomWS/{id}", roomWSHandler)
+	r.HandleFunc("/menu", menuPage(dbx))
+
+	go handleRoomWSMessages()
+
+	r.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir("./static"))))
+
+	fmt.Println("Start server")
+	srv := &http.Server{
+		Handler: r,
+		Addr:    ":3000",
+	}
+
+	log.Fatal(srv.ListenAndServe())
+}
+
+func openDB() (*sql.DB, error) {
+	return sql.Open(dbDriverName, "root:P@ssw0rd@tcp(localhost:3306)/dance_fusion?charset=utf8mb4&collation=utf8mb4_unicode_ci&parseTime=true")
+}
