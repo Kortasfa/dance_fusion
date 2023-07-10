@@ -21,38 +21,38 @@
     width: 46%;
     height: 100vh;
     background-color: #00eaff;
-    margin-left: -46%;
+    margin-left: calc(-96% + 590px);
 }
 
 .play {
     animation-duration: 1s;
     animation-name: slidein;
-    margin-left: 0;
+    margin-left: calc(-50% + 590px);
   }
 
 @keyframes slidein {
     from {
-        margin-left: -46%;
+        margin-left: calc(-96% + 590px);
       }
     
       to {
-        margin-left: 0;
+        margin-left: calc(-50% + 590px);
       }
 }
 
 .unplay {
     animation-duration: 1s;
     animation-name: unslidein;
-    margin-left: -46%;
+    margin-left: calc(-96% + 590px);
   }
 
 @keyframes unslidein {
     from {
-        margin-left: 0;
+        margin-left: calc(-50% + 590px);
       }
     
       to {
-        margin-left: -46%;
+        margin-left: calc(-96% + 590px);
       }
 }
 .game-menu__preview{
@@ -200,10 +200,13 @@
     border-radius: 10px;
     width: 107px;
     height: 107px;
+    position: absolute;
+    padding-right: 245px;
 }
 
 .song__section{
     border-radius: 10px;
+    position: relative;
     width: 352px;
     display: flex;
     background-color: #f4f4f4;
@@ -227,6 +230,11 @@
     margin: 15px 0px 0px 0;
 }
 
+@keyframes blink {
+    from { opacity: 1; /* Непрозрачный текст */ }
+    to { opacity: 80%; /* Прозрачный текст */ }
+   }
+
 .songs{
     margin: 27px 0px 0px 10px;
     overflow: auto;
@@ -235,11 +243,19 @@
 }
 
 .section__name{
-    margin: 24px;
+    margin: 24px 24px 24px 134px;
 }
 
 .btn-back{
     margin-bottom: 515px;
+}
+
+.party__messege{
+    font: normal 400 46px/1.54 'Roboto';
+    text-align: center;
+    margin: auto;
+    color: aliceblue;
+    animation: blink 1s infinite;
 }
 
 .none{
