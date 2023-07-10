@@ -2,7 +2,6 @@ const listSong = document.getElementById('list-song');
 const listGenre = document.getElementById('list-genre');
 const btnOpenInfo =  document.getElementById('openGuide');
 const guide = document.getElementById('guide');
-let numberOfUser = 0;
 
 btnOpenInfo.addEventListener('click', openGuide);
 
@@ -39,16 +38,44 @@ function closeGuide() {
   guide.classList.remove('play');
 }
 
-function startGame() {
-  window.location.href = 'homepage-url';
-  //проверка выбрана ли песня
-  //отправка в выбранную игру
-}
+let test = document.getElementsByClassName("section__img");
+let testing = '';
+// Iterate over each element in the collection
+Array.from(test).forEach(function (element) {
+  element.addEventListener('click', function () {
+    let videoSrcID = '9' + element.id;
+    let video = document.getElementById(videoSrcID);
+    let videoPlayer = document.getElementById('videoPlayer');
+    videoPlayer.src = video.innerText;
+    testing = video.innerText;
+  });
+});
+
+$(document).ready(function() {
+  let trigger = $('#Play');
+  let container = $('#content');
+
+  // Fire on click
+  trigger.on('click', function() {
+    container.load("/static/html/game.html", function() {
+      let video = $('#video-dance').get(0);
+      let src = $('#video-src').get(0);
+      src.setAttribute('src', testing);
+      console.log(testing);
+      video.addEventListener('loadeddata', function() {
+        video.play();
+      });
+    });
+
+    return false;
+  });
+});
 
 function showVideo(videoID) {
   let videoSrcID = '9' + videoID.id;
   let video = document.getElementById(videoSrcID);
   let videoPlayer = document.getElementById('videoPlayer');
+
   videoPlayer.src = video.innerText;
 }
 
@@ -59,19 +86,11 @@ socket.onopen = function(event) {
 };
 
 socket.onmessage = function(event) {
-  let userMSG = document.getElementById('needUser')
   let message = event.data;
   let parts = message.split('|');
   let userID = parts[0];
   let userName = parts[1];
   let imgSrc = parts[2];
-  numberOfUser = numberOfUser + 1;
-  userMSG.classList.add('none');
-  let indexUser = document.getElementById('user' + numberOfUser);
-  let indexUserName = document.getElementById('userName' + numberOfUser);
-  indexUser.classList.remove('none');
-
-  indexUserName.innerText = userName;
   console.log('Пользователь присоединился: ' + userID);
   console.log('Его имя: ' + userName);
   console.log('Его фотка: ' + imgSrc);
@@ -80,4 +99,3 @@ socket.onmessage = function(event) {
 socket.onclose = function(event) {
   console.log("WebSocket connection closed.");
 };
-

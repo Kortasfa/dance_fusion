@@ -10,11 +10,6 @@ function sendMessage() {
         enterInRoom.classList.add("entrance-id-room__field_warning");
         console.log("1");
     }
-    else if (enterInRoom.value != 1234) {
-        emptyID.classList.add("hidden");
-        warningID.classList.remove("hidden");
-        enterInRoom.classList.add("entrance-id-room__field_warning");
-    }
     else {
         warningID.classList.add("hidden")
         enterInRoom.classList.remove("entrance-id-room__field_warning")
@@ -43,8 +38,6 @@ function sendMessage() {
         enterInRoom.classList.add("hidden");
         connectionText.classList.remove("hidden");
     }
-
-
 }
 
 

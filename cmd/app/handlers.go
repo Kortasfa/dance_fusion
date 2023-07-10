@@ -145,7 +145,7 @@ func handleRoom(db *sqlx.DB) func(w http.ResponseWriter, r *http.Request) {
 			Styles:  styles,
 			Songs:   songs,
 			RoomKey: roomID,
-			WssURL:  "wss://" + r.Host + "/roomWS/" + roomID,
+			WssURL:  "ws://" + r.Host + "/roomWS/" + roomID,
 		}
 
 		err = tmpl.Execute(w, data)
@@ -295,7 +295,7 @@ func gameField(w http.ResponseWriter, r *http.Request) {
 	data := struct {
 		WssURL string
 	}{
-		WssURL: "wss://" + r.Host + "/start/ws",
+		WssURL: "ws://" + r.Host + "/start/ws",
 	}
 	err = ts.Execute(w, data)
 	if err != nil {

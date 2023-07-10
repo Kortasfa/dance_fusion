@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" id="content">
 <head>
     <meta charset="UTF-8"/>
     <title>Let's dance</title>
@@ -9,6 +9,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="/static/css/mainRoom.css" type="text/css" rel="stylesheet"/>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
     <script>let WssURL = "{{ .WssURL }}"</script>
 </head>
 <body class="page">
@@ -16,13 +17,15 @@
     <div>
         <div class="header__guide">
             <div>
-                <a class="guide__title">Сode room</a>
+                <a class="guide__title">Kode room</a>
                 <a class="guide__code" id="CodeRoom">{{ .RoomKey }}</a>
             </div>
             <img src="../static/svg/question-answer-svgrepo-com.svg" class="header__icon" id="openGuide">
         </div>
     </div>
 </header>
+<div class="page__info" id="guide" onclick="closeGuide()">
+</div>
 <div class="content">
     <img class="btn-back" id="return-button" src="../static/svg/Group 6.svg" onclick="closeSong()">
     <div class="dance-style" id="list-genre">
@@ -46,33 +49,29 @@
     </div>
     <div class="game-menu">
         <div class="game-menu__party">
-            <div id="needUser" class="party__messege">Join and start playing</div>
-            <div class="party__user  none" id="user1">
+            <div class="party__user">
                 <div class="user__avatar"></div>
-                <div class="user__name" id="userName1">Kirill</div>
+                <div class="user__name">Kirill</div>
             </div>
-            <div class="party__user  none" id="user2">
+            <div class="party__user">
                 <div class="user__avatar"></div>
-                <div class="user__name" id="userName2">Zachar</div>
+                <div class="user__name">Zachar</div>
             </div>
-            <div class="party__user  none" id="user3">
+            <div class="party__user">
                 <div class="user__avatar"></div>
-                <div class="user__name" id="userName3">Maksim</div>
+                <div class="user__name">Maksim</div>
             </div>
-            <div class="party__user none" id="user4">
+            <div class="party__user">
                 <div class="user__avatar"></div>
-                <div class="user__name" id="userName4">Valeryan</div>
+                <div class="user__name">Valeryan</div>
             </div>
         </div>
         <div class="game-menu__line"></div>
-    <video poster="..//static/img/618363928f4aef76ef260de7_1080_stackImages_1636000944.png" id="videoPlayer" autoplay loop class="game-menu__preview" src="../static/video/burn.mp4">
-        <source  controls="false" type="video/mp4">
-    </video>
-        
-        <div class="game-menu__play-button" id="Play"><a class="play-button" href="#" onclick="startGame">Play</a></div>
+        <iframe id="videoPlayer" class="game-menu__preview" src="../static/video/burn.mp4"
+                allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" autoplay="autoplay"
+                allowfullscreen></iframe>
+        <div class="game-menu__play-button" id="Play"><a class="play-button" href="#">Play</a></div>
     </div>
-    <div class="page__info" id="guide" onclick="closeGuide()">
-</div>
 </div>
 </body>
 </html>
