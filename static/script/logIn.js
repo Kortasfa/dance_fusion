@@ -1,4 +1,4 @@
-function signUp() {
+function logIn() {
     let nameField = document.querySelector(".name-field");
     let passwordField = document.querySelector(".password-field");
     let userInfo = {
@@ -7,14 +7,14 @@ function signUp() {
     }
     let messageContent = JSON.stringify(userInfo);
     let XHR = new XMLHttpRequest();
-    XHR.open("POST", "/api/signUp");
+    XHR.open("POST", "/api/logIn");
     XHR.onload = function () {
         if (XHR.status === 200) {
-            console.log("Successfully registered!");
+            console.log("Successfully logged in!");
         } else if (XHR.status === 409) {
-            console.log("Username is taken!");
+            console.log("Wrong username or password!");
         } else {
-            console.log("Failed to register!");
+            console.log("Failed to log in!");
         }
     };
     XHR.send(messageContent);
