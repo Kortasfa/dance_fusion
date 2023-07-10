@@ -10,11 +10,6 @@ function sendMessage() {
         enterInRoom.classList.add("entrance-id-room__field_warning");
         console.log("1");
     }
-    else if (enterInRoom.value != 1234) {
-        emptyID.classList.add("hidden");
-        warningID.classList.remove("hidden");
-        enterInRoom.classList.add("entrance-id-room__field_warning");
-    }
     else {
         warningID.classList.add("hidden")
         enterInRoom.classList.remove("entrance-id-room__field_warning")
@@ -28,8 +23,14 @@ function sendMessage() {
         XHR.open("POST", "/api/join_to_room");
         XHR.onload = function () {
             if (XHR.status === 200) {
+                btnGo.classList.add("hidden");
+                enterInRoom.classList.add("hidden");
+                connectionText.classList.remove("hidden");
                 console.log("Connected to the room!");
             } else if (XHR.status === 404) {
+                emptyID.classList.add("hidden");
+                warningID.classList.remove("hidden");
+                enterInRoom.classList.add("entrance-id-room__field_warning");
                 console.log("Room ID not found!");
             } else if (XHR.status === 409) {
                 console.log("The room is full!");
@@ -38,10 +39,6 @@ function sendMessage() {
             }
         };
         XHR.send(messageContent);
-
-        btnGo.classList.add("hidden");
-        enterInRoom.classList.add("hidden");
-        connectionText.classList.remove("hidden");
     }
 
 
