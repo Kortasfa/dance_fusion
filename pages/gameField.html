@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Dance Fusion</title>
+    <link rel="stylesheet" href="/static/css/gameField.css"/>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+    <script src="/static/script/gameField.js" defer></script>
+    <script>
+        let WssURL = "{{ .WssURL }}";
+    </script>
+</head>
+<body class="main">
+    <div class="rank">
+        <div class="rank__hero">
+            <div class="hero__avatar"></div>
+            <span class="hero__name">Name 1</span>
+            <span class="hero__score">0</span>
+        </div>
+        <div class="rank__hero hidden">
+            <div class="hero__avatar"></div>
+            <span class="hero__name">Name 2</span>
+            <span class="hero__score">0</span>
+        </div>
+        <div class="rank__hero hidden">
+            <div class="hero__avatar"></div>
+            <span class="hero__name">Name 3</span>
+            <span class="hero__score">0</span>
+        </div>
+        <div class="rank__hero hidden">
+            <div class="hero__avatar"></div>
+            <span class="hero__name">Name 4</span>
+            <span class="hero__score">0</span>
+        </div>
+    </div>
+    <div class="btn-exit">
+        <img src="/static/img/log_out.svg">
+    </div>
+    <div class="pop-up" id="pop-up">
+        <div class="pop-up__pop-up-box">
+            <span class="pop-up-box__question">Are you ready to go?</span>
+            <span class="pop-up-box__pressing">Press GO!</span>
+            <button id="btn-go" class="pop-up-box__start-btn" type="button">GO!</button>
+        </div>
+    </div>
+    <video id="video-dance" class="video-dance" controls type="video/mp4">
+        <source src="/static/video/baby_shark_dance.mp4">
+    </video>
+    <div class="dance-movements"></div>
+</body>

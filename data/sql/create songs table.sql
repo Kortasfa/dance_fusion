@@ -15,7 +15,7 @@ INSERT INTO songs(song_name, author_name, image_src, video_src, preview_video_sr
 VALUES
 	("Forget You", "ceeLoGreen", "static/img/forgetYou.jpg", "static/video/forgetYou.mp4", "static/video/forgetYou.mp4", 3),
     ("1999", "charlXCX&troyeSivan", "static/img/1999.jpg", "static/video/1999.mp4", "static/video/1999.mp4", 1),
-    ("American Girl", "bonnieMcKeeSong", "static/img/americanGirl.jpg", "static/video/americanGirl.mp4", "static/video/americanGirl.jpg", 2),
+    ("American Girl", "bonnieMcKeeSong", "static/img/americanGirl.jpg", "static/video/americanGirl.mp4", "static/video/americanGirl.mp4", 2),
     ("Burn", "ellieGoulding", "static/img/burn.jpg", "static/video/burn.mp4", "static/video/burn.mp4", 1),
     ("Firework", "katyPerry", "static/img/firework.jpg", "static/video/firework.mp4", "static/video/firework.mp4", 1),
     ("Kiss Me More", "dojaCatFtSza", "static/img/kissMeMore.jpg", "static/video/kissMeMore.mp4", "static/video/kissMeMore.mp4", 1),
