@@ -8,7 +8,6 @@ function sendMessage() {
         warningID.classList.add("hidden");
         emptyID.classList.remove("hidden");
         enterInRoom.classList.add("entrance-id-room__field_warning");
-        console.log("1");
     }
     else {
         warningID.classList.add("hidden")
@@ -26,6 +25,7 @@ function sendMessage() {
                 btnGo.classList.add("hidden");
                 enterInRoom.classList.add("hidden");
                 connectionText.classList.remove("hidden");
+                emptyID.classList.add("hidden");
                 console.log("Connected to the room!");
             } else if (XHR.status === 404) {
                 emptyID.classList.add("hidden");
