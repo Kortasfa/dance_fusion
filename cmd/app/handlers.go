@@ -304,3 +304,95 @@ func gameField(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 }
+
+func signUp(w http.ResponseWriter, r *http.Request) {
+	ts, err := template.ParseFiles("pages/signUp.html")
+	if err != nil {
+		http.Error(w, "Internal Server Error", 500)
+		log.Println(err.Error())
+		return
+	}
+	err = ts.Execute(w, nil)
+	if err != nil {
+		http.Error(w, "Internal Server Error", 500)
+		log.Println(err.Error())
+		return
+	}
+}
+
+func userExists(db *sqlx.DB, userName string) (bool, error) {
+	const query = `
+			SELECT COUNT(*)
+			FROM users
+			WHERE name = ?`
+	var count int
+	err := db.QueryRow(query, userName).Scan(&count)
+	if err != nil {
+		log.Println(err.Error())
+		return false, err
+	}
+	if count > 0 {
+		return true, nil
+	}
+	return false, nil
+}
+
+func insertNewUser(db *sqlx.DB, userName string, password string) error {
+	user := struct {
+		UserName     string
+		Password     string
+		UserImageSrc string
+	}{
+		UserName:     userName,
+		Password:     password,
+		UserImageSrc: "static/img/user_1.png",
+	}
+	query := `
+		INSERT INTO users(name, password, img_src)
+		VALUES (?, ?, ?)`
+	_, err := db.Exec(query, user.UserName, user.Password, user.UserImageSrc)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func getRegisteredUserData(db *sqlx.DB) func(w http.ResponseWriter, r *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
+		reqData, err := io.ReadAll(r.Body)
+		if err != nil {
+			http.Error(w, "Parsing error", 500)
+			log.Println(err.Error())
+			return
+		}
+		var data struct {
+			UserName string
+			Password string
+		}
+		err = json.Unmarshal(reqData, &data)
+		if err != nil {
+			http.Error(w, "JSON parsing error", 500)
+			log.Println(err.Error())
+			return
+		}
+		userName := data.UserName
+		exists, err := userExists(db, data.UserName)
+		if err != nil {
+			http.Error(w, "Internal Server Error", 500)
+			log.Println(err.Error())
+			return
+		}
+		if exists {
+			w.WriteHeader(409)
+			return
+		} else {
+			err = insertNewUser(db, userName, data.Password)
+			if err != nil {
+				http.Error(w, "Internal Server Error", 500)
+				log.Println(err.Error())
+				return
+			}
+		}
+		w.WriteHeader(200)
+	}
+}

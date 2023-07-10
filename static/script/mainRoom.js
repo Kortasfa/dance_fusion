@@ -2,6 +2,7 @@ const listSong = document.getElementById('list-song');
 const listGenre = document.getElementById('list-genre');
 const btnOpenInfo =  document.getElementById('openGuide');
 const guide = document.getElementById('guide');
+let numberOfUser = 0;
 
 btnOpenInfo.addEventListener('click', openGuide);
 
@@ -48,7 +49,6 @@ function showVideo(videoID) {
   let videoSrcID = '9' + videoID.id;
   let video = document.getElementById(videoSrcID);
   let videoPlayer = document.getElementById('videoPlayer');
-
   videoPlayer.src = video.innerText;
 }
 
@@ -59,11 +59,19 @@ socket.onopen = function(event) {
 };
 
 socket.onmessage = function(event) {
+  let userMSG = document.getElementById('needUser')
   let message = event.data;
   let parts = message.split('|');
   let userID = parts[0];
   let userName = parts[1];
   let imgSrc = parts[2];
+  numberOfUser = numberOfUser + 1;
+  userMSG.classList.add('none');
+  let indexUser = document.getElementById('user' + numberOfUser);
+  let indexUserName = document.getElementById('userName' + numberOfUser);
+  indexUser.classList.remove('none');
+
+  indexUserName.innerText = userName;
   console.log('Пользователь присоединился: ' + userID);
   console.log('Его имя: ' + userName);
   console.log('Его фотка: ' + imgSrc);
@@ -72,4 +80,3 @@ socket.onmessage = function(event) {
 socket.onclose = function(event) {
   console.log("WebSocket connection closed.");
 };
-
