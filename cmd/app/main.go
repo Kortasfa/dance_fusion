@@ -11,7 +11,7 @@ import (
 )
 
 const (
-	port         = ":3306"
+	port         = "localhost:3306"
 	dbDriverName = "mysql"
 )
 
@@ -40,7 +40,7 @@ func main() {
 	fmt.Println("Start server")
 	srv := &http.Server{
 		Handler: r,
-		Addr:    ":3000",
+		Addr:    "localhost:3000",
 	}
 
 	log.Fatal(srv.ListenAndServe())
