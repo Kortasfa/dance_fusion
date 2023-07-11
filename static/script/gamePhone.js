@@ -47,8 +47,4 @@ function sendMessage() {
 
 }
 
-
 btnGo.addEventListener("click", sendMessage);
-
-
-

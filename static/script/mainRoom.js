@@ -42,11 +42,38 @@ function closeGuide() {
   guide.classList.remove('play');
 }
 
-function startGame() {
-  window.location.href = 'homepage-url';
-  //проверка выбрана ли песня
-  //отправка в выбранную игру
-}
+let test = document.getElementsByClassName("section__img");
+let testing = '';
+// Iterate over each element in the collection
+Array.from(test).forEach(function (element) {
+  element.addEventListener('click', function () {
+    let videoSrcID = '9' + element.id;
+    let video = document.getElementById(videoSrcID);
+    let videoPlayer = document.getElementById('videoPlayer');
+    videoPlayer.src = video.innerText;
+    testing = video.innerText;
+  });
+});
+
+$(document).ready(function() {
+  let trigger = $('#Play');
+  let container = $('#content');
+
+  // Fire on click
+  trigger.on('click', function() {
+    container.load("/static/html/game.html", function() {
+      let video = $('#video-dance').get(0);
+      let src = $('#video-src').get(0);
+      src.setAttribute('src', testing);
+      console.log(testing);
+      video.addEventListener('loadeddata', function() {
+        video.play();
+      });
+    });
+
+    return false;
+  });
+});
 
 function showVideo(videoID) {
   let button = document.getElementById('PlayBtn');

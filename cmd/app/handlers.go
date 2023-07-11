@@ -242,7 +242,10 @@ func getJoinedUserData(db *sqlx.DB) func(w http.ResponseWriter, r *http.Request)
 		w.WriteHeader(200)
 		userName, imgSrc, _ := getUserInfo(db, data.UserID)
 		broadcastJoiningUserID <- []string{data.RoomID, data.UserID, userName, imgSrc}
-		fmt.Fprintf(w, "Message sent: %s", data.UserID)
+		_, err = fmt.Fprintf(w, "Message sent: %s", data.UserID)
+		if err != nil {
+			return
+		}
 	}
 }
 
@@ -257,7 +260,10 @@ func handleRoomWSMessages() {
 				message := userID + "|" + userName + "|" + imgSrc
 				err := wsConnect.WriteMessage(websocket.TextMessage, []byte(message))
 				if err != nil {
-					wsConnect.Close()
+					err := wsConnect.Close()
+					if err != nil {
+						return
+					}
 					delete(roomWSDict, wsConnect)
 				}
 			}
@@ -273,7 +279,12 @@ func roomWSHandler(w http.ResponseWriter, r *http.Request) {
 		log.Println("Failed to upgrade websocket connection:", err)
 		return
 	}
-	defer conn.Close()
+	defer func(conn *websocket.Conn) {
+		err := conn.Close()
+		if err != nil {
+
+		}
+	}(conn)
 
 	roomWSDict[conn] = websocketID
 
@@ -296,12 +307,168 @@ func gameField(w http.ResponseWriter, r *http.Request) {
 	data := struct {
 		WssURL string
 	}{
-		WssURL: "wss://" + r.Host + "/start/ws",
+		WssURL: "ws://" + r.Host + "/start/ws",
 	}
 	err = ts.Execute(w, data)
 	if err != nil {
 		http.Error(w, "Internal Server Error", 500)
 		log.Println(err.Error())
 		return
+	}
+}
+
+func signUp(w http.ResponseWriter, r *http.Request) {
+	ts, err := template.ParseFiles("pages/signUp.html")
+	if err != nil {
+		http.Error(w, "Internal Server Error", 500)
+		log.Println(err.Error())
+		return
+	}
+	err = ts.Execute(w, nil)
+	if err != nil {
+		http.Error(w, "Internal Server Error", 500)
+		log.Println(err.Error())
+		return
+	}
+}
+
+func userExists(db *sqlx.DB, userName string) (bool, error) {
+	const query = `
+			SELECT COUNT(*)
+			FROM users
+			WHERE name = ?`
+	var count int
+	err := db.QueryRow(query, userName).Scan(&count)
+	if err != nil {
+		log.Println(err.Error())
+		return false, err
+	}
+	if count > 0 {
+		return true, nil
+	}
+	return false, nil
+}
+
+func insertNewUser(db *sqlx.DB, userName string, password string) error {
+	user := struct {
+		UserName     string
+		Password     string
+		UserImageSrc string
+	}{
+		UserName:     userName,
+		Password:     password,
+		UserImageSrc: "static/img/user_1.png",
+	}
+	query := `
+		INSERT INTO users(name, password, img_src)
+		VALUES (?, ?, ?)`
+	_, err := db.Exec(query, user.UserName, user.Password, user.UserImageSrc)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func getRegisteredUserData(db *sqlx.DB) func(w http.ResponseWriter, r *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
+		reqData, err := io.ReadAll(r.Body)
+		if err != nil {
+			http.Error(w, "Parsing error", 500)
+			log.Println(err.Error())
+			return
+		}
+		var data struct {
+			UserName string
+			Password string
+		}
+		err = json.Unmarshal(reqData, &data)
+		if err != nil {
+			http.Error(w, "JSON parsing error", 500)
+			log.Println(err.Error())
+			return
+		}
+		userName := data.UserName
+		exists, err := userExists(db, data.UserName)
+		if err != nil {
+			http.Error(w, "Internal Server Error", 500)
+			log.Println(err.Error())
+			return
+		}
+		if exists {
+			w.WriteHeader(409)
+			return
+		} else {
+			err = insertNewUser(db, userName, data.Password)
+			if err != nil {
+				http.Error(w, "Internal Server Error", 500)
+				log.Println(err.Error())
+				return
+			}
+		}
+		w.WriteHeader(200)
+	}
+}
+
+func logIn(w http.ResponseWriter, r *http.Request) {
+	ts, err := template.ParseFiles("pages/logIn.html")
+	if err != nil {
+		http.Error(w, "Internal Server Error", 500)
+		log.Println(err.Error())
+		return
+	}
+	err = ts.Execute(w, nil)
+	if err != nil {
+		http.Error(w, "Internal Server Error", 500)
+		log.Println(err.Error())
+		return
+	}
+}
+
+func credentialExists(db *sqlx.DB, userName string, password string) (bool, error) {
+	const query = `
+			SELECT COUNT(*)
+			FROM users
+			WHERE name = ? and password = ?`
+	var count int
+	err := db.QueryRow(query, userName, password).Scan(&count)
+	if err != nil {
+		log.Println(err.Error())
+		return false, err
+	}
+	if count > 0 {
+		return true, nil
+	}
+	return false, nil
+}
+
+func getLoginUserData(db *sqlx.DB) func(w http.ResponseWriter, r *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
+		reqData, err := io.ReadAll(r.Body)
+		if err != nil {
+			http.Error(w, "Parsing error", 500)
+			log.Println(err.Error())
+			return
+		}
+		var data struct {
+			UserName string
+			Password string
+		}
+		err = json.Unmarshal(reqData, &data)
+		if err != nil {
+			http.Error(w, "JSON parsing error", 500)
+			log.Println(err.Error())
+			return
+		}
+		exists, err := credentialExists(db, data.UserName, data.Password)
+		if err != nil {
+			http.Error(w, "Internal Server Error", 500)
+			log.Println(err.Error())
+			return
+		}
+		if !exists {
+			w.WriteHeader(409)
+			return
+		}
+		w.WriteHeader(200)
 	}
 }

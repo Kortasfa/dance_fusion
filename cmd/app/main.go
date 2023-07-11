@@ -29,10 +29,14 @@ func main() {
 	r.HandleFunc("/home", homePageHandler)
 	r.HandleFunc("/room", handleCreateRoom)
 	r.HandleFunc("/room/{id}", handleRoom(dbx))
-	r.HandleFunc("/api/join_to_room", getJoinedUserData(dbx)).Methods("POST")
 	r.HandleFunc("/roomWS/{id}", roomWSHandler)
-	r.HandleFunc("/game_field/id", gameField)
-	//r.HandleFunc("/menu", menuPage(dbx))
+	r.HandleFunc("/gameField/id", gameField)
+	r.HandleFunc("/signUp", signUp)
+	r.HandleFunc("/login", logIn)
+
+	r.HandleFunc("/api/joinToRoom", getJoinedUserData(dbx)).Methods("POST")
+	r.HandleFunc("/api/signUp", getRegisteredUserData(dbx)).Methods("POST")
+	r.HandleFunc("/api/logIn", getLoginUserData(dbx)).Methods("POST")
 
 	go handleRoomWSMessages()
 
@@ -41,12 +45,12 @@ func main() {
 	fmt.Println("Start server")
 	srv := &http.Server{
 		Handler: r,
-		Addr:    "localhost:3000",
+		Addr:    port,
 	}
 
 	log.Fatal(srv.ListenAndServe())
 }
 
 func openDB() (*sql.DB, error) {
-	return sql.Open(dbDriverName, "root:P@ssw0rd@tcp(localhost:3306)/dance_fusion?charset=utf8mb4&collation=utf8mb4_unicode_ci&parseTime=true")
+	return sql.Open(dbDriverName, "root:root123321@tcp(localhost:3306)/dance_fusion?charset=utf8mb4&collation=utf8mb4_unicode_ci&parseTime=true")
 }

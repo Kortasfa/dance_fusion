@@ -6,7 +6,6 @@
     flex-direction: column;
     justify-content: center;
     align-items: center;
-
 }
 
 .message-user {
@@ -77,7 +76,6 @@
     border-radius: 10px;
     background: #FAFCF6;
     border-color: #FAFCF6;
-    shadow: 0;
     outline: none;
     font: 400 48px Roboto, sans-serif;
     color: rgba(0, 0, 0, 0.70);

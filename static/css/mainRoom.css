@@ -35,7 +35,7 @@
     from {
         margin-left: calc(-96% + 590px);
       }
-    
+
       to {
         margin-left: calc(-50% + 590px);
       }
@@ -50,11 +50,11 @@
 @keyframes unslidein {
     from {
         margin-left: calc(-50% + 590px);
-      }
-    
-      to {
+    }
+
+    to {
         margin-left: calc(-96% + 590px);
-      }
+    }
 }
 .game-menu__preview{
     width: 535px;
@@ -74,7 +74,7 @@
 
 .header{
     display: flex;
-    position: absolute;  
+    position: absolute;
     background-color: #ffffff;
     border-radius: 0 0 10px 0;
 }
@@ -118,8 +118,8 @@
     box-shadow: 0 6px 4px -4px rgba(0, 0, 0, .2);
     padding: 12px 31px;
     color: #1E1C1C;
-    text-decoration: none;  
-    text-align: center;  
+    text-decoration: none;
+    text-align: center;
     width: 290px;
     margin: 0 auto 12px;
 }
@@ -136,8 +136,8 @@
     background-color: #ffffff;
     padding: 12px 31px;
     color: #999;
-    text-decoration: none;  
-    text-align: center;  
+    text-decoration: none;
+    text-align: center;
     width: 290px;
     margin: 0 auto 12px;
     box-shadow: 0 6px 4px -4px rgba(0, 0, 0, .2);
@@ -155,7 +155,7 @@
 .game-menu{
     width: 642px;
     min-height: 600px;
-    background-color: #F20D40;  
+    background-color: #F20D40;
     display: flex;
     flex-direction: column;
     border-radius: 10px;
@@ -243,7 +243,7 @@
     margin: 27px 0px 0px 10px;
     overflow: auto;
     overflow-x: hidden;
-    height: 590px;   
+    height: 590px;
 }
 
 .info__title{
@@ -322,7 +322,7 @@
         from {
             margin-left: -200%;
           }
-        
+
           to {
             margin-left: 0;
           }
@@ -336,7 +336,7 @@
         from {
             margin-left: 0;
           }
-        
+
           to {
             margin-left: -200%;
           }
