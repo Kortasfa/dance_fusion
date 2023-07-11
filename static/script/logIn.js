@@ -17,8 +17,8 @@ function logIn() {
             alert("Successfully logged in!");
         } else if (XHR.status === 409) {
             warningMessage.forEach(element => element.classList.remove("hidden"));
-            nameField.classList.add("warning-border");
-            passwordField.classList.add("warning-border");
+            nameField.classList.add("warning-input");
+            passwordField.classList.add("warning-input");
             console.log("Wrong username or password!");
         } else {
             console.log("Failed to log in!");

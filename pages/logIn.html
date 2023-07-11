@@ -1,28 +1,29 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Log In</title> <!--это потом исправить-->
-    <link rel="stylesheet" href="/static/css/logIn.css"/>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
-    <script src="/static/script/logIn.js " defer></script>
-</head>
-<body class="page">
-<div class="entrance">
-    <div class="entrance__field">
+  <head>
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Log In</title> <!--это потом исправить-->
+      <link rel="stylesheet" href="/static/css/logIn.css"/>
+      <link rel="preconnect" href="https://fonts.googleapis.com">
+      <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+      <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
+      <script src="/static/script/logIn.js " defer></script>
+  </head>
+  <body class="page">
+    <div class="entrance">
+      <div class="entrance__field">
         <span class="field__description">Username</span>
         <input id="name" class="field__input" type="text">
         <span class="field__warning hidden">Wrong username or password!</span>
-    </div>
-    <div class="entrance__field">
+      </div>
+      <div class="entrance__field">
         <span class="field__description">Password</span>
         <input id="password" class="field__input field__input_type-password" type="password">
         <img class="field__eye hidden" src="/static/img/eye_off.svg">
         <span class="field__warning hidden">Wrong username or password!</span>
+      </div>
+      <button id="btn-sign-up" class="entrance__btn">Log In</button>
     </div>
-    <button id="btn-sign-up" class="entrance__btn">Log In</button>
-</div>
-</body>
+  </body>
+</html>
