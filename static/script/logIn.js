@@ -11,6 +11,7 @@ function logIn() {
     XHR.onload = function () {
         if (XHR.status === 200) {
             console.log("Successfully logged in!");
+            window.location.href = '/join';
         } else if (XHR.status === 409) {
             console.log("Wrong username or password!");
         } else {

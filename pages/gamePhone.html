@@ -9,7 +9,6 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
     <script src="/static/script/gamePhone.js " defer></script>
-    <script>let userID = "{{ .UserID }}"</script>
 </head>
 <body class="page">
 <span class="message-user">Send Message from {{ .UserID }}</span>
@@ -25,7 +24,7 @@
         <span id="id-warning" class="entrance-id-room__warning hidden">The room code is incorrect</span>
         <span id="id-empty" class="entrance-id-room__warning hidden">The field is empty</span>
     </div>
-    <button id="btn-join" class="entrance__btn-join">Connect</button>
+    <button id="btn-join" class="entrance__btn-join" onclick="sendMessage()">Connect</button>
 </div>
 <span class="connection hidden">You are joined!</span>
 </body>

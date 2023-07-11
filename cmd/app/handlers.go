@@ -1,6 +1,7 @@
 package main
 
 import (
+	"database/sql"
 	"encoding/json"
 	"fmt"
 	"github.com/gorilla/mux"
@@ -172,18 +173,22 @@ func handleCreateRoom(w http.ResponseWriter, r *http.Request) {
 }
 
 func joinPageHandler(w http.ResponseWriter, r *http.Request) {
+	_, err := r.Cookie("authCookieName")
+	if err != nil {
+		// Cookie not found, handle unauthorized access
+		//w.WriteHeader(http.StatusUnauthorized)
+		//fmt.Fprint(w, "unauthorized access")
+		http.Redirect(w, r, "/login", http.StatusFound)
+		return
+	}
+
 	tmpl, err := template.ParseFiles("pages/gamePhone.html")
 	if err != nil {
 		http.Error(w, "Internal Server Error", 500)
 		log.Println(err.Error())
 		return
 	}
-	data := struct {
-		UserID string
-	}{
-		UserID: "1",
-	}
-	err = tmpl.Execute(w, data)
+	err = tmpl.Execute(w, nil)
 	if err != nil {
 		http.Error(w, "Internal Server Error", 500)
 		log.Println(err.Error())
@@ -237,11 +242,35 @@ func getJoinedUserData(db *sqlx.DB) func(w http.ResponseWriter, r *http.Request)
 			w.WriteHeader(409)
 			return
 		}
-		roomIDDict[data.RoomID] = roomIDDict[data.RoomID] + 1
 		w.WriteHeader(200)
-		userName, imgSrc, _ := getUserInfo(db, data.UserID)
+		roomIDDict[data.RoomID] = roomIDDict[data.RoomID] + 1
+		userName, imgSrc, err := getUserInfo(db, data.UserID)
+		if err != nil {
+			http.Error(w, "Internal server error", 500)
+			log.Println(err.Error())
+			return
+		}
 		broadcastJoiningUserID <- []string{data.RoomID, data.UserID, userName, imgSrc}
-		fmt.Fprintf(w, "Message sent: %s", data.UserID)
+		_, err = fmt.Fprintf(w, "Message sent: %s", data.UserID)
+		if err != nil {
+			log.Println(err.Error())
+			return
+		}
+		http.SetCookie(w, &http.Cookie{
+			Name:    "roomCookieName",
+			Value:   fmt.Sprint(data.RoomID),
+			Path:    "/",
+			Expires: time.Now().AddDate(0, 0, 1),
+		})
+		log.Println("Cookie created")
+		cookie, err := r.Cookie("roomCookieName")
+		if err != nil {
+			log.Println(err.Error())
+			return
+		}
+		log.Println(cookie.Value)
+
+		//
 	}
 }
 
@@ -256,7 +285,10 @@ func handleRoomWSMessages() {
 				message := userID + "|" + userName + "|" + imgSrc
 				err := wsConnect.WriteMessage(websocket.TextMessage, []byte(message))
 				if err != nil {
-					wsConnect.Close()
+					err := wsConnect.Close()
+					if err != nil {
+						return
+					}
 					delete(roomWSDict, wsConnect)
 				}
 			}
@@ -272,7 +304,11 @@ func roomWSHandler(w http.ResponseWriter, r *http.Request) {
 		log.Println("Failed to upgrade websocket connection:", err)
 		return
 	}
-	defer conn.Close()
+	defer func(conn *websocket.Conn) {
+		err := conn.Close()
+		if err != nil {
+		}
+	}(conn)
 
 	roomWSDict[conn] = websocketID
 
@@ -412,21 +448,20 @@ func logIn(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func credentialExists(db *sqlx.DB, userName string, password string) (bool, error) {
+func credentialExists(db *sqlx.DB, userName string, password string) (int, bool, error) {
 	const query = `
-			SELECT COUNT(*)
-			FROM users
-			WHERE name = ? and password = ?`
-	var count int
-	err := db.QueryRow(query, userName, password).Scan(&count)
-	if err != nil {
+		SELECT id
+		FROM users
+		WHERE name = ? and password = ?`
+	var userIDs []int
+	err := db.Select(&userIDs, query, userName, password)
+	if err == sql.ErrNoRows {
+		return 0, false, nil
+	} else if err != nil {
 		log.Println(err.Error())
-		return false, err
+		return 0, false, err
 	}
-	if count > 0 {
-		return true, nil
-	}
-	return false, nil
+	return userIDs[0], true, nil
 }
 
 func getLoginUserData(db *sqlx.DB) func(w http.ResponseWriter, r *http.Request) {
@@ -447,16 +482,38 @@ func getLoginUserData(db *sqlx.DB) func(w http.ResponseWriter, r *http.Request) 
 			log.Println(err.Error())
 			return
 		}
-		exists, err := credentialExists(db, data.UserName, data.Password)
+		userID, exists, err := credentialExists(db, data.UserName, data.Password)
 		if err != nil {
 			http.Error(w, "Internal Server Error", 500)
 			log.Println(err.Error())
 			return
 		}
-		if !exists {
+		if exists {
+			http.SetCookie(w, &http.Cookie{
+				Name:    "authCookieName",
+				Value:   fmt.Sprint(userID),
+				Path:    "/",
+				Expires: time.Now().AddDate(0, 0, 1),
+			})
+			w.WriteHeader(200)
+		} else {
 			w.WriteHeader(409)
-			return
 		}
-		w.WriteHeader(200)
+	}
+}
+
+func clearCookie(db *sqlx.DB) func(w http.ResponseWriter, r *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
+		http.SetCookie(w, &http.Cookie{
+			Name:    "authCookieName",
+			Path:    "/",
+			Expires: time.Now().AddDate(0, 0, -1),
+		})
+		http.SetCookie(w, &http.Cookie{
+			Name:    "roomCookieName",
+			Path:    "/",
+			Expires: time.Now().AddDate(0, 0, -1),
+		})
+		log.Println("Cookie is deleted")
 	}
 }
