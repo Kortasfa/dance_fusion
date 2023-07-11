@@ -396,3 +396,67 @@ func getRegisteredUserData(db *sqlx.DB) func(w http.ResponseWriter, r *http.Requ
 		w.WriteHeader(200)
 	}
 }
+
+func logIn(w http.ResponseWriter, r *http.Request) {
+	ts, err := template.ParseFiles("pages/logIn.html")
+	if err != nil {
+		http.Error(w, "Internal Server Error", 500)
+		log.Println(err.Error())
+		return
+	}
+	err = ts.Execute(w, nil)
+	if err != nil {
+		http.Error(w, "Internal Server Error", 500)
+		log.Println(err.Error())
+		return
+	}
+}
+
+func credentialExists(db *sqlx.DB, userName string, password string) (bool, error) {
+	const query = `
+			SELECT COUNT(*)
+			FROM users
+			WHERE name = ? and password = ?`
+	var count int
+	err := db.QueryRow(query, userName, password).Scan(&count)
+	if err != nil {
+		log.Println(err.Error())
+		return false, err
+	}
+	if count > 0 {
+		return true, nil
+	}
+	return false, nil
+}
+
+func getLoginUserData(db *sqlx.DB) func(w http.ResponseWriter, r *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
+		reqData, err := io.ReadAll(r.Body)
+		if err != nil {
+			http.Error(w, "Parsing error", 500)
+			log.Println(err.Error())
+			return
+		}
+		var data struct {
+			UserName string
+			Password string
+		}
+		err = json.Unmarshal(reqData, &data)
+		if err != nil {
+			http.Error(w, "JSON parsing error", 500)
+			log.Println(err.Error())
+			return
+		}
+		exists, err := credentialExists(db, data.UserName, data.Password)
+		if err != nil {
+			http.Error(w, "Internal Server Error", 500)
+			log.Println(err.Error())
+			return
+		}
+		if !exists {
+			w.WriteHeader(409)
+			return
+		}
+		w.WriteHeader(200)
+	}
+}

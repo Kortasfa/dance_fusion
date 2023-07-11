@@ -29,11 +29,13 @@ func main() {
 	r.HandleFunc("/room", handleCreateRoom)
 	r.HandleFunc("/room/{id}", handleRoom(dbx))
 	r.HandleFunc("/roomWS/{id}", roomWSHandler)
-	r.HandleFunc("/game_field/id", gameField)
-	r.HandleFunc("/sign_up", signUp)
+	r.HandleFunc("/gameField/id", gameField)
+	r.HandleFunc("/signUp", signUp)
+	r.HandleFunc("/logIn", logIn)
 
-	r.HandleFunc("/api/join_to_room", getJoinedUserData(dbx)).Methods("POST")
-	r.HandleFunc("/api/sign_up", getRegisteredUserData(dbx)).Methods("POST")
+	r.HandleFunc("/api/joinToRoom", getJoinedUserData(dbx)).Methods("POST")
+	r.HandleFunc("/api/signUp", getRegisteredUserData(dbx)).Methods("POST")
+	r.HandleFunc("/api/logIn", getLoginUserData(dbx)).Methods("POST")
 
 	go handleRoomWSMessages()
 

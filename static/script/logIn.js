@@ -1,31 +1,29 @@
 const passwordEye = document.querySelector(".field__eye");
 const nameField = document.getElementById("name");
 const passwordField = document.getElementById("password");
-const signUpField = document.querySelector(".entrance");
-const signUpBtn = document.getElementById("btn-sign-up");
-const warningMessage = document.querySelector(".field__warning")
-const messageToLogIn = document.querySelector(".message-log-in")
-function signUp() {
+const logInBtn = document.getElementById("btn-sign-up");
+const warningMessage = document.querySelectorAll(".field__warning")
+
+function logIn() {
     let userInfo = {
         "userName": nameField.value,
         "password": passwordField.value
     }
     let messageContent = JSON.stringify(userInfo);
     let XHR = new XMLHttpRequest();
-    XHR.open("POST", "/api/signUp");
+    XHR.open("POST", "/api/logIn");
     XHR.onload = function () {
         if (XHR.status === 200) {
-            signUpField.classList.add("hidden");
-            messageToLogIn.classList.remove("hidden");
-            console.log("Successfully registered!");
+            alert("Successfully logged in!");
         } else if (XHR.status === 409) {
+            warningMessage.forEach(element => element.classList.remove("hidden"));
             nameField.classList.add("warning-border");
-            warningMessage.classList.remove("hidden")
-            console.log("Username is taken!");
+            passwordField.classList.add("warning-border");
+            console.log("Wrong username or password!");
         } else {
-            alert("Failed to register!");
+            console.log("Failed to log in!");
         }
-    }
+    };
     XHR.send(messageContent);
 }
 
@@ -52,4 +50,4 @@ function eye() {
 
 passwordField.addEventListener("input", eye);
 passwordEye.addEventListener("click", changeEye);
-signUpBtn.addEventListener("click", signUp)
+logInBtn.addEventListener("click", logIn)
