@@ -72,6 +72,12 @@ $(document).ready(function() {
   });
 });
 
+function showStats()
+{
+  document.getElementById('video-dance').style.display = "none";
+  
+}
+
 function showVideo(videoID) {
   let videoSrcID = '9' + videoID.id;
   let video = document.getElementById(videoSrcID);
