@@ -1,13 +1,33 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Sign Up</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up</title> <!--это потом исправить-->
+    <link rel="stylesheet" href="/static/css/signUp.css"/>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
     <script src="/static/script/signUp.js " defer></script>
 </head>
-<body>
-    <input class="name-field" type="text" placeholder="Enter your name">
-    <input class="password-field" type="text" placeholder="Enter your password">
-    <button onclick="signUp()">Sign Up</button>
+<body class="page">
+</div>
+<div class="entrance">
+    <div class="entrance__field">
+        <span class="field__description">Username</span>
+        <input id="name" class="field__input" type="text">
+        <span class="field__warning hidden">Username is taken</span>
+    </div>
+    <div class="entrance__field">
+        <span class="field__description">Password</span>
+        <input id="password" class="field__input field__input_type-password" type="password">
+        <img class="field__eye hidden" src="/static/img/eye_off.svg">
+    </div>
+    <button id="btn-sign-up" class="entrance__btn">Sign Up</button>
+</div>
+<div class="message-log-in hidden">
+    <span class="message-log-in__sign-up">OK! Let`s log in</span>
+    <button id="btn-log-in" class="message-log-in__btn">Log In</button>
+</div>
+
 </body>
-</html>
