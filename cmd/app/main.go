@@ -11,7 +11,7 @@ import (
 )
 
 const (
-	port         = ":3000"
+	port         = "localhost:3306"
 	dbDriverName = "mysql"
 )
 
