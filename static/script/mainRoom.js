@@ -10,7 +10,7 @@ function openSong(styleButtonBlock) {
   listGenre.classList.add('none');
   document.querySelector('.songs').classList.remove('none');
   const songBlock = document.getElementsByClassName('song__section');
-
+  openList = 'true';
   for (let i = 0; i < songBlock.length; i++) {
     if ((songBlock[i].id === styleButtonBlock.id) && songBlock[i].classList.contains('none')) {
       songBlock[i].classList.remove('none');
@@ -19,6 +19,9 @@ function openSong(styleButtonBlock) {
 }
 
 function closeSong() {
+  if (!listGenre.classList.contains('none')) {
+    window.location.href = adres;
+  }
   const songBlock = document.getElementsByClassName('song__section');
   for (let i = 0; i < songBlock.length; i++) {
     if (!songBlock[i].classList.contains('none')) {
@@ -46,9 +49,11 @@ function startGame() {
 }
 
 function showVideo(videoID) {
+  let button = document.getElementById('PlayBtn');
   let videoSrcID = '9' + videoID.id;
   let video = document.getElementById(videoSrcID);
   let videoPlayer = document.getElementById('videoPlayer');
+  button.classList.add('game-menu__play-button_yellow');
   videoPlayer.src = video.innerText;
 }
 
@@ -69,7 +74,9 @@ socket.onmessage = function(event) {
   userMSG.classList.add('none');
   let indexUser = document.getElementById('user' + numberOfUser);
   let indexUserName = document.getElementById('userName' + numberOfUser);
+  let indexUserImg = document.getElementById('userImg' + numberOfUser);
   indexUser.classList.remove('none');
+  indexUserImg.src =  imgSrc;
 
   indexUserName.innerText = userName;
   console.log('Пользователь присоединился: ' + userID);
@@ -81,3 +88,4 @@ socket.onclose = function(event) {
   console.log("WebSocket connection closed.");
 };
 
+let adres = 'http://' + document.location.host + '/home';

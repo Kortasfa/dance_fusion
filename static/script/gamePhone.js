@@ -19,30 +19,30 @@ function sendMessage() {
         warningID.classList.add("hidden")
         enterInRoom.classList.remove("entrance-id-room__field_warning")
         let IDField = document.getElementById("id-field");
-        let postInfo = {
-            "userID": userID,
+    let postInfo = {
+        "userID": userID,
             "roomID": enterInRoom.value
-        }
-        let messageContent = JSON.stringify(postInfo);
-        let XHR = new XMLHttpRequest();
-        XHR.open("POST", "/api/join_to_room");
-        XHR.onload = function () {
-            if (XHR.status === 200) {
-                console.log("Connected to the room!");
-            } else if (XHR.status === 404) {
+    }
+    let messageContent = JSON.stringify(postInfo);
+    let XHR = new XMLHttpRequest();
+    XHR.open("POST", "/api/join_to_room");
+    XHR.onload = function () {
+        if (XHR.status === 200) {
+            console.log("Connected to the room!");
+        } else if (XHR.status === 404) {
                 console.log("Room ID not found!");
-            } else if (XHR.status === 409) {
-                console.log("The room is full!");
-            } else {
-                console.log("Failed to send room id");
-            }
-        };
-        XHR.send(messageContent);
+        } else if (XHR.status === 409) {
+            console.log("The room is full!");
+        } else {
+            console.log("Failed to send room id");
+        }
+    };
+    XHR.send(messageContent);
 
         btnGo.classList.add("hidden");
         enterInRoom.classList.add("hidden");
         connectionText.classList.remove("hidden");
-    }
+}
 
 
 }

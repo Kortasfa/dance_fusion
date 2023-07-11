@@ -3,15 +3,16 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/gorilla/mux"
-	"github.com/gorilla/websocket"
-	"github.com/jmoiron/sqlx"
 	"html/template"
 	"io"
 	"log"
 	"math/rand"
 	"net/http"
 	"time"
+
+	"github.com/gorilla/mux"
+	"github.com/gorilla/websocket"
+	"github.com/jmoiron/sqlx"
 )
 
 var upgrader = websocket.Upgrader{
@@ -145,7 +146,7 @@ func handleRoom(db *sqlx.DB) func(w http.ResponseWriter, r *http.Request) {
 			Styles:  styles,
 			Songs:   songs,
 			RoomKey: roomID,
-			WssURL:  "wss://" + r.Host + "/roomWS/" + roomID,
+			WssURL:  "ws://" + r.Host + "/roomWS/" + roomID,
 		}
 
 		err = tmpl.Execute(w, data)
