@@ -6,6 +6,10 @@ const signUpBtn = document.getElementById("btn-sign-up");
 const warningMessage = document.querySelector(".field__warning")
 const messageToLogIn = document.querySelector(".message-log-in")
 function signUp() {
+    // if (nameField.value === "") {
+    //
+    // }
+
     let userInfo = {
         "userName": nameField.value,
         "password": passwordField.value
@@ -19,7 +23,7 @@ function signUp() {
             messageToLogIn.classList.remove("hidden");
             console.log("Successfully registered!");
         } else if (XHR.status === 409) {
-            nameField.classList.add("warning-border");
+            nameField.classList.add("warning-input");
             warningMessage.classList.remove("hidden")
             console.log("Username is taken!");
         } else {
