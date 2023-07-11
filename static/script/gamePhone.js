@@ -19,7 +19,7 @@ function sendMessage() {
         }
         let messageContent = JSON.stringify(postInfo);
         let XHR = new XMLHttpRequest();
-        XHR.open("POST", "/api/join_to_room");
+        XHR.open("POST", "/api/joinToRoom");
         XHR.onload = function () {
             if (XHR.status === 200) {
                 btnGo.classList.add("hidden");

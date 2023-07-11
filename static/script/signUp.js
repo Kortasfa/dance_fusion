@@ -12,7 +12,7 @@ function signUp() {
     }
     let messageContent = JSON.stringify(userInfo);
     let XHR = new XMLHttpRequest();
-    XHR.open("POST", "/api/sign_up");
+    XHR.open("POST", "/api/signUp");
     XHR.onload = function () {
         if (XHR.status === 200) {
             signUpField.classList.add("hidden");
