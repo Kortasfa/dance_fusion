@@ -12,7 +12,7 @@ import (
 )
 
 const (
-	port         = "localhost:3306"
+	port         = "localhost:3000"
 	dbDriverName = "mysql"
 )
 
@@ -26,8 +26,10 @@ func main() {
 
 	r := mux.NewRouter()
 	r.HandleFunc("/join", joinPageHandler).Methods("GET")
+	r.HandleFunc("/", homePageHandler)
 	r.HandleFunc("/home", homePageHandler)
 	r.HandleFunc("/room", handleCreateRoom)
+	r.HandleFunc("/room/", handleCreateRoom)
 	r.HandleFunc("/room/{id}", handleRoom(dbx))
 	r.HandleFunc("/roomWS/{id}", roomWSHandler)
 	r.HandleFunc("/gameField/id", gameField)
@@ -37,6 +39,7 @@ func main() {
 	r.HandleFunc("/api/joinToRoom", getJoinedUserData(dbx)).Methods("POST")
 	r.HandleFunc("/api/signUp", getRegisteredUserData(dbx)).Methods("POST")
 	r.HandleFunc("/api/logIn", getLoginUserData(dbx)).Methods("POST")
+	r.HandleFunc("/clear", clearCookie(dbx))
 
 	go handleRoomWSMessages()
 

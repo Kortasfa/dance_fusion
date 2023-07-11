@@ -82,15 +82,13 @@ $(document).ready(function() {
 function showStats()
 {
   document.getElementById('video-dance').style.display = "none";
-  
+
 }
 
 function showVideo(videoID) {
-  let button = document.getElementById('PlayBtn');
   let videoSrcID = '9' + videoID.id;
   let video = document.getElementById(videoSrcID);
   let videoPlayer = document.getElementById('videoPlayer');
-  button.classList.add('game-menu__play-button_yellow');
   videoPlayer.src = video.innerText;
 }
 

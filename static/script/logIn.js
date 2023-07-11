@@ -5,6 +5,8 @@ const logInBtn = document.getElementById("btn-sign-up");
 const warningMessage = document.querySelectorAll(".field__warning")
 
 function logIn() {
+    let nameField = document.querySelector(".name-field");
+    let passwordField = document.querySelector(".password-field");
     let userInfo = {
         "userName": nameField.value,
         "password": passwordField.value
@@ -14,7 +16,8 @@ function logIn() {
     XHR.open("POST", "/api/logIn");
     XHR.onload = function () {
         if (XHR.status === 200) {
-            alert("Successfully logged in!");
+            console.log("Successfully logged in!");
+            window.location.href = '/join';
         } else if (XHR.status === 409) {
             warningMessage.forEach(element => element.classList.remove("hidden"));
             nameField.classList.add("warning-border");
