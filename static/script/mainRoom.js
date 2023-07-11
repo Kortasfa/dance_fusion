@@ -65,15 +65,25 @@ $(document).ready(function() {
       let video = $('#video-dance').get(0);
       let src = $('#video-src').get(0);
       src.setAttribute('src', testing);
-      console.log(testing);
+
       video.addEventListener('loadeddata', function() {
         video.play();
+      });
+
+      video.addEventListener('ended', function() {
+        showStats();
       });
     });
 
     return false;
   });
 });
+
+function showStats()
+{
+  document.getElementById('video-dance').style.display = "none";
+  
+}
 
 function showVideo(videoID) {
   let button = document.getElementById('PlayBtn');
