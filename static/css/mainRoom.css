@@ -18,6 +18,7 @@
 
 .page__info{
     position: absolute;
+    overflow-y: auto;
     width: 46%;
     height: 100vh;
     background-color: #00eaff;
@@ -28,23 +29,23 @@
     animation-duration: 1s;
     animation-name: slidein;
     margin-left: calc(-50% + 590px);
-}
+  }
 
 @keyframes slidein {
     from {
         margin-left: calc(-96% + 590px);
-    }
+      }
 
-    to {
+      to {
         margin-left: calc(-50% + 590px);
-    }
+      }
 }
 
 .unplay {
     animation-duration: 1s;
     animation-name: unslidein;
     margin-left: calc(-96% + 590px);
-}
+  }
 
 @keyframes unslidein {
     from {
@@ -93,6 +94,8 @@
 
 .guide__title{
     font: normal 400 37px/1.54 'Roboto';
+    color: black;
+    text-decoration: none;
 }
 
 .guide__code{
@@ -231,9 +234,10 @@
 }
 
 @keyframes blink {
-    from { opacity: 1; /* Непрозрачный текст */ }
-    to { opacity: 80%; /* Прозрачный текст */ }
-}
+    0% { opacity: 1; /* Непрозрачный текст */ }
+    50% { opacity: 80%; /* Прозрачный текст */ }
+    100% { opacity: 1; /* Непрозрачный текст */ }
+   }
 
 .songs{
     margin: 27px 0px 0px 10px;
@@ -271,6 +275,79 @@
     animation: blink 1s infinite;
 }
 
+.game-menu__play-button_yellow{
+    background: #DBFF00;
+}
+
 .none{
     display: none;
 }
+
+.songs::-webkit-scrollbar {
+    width: 0;
+  }
+
+@media screen and (max-width: 1180px) {
+    .content {
+    margin: auto;
+    display: flex;
+    width: auto;
+    height: auto;
+    align-items: center;
+    justify-content: flex-end;
+    flex-wrap: nowrap;
+    flex-direction: column;
+}
+    .songs {
+    margin: 25px 0px 15px 10px;
+    overflow: auto;
+    overflow-x: hidden;
+    height: 353px;}
+
+    .page__info{
+        width: 100%;
+        margin-left: -200%;
+        height: 100%;
+    }
+    .btn-back {
+        margin-bottom: 0;
+    }
+
+    .play {
+        animation-duration: 1s;
+        animation-name: slidein;
+        margin-left: 0;
+    }
+    @keyframes slidein {
+        from {
+            margin-left: -200%;
+          }
+
+          to {
+            margin-left: 0;
+          }
+    }
+    .unplay {
+        animation-duration: 1s;
+        animation-name: unslidein;
+        margin-left: -200%;
+    }
+    @keyframes unslidein {
+        from {
+            margin-left: 0;
+          }
+
+          to {
+            margin-left: -200%;
+          }
+    }
+    .header {
+        display: flex;
+        position: relative;
+        background-color: #ffffff;
+        border-radius: 0 0 10px 10px;
+        width: 270px;
+        margin: 0  auto;
+        margin-bottom: 10px;
+    }
+  }

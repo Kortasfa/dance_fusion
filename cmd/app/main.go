@@ -3,11 +3,12 @@ package main
 import (
 	"database/sql"
 	"fmt"
+	"log"
+	"net/http"
+
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/gorilla/mux"
 	"github.com/jmoiron/sqlx"
-	"log"
-	"net/http"
 )
 
 const (
@@ -54,5 +55,5 @@ func main() {
 }
 
 func openDB() (*sql.DB, error) {
-	return sql.Open(dbDriverName, "root:P@ssw0rd@tcp(localhost:3306)/dance_fusion?charset=utf8mb4&collation=utf8mb4_unicode_ci&parseTime=true")
+	return sql.Open(dbDriverName, "root:root123321@tcp(localhost:3306)/dance_fusion?charset=utf8mb4&collation=utf8mb4_unicode_ci&parseTime=true")
 }

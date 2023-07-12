@@ -175,9 +175,6 @@ func handleCreateRoom(w http.ResponseWriter, r *http.Request) {
 func joinPageHandler(w http.ResponseWriter, r *http.Request) {
 	_, err := r.Cookie("authCookieName")
 	if err != nil {
-		// Cookie not found, handle unauthorized access
-		//w.WriteHeader(http.StatusUnauthorized)
-		//fmt.Fprint(w, "unauthorized access")
 		http.Redirect(w, r, "/login", http.StatusFound)
 		return
 	}
@@ -242,7 +239,6 @@ func getJoinedUserData(db *sqlx.DB) func(w http.ResponseWriter, r *http.Request)
 			w.WriteHeader(409)
 			return
 		}
-		w.WriteHeader(200)
 		roomIDDict[data.RoomID] = roomIDDict[data.RoomID] + 1
 		userName, imgSrc, err := getUserInfo(db, data.UserID)
 		if err != nil {
@@ -256,21 +252,7 @@ func getJoinedUserData(db *sqlx.DB) func(w http.ResponseWriter, r *http.Request)
 			log.Println(err.Error())
 			return
 		}
-		http.SetCookie(w, &http.Cookie{
-			Name:    "roomCookieName",
-			Value:   fmt.Sprint(data.RoomID),
-			Path:    "/",
-			Expires: time.Now().AddDate(0, 0, 1),
-		})
-		log.Println("Cookie created")
-		cookie, err := r.Cookie("roomCookieName")
-		if err != nil {
-			log.Println(err.Error())
-			return
-		}
-		log.Println(cookie.Value)
-
-		//
+		w.WriteHeader(200)
 	}
 }
 

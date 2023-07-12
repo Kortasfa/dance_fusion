@@ -10,7 +10,7 @@ function openSong(styleButtonBlock) {
   listGenre.classList.add('none');
   document.querySelector('.songs').classList.remove('none');
   const songBlock = document.getElementsByClassName('song__section');
-
+  openList = 'true';
   for (let i = 0; i < songBlock.length; i++) {
     if ((songBlock[i].id === styleButtonBlock.id) && songBlock[i].classList.contains('none')) {
       songBlock[i].classList.remove('none');
@@ -19,6 +19,9 @@ function openSong(styleButtonBlock) {
 }
 
 function closeSong() {
+  if (!listGenre.classList.contains('none')) {
+    window.location.href = adres;
+  }
   const songBlock = document.getElementsByClassName('song__section');
   for (let i = 0; i < songBlock.length; i++) {
     if (!songBlock[i].classList.contains('none')) {
@@ -49,7 +52,6 @@ Array.from(test).forEach(function (element) {
     let videoPlayer = document.getElementById('videoPlayer');
     videoPlayer.src = video.innerText;
     testing = video.innerText;
-    testing = testing.substr(0, testing.lastIndexOf(".")) + ".mkv";
   });
 });
 
@@ -63,15 +65,25 @@ $(document).ready(function() {
       let video = $('#video-dance').get(0);
       let src = $('#video-src').get(0);
       src.setAttribute('src', testing);
-      console.log(testing);
+
       video.addEventListener('loadeddata', function() {
         video.play();
+      });
+
+      video.addEventListener('ended', function() {
+        showStats();
       });
     });
 
     return false;
   });
 });
+
+function showStats()
+{
+  document.getElementById('video-dance').style.display = "none";
+
+}
 
 function showVideo(videoID) {
   let videoSrcID = '9' + videoID.id;
@@ -97,7 +109,9 @@ socket.onmessage = function(event) {
   userMSG.classList.add('none');
   let indexUser = document.getElementById('user' + numberOfUser);
   let indexUserName = document.getElementById('userName' + numberOfUser);
+  let indexUserImg = document.getElementById('userImg' + numberOfUser);
   indexUser.classList.remove('none');
+  indexUserImg.src =  imgSrc;
 
   indexUserName.innerText = userName;
   console.log('Пользователь присоединился: ' + userID);
@@ -108,3 +122,5 @@ socket.onmessage = function(event) {
 socket.onclose = function(event) {
   console.log("WebSocket connection closed.");
 };
+
+let adres = 'http://' + document.location.host + '/home';

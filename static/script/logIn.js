@@ -1,3 +1,9 @@
+const passwordEye = document.querySelector(".field__eye");
+const nameField = document.getElementById("name");
+const passwordField = document.getElementById("password");
+const logInBtn = document.getElementById("btn-sign-up");
+const warningMessage = document.querySelectorAll(".field__warning")
+
 function logIn() {
     let nameField = document.querySelector(".name-field");
     let passwordField = document.querySelector(".password-field");
@@ -13,6 +19,9 @@ function logIn() {
             console.log("Successfully logged in!");
             window.location.href = '/join';
         } else if (XHR.status === 409) {
+            warningMessage.forEach(element => element.classList.remove("hidden"));
+            nameField.classList.add("warning-input");
+            passwordField.classList.add("warning-input");
             console.log("Wrong username or password!");
         } else {
             console.log("Failed to log in!");
@@ -20,3 +29,28 @@ function logIn() {
     };
     XHR.send(messageContent);
 }
+
+function changeEye() {
+    console.log(passwordField.type);
+    if (passwordField.type === "password") {
+        passwordField.type = "text";
+        passwordEye.src = "/static/img/eye.svg";
+    }
+    else if (passwordField.type === "text") {
+        passwordField.type = "password";
+        passwordEye.src = "/static/img/eye_off.svg";
+    }
+}
+
+function eye() {
+    if (passwordField.value === "") {
+        passwordEye.classList.add("hidden")
+    }
+    else {
+        passwordEye.classList.remove("hidden")
+    }
+}
+
+passwordField.addEventListener("input", eye);
+passwordEye.addEventListener("click", changeEye);
+logInBtn.addEventListener("click", logIn)

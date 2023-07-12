@@ -75,3 +75,5 @@ function sendMessage() {
         XHR.send(messageContent);
     }
 }
+
+btnGo.addEventListener("click", sendMessage);
