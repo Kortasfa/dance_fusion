@@ -3,15 +3,16 @@ package main
 import (
 	"database/sql"
 	"fmt"
+	"log"
+	"net/http"
+
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/gorilla/mux"
 	"github.com/jmoiron/sqlx"
-	"log"
-	"net/http"
 )
 
 const (
-	port         = "localhost:3306"
+	port         = "localhost:3000"
 	dbDriverName = "mysql"
 )
 
@@ -25,17 +26,20 @@ func main() {
 
 	r := mux.NewRouter()
 	r.HandleFunc("/join", joinPageHandler).Methods("GET")
+	r.HandleFunc("/", homePageHandler)
 	r.HandleFunc("/home", homePageHandler)
 	r.HandleFunc("/room", handleCreateRoom)
+	r.HandleFunc("/room/", handleCreateRoom)
 	r.HandleFunc("/room/{id}", handleRoom(dbx))
 	r.HandleFunc("/roomWS/{id}", roomWSHandler)
 	r.HandleFunc("/gameField/id", gameField)
 	r.HandleFunc("/signUp", signUp)
-	r.HandleFunc("/logIn", logIn)
+	r.HandleFunc("/login", logIn)
 
 	r.HandleFunc("/api/joinToRoom", getJoinedUserData(dbx)).Methods("POST")
 	r.HandleFunc("/api/signUp", getRegisteredUserData(dbx)).Methods("POST")
 	r.HandleFunc("/api/logIn", getLoginUserData(dbx)).Methods("POST")
+	r.HandleFunc("/clear", clearCookie(dbx))
 
 	go handleRoomWSMessages()
 
@@ -44,7 +48,7 @@ func main() {
 	fmt.Println("Start server")
 	srv := &http.Server{
 		Handler: r,
-		Addr:    "localhost:3000",
+		Addr:    port,
 	}
 
 	log.Fatal(srv.ListenAndServe())

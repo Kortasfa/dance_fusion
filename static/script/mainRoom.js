@@ -10,7 +10,7 @@ function openSong(styleButtonBlock) {
   listGenre.classList.add('none');
   document.querySelector('.songs').classList.remove('none');
   const songBlock = document.getElementsByClassName('song__section');
-
+  openList = 'true';
   for (let i = 0; i < songBlock.length; i++) {
     if ((songBlock[i].id === styleButtonBlock.id) && songBlock[i].classList.contains('none')) {
       songBlock[i].classList.remove('none');
@@ -19,6 +19,9 @@ function openSong(styleButtonBlock) {
 }
 
 function closeSong() {
+  if (!listGenre.classList.contains('none')) {
+    window.location.href = adres;
+  }
   const songBlock = document.getElementsByClassName('song__section');
   for (let i = 0; i < songBlock.length; i++) {
     if (!songBlock[i].classList.contains('none')) {
@@ -39,10 +42,47 @@ function closeGuide() {
   guide.classList.remove('play');
 }
 
-function startGame() {
-  window.location.href = 'homepage-url';
-  //проверка выбрана ли песня
-  //отправка в выбранную игру
+let test = document.getElementsByClassName("section__img");
+let testing = '';
+// Iterate over each element in the collection
+Array.from(test).forEach(function (element) {
+  element.addEventListener('click', function () {
+    let videoSrcID = '9' + element.id;
+    let video = document.getElementById(videoSrcID);
+    let videoPlayer = document.getElementById('videoPlayer');
+    videoPlayer.src = video.innerText;
+    testing = video.innerText;
+  });
+});
+
+$(document).ready(function() {
+  let trigger = $('#Play');
+  let container = $('#content');
+
+  // Fire on click
+  trigger.on('click', function() {
+    container.load("/static/html/game.html", function() {
+      let video = $('#video-dance').get(0);
+      let src = $('#video-src').get(0);
+      src.setAttribute('src', testing);
+
+      video.addEventListener('loadeddata', function() {
+        video.play();
+      });
+
+      video.addEventListener('ended', function() {
+        showStats();
+      });
+    });
+
+    return false;
+  });
+});
+
+function showStats()
+{
+  document.getElementById('video-dance').style.display = "none";
+
 }
 
 function showVideo(videoID) {
@@ -69,7 +109,9 @@ socket.onmessage = function(event) {
   userMSG.classList.add('none');
   let indexUser = document.getElementById('user' + numberOfUser);
   let indexUserName = document.getElementById('userName' + numberOfUser);
+  let indexUserImg = indexUser.querySelector(".user__avatar");
   indexUser.classList.remove('none');
+  indexUserImg.src =  '../' + imgSrc;
 
   indexUserName.innerText = userName;
   console.log('Пользователь присоединился: ' + userID);
@@ -80,3 +122,5 @@ socket.onmessage = function(event) {
 socket.onclose = function(event) {
   console.log("WebSocket connection closed.");
 };
+
+let adres = 'http://' + document.location.host + '/home';

@@ -14,7 +14,8 @@ function logIn() {
     XHR.open("POST", "/api/logIn");
     XHR.onload = function () {
         if (XHR.status === 200) {
-            alert("Successfully logged in!");
+            console.log("Successfully logged in!");
+            window.location.href = '/join';
         } else if (XHR.status === 409) {
             warningMessage.forEach(element => element.classList.remove("hidden"));
             nameField.classList.add("warning-input");

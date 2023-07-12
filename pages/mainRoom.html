@@ -1,8 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" id="content">
 <head>
     <meta charset="UTF-8"/>
     <title>Let's dance</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
     <script src="../static/script/mainRoom.js" defer></script>
     <link rel="preconnect" href="https://fonts.googleapis.com"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -48,37 +49,48 @@
         <div class="game-menu__party">
             <div id="needUser" class="party__messege">Join and start playing</div>
             <div class="party__user  none" id="user1">
-                <div class="user__avatar"></div>
+               <img class="user__avatar"/>
                 <div class="user__name" id="userName1">Kirill</div>
             </div>
             <div class="party__user  none" id="user2">
-                <div class="user__avatar"></div>
+               <img class="user__avatar"/>
                 <div class="user__name" id="userName2">Zachar</div>
             </div>
             <div class="party__user  none" id="user3">
-                <div class="user__avatar"></div>
+               <img class="user__avatar"/>
                 <div class="user__name" id="userName3">Maksim</div>
             </div>
             <div class="party__user none" id="user4">
-                <div class="user__avatar"></div>
+               <img class="user__avatar"/>
                 <div class="user__name" id="userName4">Valeryan</div>
             </div>
         </div>
         <div class="game-menu__line"></div>
-        <video poster="..//static/img/618363928f4aef76ef260de7_1080_stackImages_1636000944.png" id="videoPlayer" autoplay loop class="game-menu__preview" src="../static/video/burn.mp4">
-            <source  controls="false" type="video/mp4">
+        <video poster="../static/img/618363928f4aef76ef260de7_1080_stackImages_1636000944.png" id="videoPlayer" autoplay
+               loop class="game-menu__preview" src="../static/video/burn.mp4">
+            <source controls="false" type="video/mp4">
         </video>
-        <div class="game-menu__play-button" id="Play"><a class="play-button" href="#" onclick="startGame">Play</a></div>
+        <div class="game-menu__play-button" id="Play"><a class="play-button">Play</a></div>
     </div>
     <div class="page__info" id="guide" onclick="closeGuide()">
         <h1 class="info__title">Руководство пользователя</h1>
         <div class="info__rmation">
-            <p>1.	Откройте веб-браузер на вашем компьютере и перейдите на сайт игры "Dance Fusion". На главной странице вы увидите опцию "Создать комнату". Щелкните по этой кнопке, чтобы создать новую комнату для игры. </p>
-            <p>2.	После создания комнаты, вам будет предложен выбор песен, под которые вы собираетесь танцевать. Из списка доступных песен выберите ту, которую хотите исполнить. Теперь возьмите свой мобильный телефон и откройте веб-браузер на нем. </p>
-            <p>3.	На странице, открытой на вашем мобильном телефоне, вы увидите поле для ввода кода комнаты. Введите код комнаты, который отображается на экране вашего компьютера. После ввода кода комнаты нажмите кнопку "Присоединиться". Теперь вы подключены к комнате и готовы начать игру. </p>
-            <p>4.	На экране компьютера вы увидите интерфейс игры с выбранной песней. Подготовьтесь держать свой мобильный телефон в руке и следовать инструкциям на экране компьютера. Нажмите кнопку "Играть", чтобы начать танцевать. </p>
-            <p>5.	Следуйте указаниям и двигайтесь синхронно с отображаемыми движениями и ритмами. Ваш прогресс и количество очков будут отображаться на экране компьютера. Постарайтесь повторять движения и ритмы максимально точно, чтобы набрать максимальное количество очков. </p>
-            <p>6.	По окончании песни вы увидите свои результаты и сможете посмотреть свою оценку и достижения. Приятного танца и удачи!</p>
+            <p>1. Откройте веб-браузер на вашем компьютере и перейдите на сайт игры "Dance Fusion". На главной странице
+                вы увидите опцию "Создать комнату". Щелкните по этой кнопке, чтобы создать новую комнату для игры. </p>
+            <p>2. После создания комнаты, вам будет предложен выбор песен, под которые вы собираетесь танцевать. Из
+                списка доступных песен выберите ту, которую хотите исполнить. Теперь возьмите свой мобильный телефон и
+                откройте веб-браузер на нем. </p>
+            <p>3. На странице, открытой на вашем мобильном телефоне, вы увидите поле для ввода кода комнаты. Введите код
+                комнаты, который отображается на экране вашего компьютера. После ввода кода комнаты нажмите кнопку
+                "Присоединиться". Теперь вы подключены к комнате и готовы начать игру. </p>
+            <p>4. На экране компьютера вы увидите интерфейс игры с выбранной песней. Подготовьтесь держать свой
+                мобильный телефон в руке и следовать инструкциям на экране компьютера. Нажмите кнопку "Играть", чтобы
+                начать танцевать. </p>
+            <p>5. Следуйте указаниям и двигайтесь синхронно с отображаемыми движениями и ритмами. Ваш прогресс и
+                количество очков будут отображаться на экране компьютера. Постарайтесь повторять движения и ритмы
+                максимально точно, чтобы набрать максимальное количество очков. </p>
+            <p>6. По окончании песни вы увидите свои результаты и сможете посмотреть свою оценку и достижения. Приятного
+                танца и удачи!</p>
         </div>
     </div>
 </div>
