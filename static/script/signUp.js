@@ -41,6 +41,7 @@ function signUp() {
                 window.location.href = "/logIn";
                 console.log("Successfully registered!");
             } else if (XHR.status === 409) {
+                console.clear();
                 usernameEmpty.classList.add("hidden")
                 nameField.classList.add("warning-input");
                 warningUsername.classList.remove("hidden");

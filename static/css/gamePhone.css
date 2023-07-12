@@ -47,6 +47,19 @@
     color: #1E1C1C;
 }
 
+.btn-log-out {
+    position: absolute;
+    top: 50px;
+    right: 10px;
+    background: #F20D40;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
 .entrance {
     display: flex;
     flex-direction: column;

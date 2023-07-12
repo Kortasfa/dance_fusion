@@ -4,6 +4,7 @@ const connectionText = document.querySelector(".connection")
 const warningID = document.getElementById("id-warning");
 const emptyID = document.getElementById("id-empty");
 const fullID = document.getElementById("id-full");
+const btnLogOut = document.querySelector(".btn-log-out");
 function getCookieValue(cookieName) {
     let allCookies = document.cookie;
     let cookiesArray = allCookies.split(';');
@@ -82,4 +83,12 @@ function sendMessage() {
     }
 }
 
+async function logout() {
+    const response = await fetch("/clear");
+    if (response.ok) {
+        window.location.href = "/logIn";
+    }
+}
+
+btnLogOut.addEventListener("click", logout)
 btnGo.addEventListener("click", sendMessage);
