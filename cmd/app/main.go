@@ -34,7 +34,7 @@ func main() {
 	r.HandleFunc("/roomWS/{id}", roomWSHandler)
 	r.HandleFunc("/gameField/id", gameField)
 	r.HandleFunc("/signUp", signUp)
-	r.HandleFunc("/login", logIn)
+	r.HandleFunc("/logIn", logIn)
 
 	r.HandleFunc("/api/joinToRoom", getJoinedUserData(dbx)).Methods("POST")
 	r.HandleFunc("/api/signUp", getRegisteredUserData(dbx)).Methods("POST")
