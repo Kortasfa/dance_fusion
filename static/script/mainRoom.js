@@ -109,9 +109,9 @@ socket.onmessage = function(event) {
   userMSG.classList.add('none');
   let indexUser = document.getElementById('user' + numberOfUser);
   let indexUserName = document.getElementById('userName' + numberOfUser);
-  let indexUserImg = document.getElementById('userImg' + numberOfUser);
+  let indexUserImg = indexUser.querySelector(".user__avatar");
   indexUser.classList.remove('none');
-  indexUserImg.src =  imgSrc;
+  indexUserImg.src =  '../' + imgSrc;
 
   indexUserName.innerText = userName;
   console.log('Пользователь присоединился: ' + userID);

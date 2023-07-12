@@ -5,8 +5,6 @@ const logInBtn = document.getElementById("btn-sign-up");
 const warningMessage = document.querySelectorAll(".field__warning")
 
 function logIn() {
-    let nameField = document.querySelector(".name-field");
-    let passwordField = document.querySelector(".password-field");
     let userInfo = {
         "userName": nameField.value,
         "password": passwordField.value

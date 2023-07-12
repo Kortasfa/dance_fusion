@@ -1,7 +1,6 @@
 package main
 
 import (
-	"database/sql"
 	"encoding/json"
 	"fmt"
 	"github.com/gorilla/mux"
@@ -437,7 +436,7 @@ func credentialExists(db *sqlx.DB, userName string, password string) (int, bool,
 		WHERE name = ? and password = ?`
 	var userIDs []int
 	err := db.Select(&userIDs, query, userName, password)
-	if err == sql.ErrNoRows {
+	if len(userIDs) == 0 {
 		return 0, false, nil
 	} else if err != nil {
 		log.Println(err.Error())
