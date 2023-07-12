@@ -1,36 +1,58 @@
 const passwordEye = document.querySelector(".field__eye");
 const nameField = document.getElementById("name");
 const passwordField = document.getElementById("password");
-const signUpField = document.querySelector(".entrance");
 const signUpBtn = document.getElementById("btn-sign-up");
-const warningMessage = document.querySelector(".field__warning")
-const messageToLogIn = document.querySelector(".message-log-in")
+const warningUsername = document.getElementById("username-taken");
+const usernameEmpty = document.getElementById("username-empty");
+const passwordEmpty = document.getElementById("password-empty");
 function signUp() {
-    // if (nameField.value === "") {
-    //
-    // }
-
     let userInfo = {
         "userName": nameField.value,
         "password": passwordField.value
     }
     let messageContent = JSON.stringify(userInfo);
     let XHR = new XMLHttpRequest();
-    XHR.open("POST", "/api/signUp");
-    XHR.onload = function () {
-        if (XHR.status === 200) {
-            signUpField.classList.add("hidden");
-            messageToLogIn.classList.remove("hidden");
-            console.log("Successfully registered!");
-        } else if (XHR.status === 409) {
-            nameField.classList.add("warning-input");
-            warningMessage.classList.remove("hidden")
-            console.log("Username is taken!");
-        } else {
-            alert("Failed to register!");
-        }
+    if ((nameField.value === "") && (passwordField.value !== "")) {
+        nameField.classList.add("warning-input");
+        usernameEmpty.classList.remove("hidden");
+        passwordField.classList.remove("warning-input");
+        passwordEmpty.classList.add("hidden");
+        warningUsername.classList.add("hidden");
     }
-    XHR.send(messageContent);
+    else if ((nameField.value !== "") && (passwordField.value === "")) {
+        nameField.classList.remove("warning-input");
+        usernameEmpty.classList.add("hidden");
+        passwordField.classList.add("warning-input");
+        passwordEmpty.classList.remove("hidden");
+
+    }
+    else if ((nameField.value === "") && (passwordField.value === "")) {
+        nameField.classList.add("warning-input");
+        usernameEmpty.classList.remove("hidden");
+        passwordField.classList.add("warning-input");
+        passwordEmpty.classList.remove("hidden");
+        warningUsername.classList.add("hidden");
+    }
+    else {
+
+        XHR.open("POST", "/api/signUp");
+        XHR.onload = function () {
+            if (XHR.status === 200) {
+                window.location.href = "/logIn";
+                console.log("Successfully registered!");
+            } else if (XHR.status === 409) {
+                usernameEmpty.classList.add("hidden")
+                nameField.classList.add("warning-input");
+                warningUsername.classList.remove("hidden");
+                passwordField.classList.remove("warning-input");
+                passwordEmpty.classList.add("hidden");
+                console.log("Username is taken!");
+            } else {
+                alert("Failed to register!");
+            }
+        }
+        XHR.send(messageContent);
+    }
 }
 
 function changeEye() {

@@ -3,6 +3,7 @@ const enterInRoom = document.querySelector(".entrance-id-room__field")
 const connectionText = document.querySelector(".connection")
 const warningID = document.getElementById("id-warning");
 const emptyID = document.getElementById("id-empty");
+const fullID = document.getElementById("id-full");
 function getCookieValue(cookieName) {
     let allCookies = document.cookie;
     let cookiesArray = allCookies.split(';');
@@ -24,6 +25,7 @@ function setCookie(cookieName, value, days) {
 function sendMessage() {
     if (enterInRoom.value === "") {
         warningID.classList.add("hidden");
+        fullID.classList.add("hidden");
         emptyID.classList.remove("hidden");
         enterInRoom.classList.add("entrance-id-room__field_warning");
     }
@@ -37,14 +39,11 @@ function sendMessage() {
         if (roomCookieValue !== "") {
             if (enterInRoom.value !== roomCookieValue) {
                 console.log("You are already connected to another room!");
-            }
-            else {
+            } else {
                 console.log("You are already connected to this room!");
             }
             return
         }
-        warningID.classList.add("hidden")
-        enterInRoom.classList.remove("entrance-id-room__field_warning")
         let IDField = document.getElementById("id-field");
         let postInfo = {
             "userID": authCookieValue,
@@ -59,17 +58,24 @@ function sendMessage() {
                 enterInRoom.classList.add("hidden");
                 connectionText.classList.remove("hidden");
                 emptyID.classList.add("hidden");
+                fullID.classList.add("hidden");
+                warningID.classList.add("hidden");
                 console.log("Connected to the room!");
                 setCookie("roomCookieName", enterInRoom.value, 1)
             } else if (XHR.status === 404) {
                 emptyID.classList.add("hidden");
                 warningID.classList.remove("hidden");
+                fullID.classList.add("hidden");
                 enterInRoom.classList.add("entrance-id-room__field_warning");
                 console.log("Room ID not found!");
             } else if (XHR.status === 409) {
+                emptyID.classList.add("hidden");
+                fullID.classList.remove("hidden");
+                warningID.classList.add("hidden");
+                enterInRoom.classList.add("entrance-id-room__field_warning");
                 console.log("The room is full!");
             } else {
-                console.log("Failed to send room id");
+                alert("Failed to send room id");
             }
         };
         XHR.send(messageContent);
