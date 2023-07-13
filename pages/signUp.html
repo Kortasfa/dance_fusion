@@ -15,18 +15,16 @@
       <div class="entrance__field">
         <span class="field__description">Username</span>
         <input id="name" class="field__input" type="text">
-        <span class="field__warning hidden">Username is taken</span>
+        <span id="username-taken" class="field__warning hidden">Username is taken</span>
+        <span id="username-empty" class="field__warning hidden">The field is empty</span>
       </div>
       <div class="entrance__field">
         <span class="field__description">Password</span>
         <input id="password" class="field__input field__input_type-password" type="password">
         <img class="field__eye hidden" src="/static/img/eye_off.svg">
+        <span id="password-empty" class="field__warning hidden">The field is empty</span>
       </div>
       <button id="btn-sign-up" class="entrance__btn">Sign Up</button>
-    </div>
-    <div class="message-log-in hidden">
-      <span class="message-log-in__sign-up">OK! Let`s log in</span>
-      <button id="btn-log-in" class="message-log-in__btn">Log In</button>
     </div>
   </body>
 </html>

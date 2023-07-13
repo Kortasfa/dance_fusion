@@ -5,12 +5,6 @@
     margin: 0;
 }
 
-.game-menu__line{
-    height: 2px;
-    background: #D20835;
-    filter: blur(2px);
-}
-
 .page{
     background-color: #0DF2BF;
     position: relative;
@@ -143,10 +137,6 @@
     box-shadow: 0 6px 4px -4px rgba(0, 0, 0, .2);
 }
 
-.play-button:hover{
-    background: #DBFF00;
-}
-
 .game-menu__play-button{
     margin-top: auto;
     margin-bottom: 5px;
@@ -202,7 +192,7 @@
 .section__img{
     border-radius: 10px;
     width: 107px;
-    height: 107px;
+    height: 105px;
     position: absolute;
     padding-right: 245px;
 }
@@ -248,15 +238,16 @@
 
 .info__title{
     text-align: center;
-    margin: 10px;
+    margin: 35px;
+    font: normal 400 48px 'Roboto';
 }
 
 .info__rmation{
-    font: normal 400 22px 'Roboto';
+    font: normal 400 40px 'Roboto';
 }
 
 .info__rmation p{
-    margin: 14px
+    margin: 35px;
 }
 
 .section__name{
@@ -275,12 +266,16 @@
     animation: blink 1s infinite;
 }
 
-.game-menu__play-button_yellow{
-    background: #DBFF00;
-}
-
 .none{
     display: none;
+}
+
+.hide{
+    visibility: hidden;
+}
+
+.button_yellow{
+    background: #DBFF00;
 }
 
 .songs::-webkit-scrollbar {

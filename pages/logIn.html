@@ -15,13 +15,15 @@
       <div class="entrance__field">
         <span class="field__description">Username</span>
         <input id="name" class="field__input" type="text">
-        <span class="field__warning hidden">Wrong username or password!</span>
+        <span class="field__warning-wrong hidden">Wrong username or password!</span>
+        <span id="username-empty" class="field__warning hidden">The field is empty</span>
       </div>
       <div class="entrance__field">
         <span class="field__description">Password</span>
         <input id="password" class="field__input field__input_type-password" type="password">
         <img class="field__eye hidden" src="/static/img/eye_off.svg">
-        <span class="field__warning hidden">Wrong username or password!</span>
+        <span class="field__warning-wrong hidden">Wrong username or password!</span>
+        <span id="password-empty" class="field__warning hidden">The field is empty</span>
       </div>
       <button id="btn-sign-up" class="entrance__btn">Log In</button>
     </div>

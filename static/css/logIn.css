@@ -52,6 +52,11 @@
     left: 235px;
 }
 
+.field__warning-wrong {
+    font: 400 20px Roboto, sans-serif;
+    color: #F20D40;
+}
+
 .field__warning {
     font: 400 20px Roboto, sans-serif;
     color: #F20D40;

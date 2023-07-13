@@ -555,5 +555,6 @@ func clearCookie(db *sqlx.DB) func(w http.ResponseWriter, r *http.Request) {
 			Expires: time.Now().AddDate(0, 0, -1),
 		})
 		fmt.Println("Cookie is deleted")
+		w.WriteHeader(200)
 	}
 }

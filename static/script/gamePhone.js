@@ -3,6 +3,8 @@ const enterInRoom = document.querySelector(".entrance-id-room__field")
 const connectionText = document.querySelector(".connection")
 const warningID = document.getElementById("id-warning");
 const emptyID = document.getElementById("id-empty");
+const fullID = document.getElementById("id-full");
+const btnLogOut = document.querySelector(".btn-log-out");
 
 function setJsonCookie(name, value, expirationDays) {
     const jsonValue = JSON.stringify(value);
@@ -36,6 +38,7 @@ document.querySelector('.user__avatar').src = userInfo.ImgSrc;
 function sendMessage() {
     if (enterInRoom.value === "") {
         warningID.classList.add("hidden");
+        fullID.classList.add("hidden");
         emptyID.classList.remove("hidden");
         enterInRoom.classList.add("entrance-id-room__field_warning");
     }
@@ -53,8 +56,6 @@ function sendMessage() {
             }
             return
         }
-        warningID.classList.add("hidden")
-        enterInRoom.classList.remove("entrance-id-room__field_warning")
         let IDField = document.getElementById("id-field");
         let postInfo = {
             "userID": userInfo.UserID,
@@ -69,21 +70,35 @@ function sendMessage() {
                 enterInRoom.classList.add("hidden");
                 connectionText.classList.remove("hidden");
                 emptyID.classList.add("hidden");
+                fullID.classList.add("hidden");
+                warningID.classList.add("hidden");
                 console.log("Connected to the room!");
-                //setCookie("roomCookieName", enterInRoom.value, 1)
             } else if (XHR.status === 404) {
                 emptyID.classList.add("hidden");
                 warningID.classList.remove("hidden");
+                fullID.classList.add("hidden");
                 enterInRoom.classList.add("entrance-id-room__field_warning");
                 console.log("Room ID not found!");
             } else if (XHR.status === 409) {
+                emptyID.classList.add("hidden");
+                fullID.classList.remove("hidden");
+                warningID.classList.add("hidden");
+                enterInRoom.classList.add("entrance-id-room__field_warning");
                 console.log("The room is full!");
             } else {
-                console.log("Failed to send room id");
+                alert("Failed to send room id");
             }
         };
         XHR.send(messageContent);
     }
 }
 
+async function logout() {
+    const response = await fetch("/clear");
+    if (response.ok) {
+        window.location.href = "/logIn";
+    }
+}
+
+btnLogOut.addEventListener("click", logout)
 btnGo.addEventListener("click", sendMessage);
