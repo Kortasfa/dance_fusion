@@ -62,35 +62,17 @@
 }
 
 .entrance__btn {
+    box-sizing: border-box;
     width: 270px;
     height: 76px;
     border-radius: 10px;
     background: #F20D40;
     border-color: #F20D40;
-    font: 400 50px Roboto, sans-serif;
+    font: 400 42px Roboto, sans-serif;
     color: #FAFCF6;
-}
-
-.message-log-in {
     display: flex;
-    flex-direction: column;
+    justify-content: center;
     align-items: center;
-    gap: 40px;
-}
-
-.message-log-in__btn {
-    width: 270px;
-    height: 76px;
-    border-radius: 10px;
-    background: #F20D40;
-    border-color: #F20D40;
-    font: 400 50px Roboto, sans-serif;
-    color: #FAFCF6;
-}
-
-.message-log-in__sign-up {
-    font: 400 48px Roboto, sans-serif;
-    color: #F20D40;
 }
 
 .hidden {
