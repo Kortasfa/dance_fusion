@@ -62,13 +62,17 @@
 }
 
 .entrance__btn {
+    box-sizing: border-box;
     width: 270px;
     height: 76px;
     border-radius: 10px;
     background: #F20D40;
     border-color: #F20D40;
-    font: 400 50px Roboto, sans-serif;
+    font: 400 42px Roboto, sans-serif;
     color: #FAFCF6;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 .hidden {
