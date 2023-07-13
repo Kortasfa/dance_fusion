@@ -44,7 +44,6 @@ function ChengeBtn(){
     redyGame = true;
   }
   if (redyGame) {
-    console.log('lol');
     PlayBtn.classList.add('button_yellow');
   }
 }

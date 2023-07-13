@@ -1,5 +1,5 @@
 function redirect() {
-    window.location.href = '/room';
+    if (/Android|webOS|iPhone|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) { window.location.href = '/logIn'} else{ window.location.href = '/room';}
 }
 let btnGo = document.querySelector('.button');
 btnGo.addEventListener("click", redirect);
