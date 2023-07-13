@@ -79,6 +79,7 @@
     display: flex;
     text-align: center;
     border-radius: 0 0 0 10px;
+    flex-wrap: nowrap;
 }
 
 .header__icon{
@@ -255,7 +256,7 @@
 }
 
 .btn-back{
-    margin-bottom: 515px;
+    margin-bottom: 500px;
 }
 
 .party__messege{
@@ -346,3 +347,32 @@
         margin-bottom: 10px;
     }
   }
+@media screen and (max-width: 642px) {
+    .game-menu {
+        width: 355px;
+    }
+
+    .game-menu__party {
+        height: 90px;
+    }
+
+    .game-menu {
+        width: 355px;
+        min-height: 420px;
+    }
+
+    .party__messege {
+        font: normal 400 32px/1.54 'Roboto';
+    }
+
+    .game-menu__preview {
+        width: 340px;
+        height: 192px;
+    }
+
+    .play-button {
+        padding: 4px 31px;
+        width: 150px;
+        margin: 0 auto 12px;
+    }
+}
