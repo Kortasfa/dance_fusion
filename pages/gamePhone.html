@@ -9,13 +9,12 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
   <script src="/static/script/gamePhone.js " defer></script>
-  <script>let userID = "{{ .UserID }}"</script>
   </head>
   <body class="page">
     <span class="message-user">Send Message from {{ .UserID }}</span>
     <div class="users">
       <div class="users__user">
-        <div class="user__avatar"></div>
+        <img class="user__avatar">
         <span class="user__name">Name 1</span>
       </div>
     </div>
