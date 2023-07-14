@@ -9,23 +9,24 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
   <script src="/static/script/gamePhone.js " defer></script>
-  <script>let userID = "{{ .UserID }}"</script>
   </head>
   <body class="page">
-    <span class="message-user">Send Message from {{ .UserID }}</span>
     <div class="users">
       <div class="users__user">
-        <div class="user__avatar"></div>
+        <img class="user__avatar">
         <span class="user__name">Name 1</span>
       </div>
     </div>
+    <img class="btn-log-out" src="/static/img/log_out.svg">
     <div class="entrance">
       <div class="entrance__entrance-id-room">
         <input class="entrance-id-room__field" type="number">
-        <span id="id-warning" class="entrance-id-room__warning hidden">The room code is incorrect</span>
+        <span id="id-warning" class="entrance-id-room__warning hidden">The room code is not found!</span>
         <span id="id-empty" class="entrance-id-room__warning hidden">The field is empty</span>
+        <span id="id-full" class="entrance-id-room__warning hidden">The field is empty</span>
       </div>
       <button id="btn-join" class="entrance__btn-join">Connect</button>
+      <span class="entrance__instruction">Please, hold your phone in the right hand</span>
     </div>
     <span class="connection hidden">You are joined!</span>
   </body>
