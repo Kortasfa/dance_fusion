@@ -13,31 +13,33 @@
 <div class="customization">
 	<div class="customization__character">
 		<div class="character__avatar">
-			<div>
-				<div  class="avatar">
-					<div class="avatar__circle"></div>
-					<div class="avatar__face"></div>
-					<div class="avatar__hat"></div>
+			<div class="character__level"><a class="level" >99</a></div>
+			<div  class="avatar">
+				<div  class="avatar__head">
+					<div class="head__circle"></div>
+					<div class="head__face"></div>
+					<div class="head__hat"></div>
 				</div>
-				<div class="avatar__name">UserName</div>
+				<div class="avatar__name"><a>Kirill</a></div>
 			</div>
-      <div  class="avatar">
-				<div class="avatar__circle"></div>
-				<div class="avatar__face"></div>
-				<div class="avatar__hat"></div>
-      </div>
-      <div class="avatar__name">UserName</div>
 		</div>
-		<div class="character__level"></div>
 	</div>
 	<div class="customization__option">
 		<div class="option__type">
-			<div class="type" id="hat">hat</div>
-			<div class="type" id="face">face</div>
-			<div class="type" id="circle">circle</div>
+			<div class="type" id="hat"><a class="type__text">hat</a></div>
+			<div class="type" id="face"><a class="type__text">face</a></div>
+			<div class="type" id="circle"><a class="type__text">body</a></div>
 		</div>
-		<div class="change">
-			<div></div>
+		<div class="option__element">
+			{{ range .Hats }}
+			<div class="element">{{ .hatSrc }}{{ .recommendedLevel }}</div>
+			{{ end }}
+			{{ range .Bodies }}
+			<div class="element">{{ .bodySrc }}{{ .recommendedLevel }}</div>
+			{{ end }}
+			{{ range .Faces }}
+			<div class="element">{{ .faceSrc }}{{ .recommendedLevel }}</div>
+			{{ end }}
 		</div>
 	</div>
 </div>

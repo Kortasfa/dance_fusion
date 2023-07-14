@@ -35,7 +35,7 @@
       }
 }
 
-.unplay {
+.unPlay {
     animation-duration: 1s;
     animation-name: unslidein;
     margin-left: calc(-96% + 590px);
@@ -243,11 +243,11 @@
     font: normal 400 48px 'Roboto';
 }
 
-.info__rmation{
+.information{
     font: normal 400 40px 'Roboto';
 }
 
-.info__rmation p{
+.information p{
     margin: 35px;
 }
 
@@ -259,7 +259,7 @@
     margin-bottom: 500px;
 }
 
-.party__messege{
+.party__message{
     font: normal 400 46px/1.54 'Roboto';
     text-align: center;
     margin: auto;
@@ -314,6 +314,7 @@
         animation-name: slidein;
         margin-left: 0;
     }
+
     @keyframes slidein {
         from {
             margin-left: -200%;
@@ -323,7 +324,7 @@
             margin-left: 0;
           }
     }
-    .unplay {
+    .unPlay {
         animation-duration: 1s;
         animation-name: unslidein;
         margin-left: -200%;
@@ -361,7 +362,7 @@
         min-height: 420px;
     }
 
-    .party__messege {
+    .party__message {
         font: normal 400 32px/1.54 'Roboto';
     }
 

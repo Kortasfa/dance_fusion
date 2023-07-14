@@ -35,6 +35,7 @@ func main() {
 	r.HandleFunc("/gameField/id", gameField)
 	r.HandleFunc("/signUp", signUp)
 	r.HandleFunc("/logIn", logIn)
+    r.HandleFunc("/customization", customUser(dbx))
 
 	r.HandleFunc("/api/joinToRoom", getJoinedUserData(dbx)).Methods("POST")
 	r.HandleFunc("/api/signUp", getRegisteredUserData(dbx)).Methods("POST")
@@ -55,5 +56,5 @@ func main() {
 }
 
 func openDB() (*sql.DB, error) {
-	return sql.Open(dbDriverName, "root:P@ssw0rd@tcp(localhost:3306)/dance_fusion?charset=utf8mb4&collation=utf8mb4_unicode_ci&parseTime=true")
+	return sql.Open(dbDriverName, "root:root@tcp(localhost:3306)/dance_fusion?charset=utf8mb4&collation=utf8mb4_unicode_ci&parseTime=true")
 }

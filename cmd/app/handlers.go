@@ -53,6 +53,131 @@ type menuPageData struct {
 	WssURL  string
 }
 
+type hatData struct {
+	recommendedLevel int    `db:"recommended_level"`
+	hatSrc           string `db:"hat_src"`
+}
+
+type bodyData struct {
+	recommendedLevel int    `db:"recommended_level"`
+	bodySrc          string `db:"body_src"`
+}
+
+type faceData struct {
+	recommendedLevel int    `db:"recommended_level"`
+	faceSrc          string `db:"face_src"`
+}
+
+type customPageData struct {
+	Hats   []hatData
+	Bodies []bodyData
+	Faces  []faceData
+}
+
+
+func getHatsData(db *sqlx.DB) ([]hatData, error) {
+	const query = `
+		SELECT
+			recommended_level,
+			hat_src
+		FROM
+			hats
+	`
+	var data []hatData
+
+	err := db.Select(&data, query)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return data, nil
+}
+
+func getBodiesData(db *sqlx.DB) ([]bodyData, error) {
+	const query = `
+		SELECT
+			recommended_level,
+			body_src
+		FROM
+			bodies
+	`
+	var data []bodyData
+
+	err := db.Select(&data, query)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return data, nil
+}
+
+func getFacesData(db *sqlx.DB) ([]faceData, error) {
+	const query = `
+		SELECT
+			recommended_level,
+			face_src
+		FROM
+			faces
+	`
+	var data []faceData
+
+	err := db.Select(&data, query)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return data, nil
+}
+
+func customUser(db *sqlx.DB) func(w http.ResponseWriter, r *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
+
+		tmpl, err := template.ParseFiles("pages/userAccount.html")
+		if err != nil {
+			http.Error(w, "Internal Server Error", 501)
+			log.Println(err.Error())
+			return
+		}
+
+		hats, err := getHatsData(db)
+		if err != nil {
+			http.Error(w, "Internal Server Error", 502)
+			log.Println(err)
+			return
+		}
+
+		bodies, err := getBodiesData(db)
+		if err != nil {
+			http.Error(w, "Internal Server Error", 503)
+			log.Println(err)
+			return
+		}
+
+		faces, err := getFacesData(db)
+		if err != nil {
+			http.Error(w, "Internal Server Error", 504)
+			log.Println(err)
+			return
+		}
+
+		data := customPageData{
+			Hats:   hats,
+			Bodies: bodies,
+			Faces:  faces,
+		}
+
+		err = tmpl.Execute(w, data)
+		if err != nil {
+			http.Error(w, "Internal Server Error", 505)
+			log.Println(err.Error())
+			return
+		}
+	}
+}
+
 func homePageHandler(w http.ResponseWriter, r *http.Request) {
 	tmpl, err := template.ParseFiles("pages/homePage.html")
 	if err != nil {
@@ -428,31 +553,31 @@ func getRegisteredUserData(db *sqlx.DB) func(w http.ResponseWriter, r *http.Requ
 			w.WriteHeader(409)
 			return
 		}
-        userID, err := insertNewUser(db, userName, data.Password)
-        if err != nil {
-            http.Error(w, "Internal Server Error", 500)
-            log.Println(err.Error())
-            return
-        }
+		userID, err := insertNewUser(db, userName, data.Password)
+		if err != nil {
+			http.Error(w, "Internal Server Error", 500)
+			log.Println(err.Error())
+			return
+		}
 
-        _, imgSrc, err := getUserInfo(db, fmt.Sprintf("%d", userID))
-        if err != nil {
-            http.Error(w, "Internal Server Error", 500)
-            log.Println(err.Error())
-            return
-        }
-        user := userInfo{
-            UserID:       userID,
-            UserName:     userName,
-            ImgSrc:       imgSrc,
-            SelectedRoom: "",
-        }
-        err = setJsonCookie(w, "userInfoCookie", user, 24*time.Hour)
-        if err != nil {
-            http.Error(w, "Internal Server Error", 500)
-            log.Println(err.Error())
-            return
-        }
+		_, imgSrc, err := getUserInfo(db, fmt.Sprintf("%d", userID))
+		if err != nil {
+			http.Error(w, "Internal Server Error", 500)
+			log.Println(err.Error())
+			return
+		}
+		user := userInfo{
+			UserID:       userID,
+			UserName:     userName,
+			ImgSrc:       imgSrc,
+			SelectedRoom: "",
+		}
+		err = setJsonCookie(w, "userInfoCookie", user, 24*time.Hour)
+		if err != nil {
+			http.Error(w, "Internal Server Error", 500)
+			log.Println(err.Error())
+			return
+		}
 		w.WriteHeader(200)
 	}
 }
