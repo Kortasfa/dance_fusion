@@ -63,6 +63,7 @@
 
 .entrance__btn {
     box-sizing: border-box;
+    border-style: none;
     width: 270px;
     height: 76px;
     border-radius: 10px;
