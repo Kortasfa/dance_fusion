@@ -56,7 +56,7 @@ function signUp() {
     }
 }
 
-function changeEye() {
+function changeEye(){
     console.log(passwordField.type);
     if (passwordField.type === "password") {
         passwordField.type = "text";

@@ -11,6 +11,7 @@
 .entrance {
     display: flex;
     flex-direction: column;
+    align-items: center;
     gap: 40px;
 }
 
@@ -68,37 +69,44 @@
 }
 
 .entrance__btn {
+    box-sizing: border-box;
+    border-style: none;
     width: 270px;
     height: 76px;
     border-radius: 10px;
     background: #F20D40;
     border-color: #F20D40;
-    font: 400 50px Roboto, sans-serif;
+    font: 400 42px Roboto, sans-serif;
     color: #FAFCF6;
-}
-
-.message-log-in {
     display: flex;
-    flex-direction: column;
+    justify-content: center;
     align-items: center;
-    gap: 40px;
 }
 
-.message-log-in__btn {
-    width: 270px;
-    height: 76px;
-    border-radius: 10px;
-    background: #F20D40;
-    border-color: #F20D40;
-    font: 400 50px Roboto, sans-serif;
-    color: #FAFCF6;
+.signup-text__offer {
+    font: 400 20px Roboto, sans-serif;
+    color: #555452;
 }
 
-.message-log-in__sign-up {
-    font: 400 48px Roboto, sans-serif;
+.signup-text__offer_link {
+    font: 700 20px Roboto, sans-serif;
     color: #F20D40;
 }
 
 .hidden {
     display: none;
+}
+
+@media screen and (min-width: 200px) {
+    .entrance__signup-text {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+}
+
+@media screen and (min-width: 370px) {
+    .entrance__signup-text {
+        display: block;
+    }
 }

@@ -1,0 +1,46 @@
+*
+{
+    font-weight: normal;
+    background-repeat: no-repeat;
+    margin: 0;
+}
+
+.customization{
+    background-color: #0DF2BF;
+    display: flex;
+    flex-direction: column;
+    align-content: center;
+    justify-content: center;
+}
+
+.character__avatar{
+    background-color: #F20D40;
+    border-radius: 0 0 10px 10px;
+    margin-bottom: 20px;
+}
+
+.avatar{
+    position: relative;
+    height: 56px;
+    width: 56px;
+}
+
+.customization__character{
+    width: 360px;
+    margin: 0 auto;
+}
+
+.avatar__circle{
+    height: 56px;
+    width: 56px;
+    border-radius: 50%;
+}
+
+.customization__option{
+    width: 360px;
+}
+
+.change{
+    width: 360px;
+
+}
