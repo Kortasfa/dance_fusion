@@ -81,6 +81,7 @@ function closeGuide() {
   guide.classList.remove('play');
 }
 
+let songName = '';
 let test = document.getElementsByClassName("section__img");
 let testing = '';
 // Iterate over each element in the collection
@@ -89,7 +90,7 @@ Array.from(test).forEach(function (element) {
     let videoSrcID = '9' + element.id;
     let video = document.getElementById(videoSrcID);
     let videoPlayer = document.getElementById('videoPlayer');
-
+    songName = document.querySelector('.song' + element.id).innerHTML;
     // let menuItem = parent.querySelectorAll('.button_yellow');
     // // Отлавливаем элемент в родители на который мы нажали
     // for(let i = 0; i < menuItem.length; i++) {
@@ -109,6 +110,11 @@ $(document).ready(function() {
   // Fire on click
   trigger.on('click', function() {
     if (PlayBtn.classList.contains('button_yellow')) {
+
+      socket.send(songName);
+      console.log(songName)// Можно отправить pause или resume
+
+
       container.load("/static/html/game.html", function () {
         let video = $('#video-dance').get(0);
         let src = $('#video-src').get(0);
