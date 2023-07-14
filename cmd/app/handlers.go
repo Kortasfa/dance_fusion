@@ -8,11 +8,10 @@ import (
 	"github.com/jmoiron/sqlx"
 	"html/template"
 	"io"
-	"io/ioutil"
 	"log"
 	"math/rand"
 	"net/http"
-	"strconv"
+	"net/url"
 	"time"
 )
 
@@ -40,10 +39,11 @@ type songsData struct {
 	StyleID         int    `db:"style_id"`
 }
 
-type userData struct {
-	UserID   int    `db:"id"`
-	UserName string `db:"name"`
-	ImgSrc   string `db:"img_src"`
+type userInfo struct {
+	UserID       int
+	UserName     string
+	ImgSrc       string
+	SelectedRoom string
 }
 
 type menuPageData struct {
@@ -66,21 +66,6 @@ func homePageHandler(w http.ResponseWriter, r *http.Request) {
 		BackgroundVideoSrc: "static/video/JDN_Landing_Video.mp4",
 	}
 	err = tmpl.Execute(w, data)
-	if err != nil {
-		http.Error(w, "Internal Server Error", 500)
-		log.Println(err.Error())
-		return
-	}
-}
-
-func test(w http.ResponseWriter, r *http.Request) {
-	tmpl, err := template.ParseFiles("pages/sensors.html")
-	if err != nil {
-		http.Error(w, "Internal Server Error", 500)
-		log.Println(err.Error())
-		return
-	}
-	err = tmpl.Execute(w, tmpl)
 	if err != nil {
 		http.Error(w, "Internal Server Error", 500)
 		log.Println(err.Error())
@@ -162,7 +147,7 @@ func handleRoom(db *sqlx.DB) func(w http.ResponseWriter, r *http.Request) {
 			Styles:  styles,
 			Songs:   songs,
 			RoomKey: roomID,
-			WssURL:  "ws://" + r.Host + "/roomWS/" + roomID,
+			WssURL:  "wss://" + r.Host + "/roomWS/" + roomID,
 		}
 
 		err = tmpl.Execute(w, data)
@@ -189,27 +174,18 @@ func handleCreateRoom(w http.ResponseWriter, r *http.Request) {
 }
 
 func joinPageHandler(w http.ResponseWriter, r *http.Request) {
-	cookie, err := r.Cookie("authCookieName")
+	_, err := r.Cookie("userInfoCookie")
 	if err != nil {
-		// Cookie not found, handle unauthorized access
-		w.WriteHeader(http.StatusUnauthorized)
-		fmt.Fprint(w, "unauthorized access")
-		http.Redirect(w, r, fmt.Sprintf("/login"), http.StatusFound)
+		http.Redirect(w, r, "/login", http.StatusFound)
 		return
 	}
-
 	tmpl, err := template.ParseFiles("pages/gamePhone.html")
 	if err != nil {
 		http.Error(w, "Internal Server Error", 500)
 		log.Println(err.Error())
 		return
 	}
-	data := struct {
-		UserID string
-	}{
-		UserID: cookie.Value,
-	}
-	err = tmpl.Execute(w, data)
+	err = tmpl.Execute(w, nil)
 	if err != nil {
 		http.Error(w, "Internal Server Error", 500)
 		log.Println(err.Error())
@@ -228,7 +204,12 @@ func getUserInfo(db *sqlx.DB, userID string) (string, string, error) {
 		   id=?
 	`
 	row := db.QueryRow(query, userID)
-	data := new(userData)
+	//data := new(userData)
+	data := new(struct {
+		UserID   int    `db:"id"`
+		UserName string `db:"name"`
+		ImgSrc   string `db:"img_src"`
+	})
 	err := row.Scan(&data.UserName, &data.ImgSrc)
 	if err != nil {
 		return "", "", err
@@ -245,7 +226,7 @@ func getJoinedUserData(db *sqlx.DB) func(w http.ResponseWriter, r *http.Request)
 			return
 		}
 		var data struct {
-			UserID string
+			UserID int
 			RoomID string
 		}
 		err = json.Unmarshal(reqData, &data)
@@ -254,7 +235,6 @@ func getJoinedUserData(db *sqlx.DB) func(w http.ResponseWriter, r *http.Request)
 			log.Println(err.Error())
 			return
 		}
-		println(data.UserID)
 		_, exists := roomIDDict[data.RoomID]
 		if !exists {
 			w.WriteHeader(404)
@@ -265,13 +245,29 @@ func getJoinedUserData(db *sqlx.DB) func(w http.ResponseWriter, r *http.Request)
 			return
 		}
 		roomIDDict[data.RoomID] = roomIDDict[data.RoomID] + 1
-		w.WriteHeader(200)
-		userName, imgSrc, _ := getUserInfo(db, data.UserID)
-		broadcastJoiningUserID <- []string{data.RoomID, data.UserID, userName, imgSrc}
-		_, err = fmt.Fprintf(w, "Message sent: %s", data.UserID)
+		userName, imgSrc, err := getUserInfo(db, fmt.Sprintf("%d", data.UserID))
 		if err != nil {
+			http.Error(w, "Internal server error", 500)
+			log.Println(err.Error())
 			return
 		}
+		broadcastJoiningUserID <- []string{data.RoomID, fmt.Sprintf("%d", data.UserID), userName, imgSrc}
+
+		var user userInfo
+		err = getJsonCookie(r, "userInfoCookie", &user)
+		if err != nil {
+			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+			log.Println(err.Error())
+			return
+		}
+		user.SelectedRoom = data.RoomID
+		err = setJsonCookie(w, "userInfoCookie", user, 24*time.Hour)
+		if err != nil {
+			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+			log.Println(err.Error())
+			return
+		}
+		w.WriteHeader(200)
 	}
 }
 
@@ -332,7 +328,7 @@ func gameField(w http.ResponseWriter, r *http.Request) {
 	data := struct {
 		WssURL string
 	}{
-		WssURL: "ws://" + r.Host + "/start/ws",
+		WssURL: "wss://" + r.Host + "/start/ws",
 	}
 	err = ts.Execute(w, data)
 	if err != nil {
@@ -343,6 +339,11 @@ func gameField(w http.ResponseWriter, r *http.Request) {
 }
 
 func signUp(w http.ResponseWriter, r *http.Request) {
+	_, err := r.Cookie("userInfoCookie")
+	if err == nil {
+		http.Redirect(w, r, "/join", http.StatusFound)
+		return
+	}
 	ts, err := template.ParseFiles("pages/signUp.html")
 	if err != nil {
 		http.Error(w, "Internal Server Error", 500)
@@ -374,7 +375,7 @@ func userExists(db *sqlx.DB, userName string) (bool, error) {
 	return false, nil
 }
 
-func insertNewUser(db *sqlx.DB, userName string, password string) error {
+func insertNewUser(db *sqlx.DB, userName string, password string) (int, error) {
 	user := struct {
 		UserName     string
 		Password     string
@@ -387,11 +388,15 @@ func insertNewUser(db *sqlx.DB, userName string, password string) error {
 	query := `
 		INSERT INTO users(name, password, img_src)
 		VALUES (?, ?, ?)`
-	_, err := db.Exec(query, user.UserName, user.Password, user.UserImageSrc)
+	result, err := db.Exec(query, user.UserName, user.Password, user.UserImageSrc)
 	if err != nil {
-		return err
+		return 0, err
 	}
-	return nil
+	userID, err := result.LastInsertId()
+	if err != nil {
+		return 0, err
+	}
+	return int(userID), nil
 }
 
 func getRegisteredUserData(db *sqlx.DB) func(w http.ResponseWriter, r *http.Request) {
@@ -422,19 +427,42 @@ func getRegisteredUserData(db *sqlx.DB) func(w http.ResponseWriter, r *http.Requ
 		if exists {
 			w.WriteHeader(409)
 			return
-		} else {
-			err = insertNewUser(db, userName, data.Password)
-			if err != nil {
-				http.Error(w, "Internal Server Error", 500)
-				log.Println(err.Error())
-				return
-			}
 		}
+        userID, err := insertNewUser(db, userName, data.Password)
+        if err != nil {
+            http.Error(w, "Internal Server Error", 500)
+            log.Println(err.Error())
+            return
+        }
+
+        _, imgSrc, err := getUserInfo(db, fmt.Sprintf("%d", userID))
+        if err != nil {
+            http.Error(w, "Internal Server Error", 500)
+            log.Println(err.Error())
+            return
+        }
+        user := userInfo{
+            UserID:       userID,
+            UserName:     userName,
+            ImgSrc:       imgSrc,
+            SelectedRoom: "",
+        }
+        err = setJsonCookie(w, "userInfoCookie", user, 24*time.Hour)
+        if err != nil {
+            http.Error(w, "Internal Server Error", 500)
+            log.Println(err.Error())
+            return
+        }
 		w.WriteHeader(200)
 	}
 }
 
 func logIn(w http.ResponseWriter, r *http.Request) {
+	_, err := r.Cookie("userInfoCookie")
+	if err == nil {
+		http.Redirect(w, r, "/join", http.StatusFound)
+		return
+	}
 	ts, err := template.ParseFiles("pages/logIn.html")
 	if err != nil {
 		http.Error(w, "Internal Server Error", 500)
@@ -449,21 +477,20 @@ func logIn(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func credentialExists(db *sqlx.DB, userName string, password string) ([]int64, bool, error) {
+func credentialExists(db *sqlx.DB, userName string, password string) (int, bool, error) {
 	const query = `
 		SELECT id
 		FROM users
 		WHERE name = ? and password = ?`
-	var ids []int64
-	err := db.Select(&ids, query, userName, password)
-	if err != nil {
+	var userIDs []int
+	err := db.Select(&userIDs, query, userName, password)
+	if len(userIDs) == 0 {
+		return 0, false, nil
+	} else if err != nil {
 		log.Println(err.Error())
-		return nil, false, err
+		return 0, false, err
 	}
-	if len(ids) > 0 {
-		return ids, true, nil
-	}
-	return nil, false, nil
+	return userIDs[0], true, nil
 }
 
 func getLoginUserData(db *sqlx.DB) func(w http.ResponseWriter, r *http.Request) {
@@ -484,82 +511,77 @@ func getLoginUserData(db *sqlx.DB) func(w http.ResponseWriter, r *http.Request) 
 			log.Println(err.Error())
 			return
 		}
-		ids, exists, err := credentialExists(db, data.UserName, data.Password)
+		userID, exists, err := credentialExists(db, data.UserName, data.Password)
 		if err != nil {
 			http.Error(w, "Internal Server Error", 500)
 			log.Println(err.Error())
 			return
 		}
 		if exists {
-			// IDs exist, you can access them from the 'ids' slice
-			fmt.Println("User IDs:", ids)
+			_, imgSrc, err := getUserInfo(db, fmt.Sprintf("%d", userID))
+			if err != nil {
+				http.Error(w, "Internal Server Error", 500)
+				log.Println(err.Error())
+				return
+			}
+			user := userInfo{
+				UserID:       userID,
+				UserName:     data.UserName,
+				ImgSrc:       imgSrc,
+				SelectedRoom: "",
+			}
+			err = setJsonCookie(w, "userInfoCookie", user, 24*time.Hour)
+			if err != nil {
+				http.Error(w, "Internal Server Error", 500)
+				log.Println(err.Error())
+				return
+			}
+			w.WriteHeader(http.StatusOK)
 		} else {
-			fmt.Println("User not found")
+			w.WriteHeader(409)
 		}
-
-		http.SetCookie(w, &http.Cookie{
-			Name:    "authCookieName",
-			Value:   fmt.Sprint(ids),
-			Path:    "/",
-			Expires: time.Now().AddDate(0, 0, 1),
-		})
-		w.WriteHeader(200)
 	}
 }
 
-func protectedHandler(w http.ResponseWriter, r *http.Request) {
-	// Check if the cookie is present in the request
-	cookie, err := r.Cookie("authCookieName")
+func setJsonCookie(w http.ResponseWriter, name string, value interface{}, expiration time.Duration) error {
+	cookieValue, err := json.Marshal(value)
 	if err != nil {
-		// Cookie not found, handle unauthorized access
-		w.WriteHeader(http.StatusUnauthorized)
-		fmt.Fprint(w, "unauthorized access")
-		return
+		return err
 	}
+	escapedValue := url.QueryEscape(string(cookieValue))
+	http.SetCookie(w, &http.Cookie{
+		Name:    name,
+		Value:   escapedValue,
+		Path:    "/",
+		Expires: time.Now().AddDate(0, 0, 1),
+	})
+	return nil
+}
 
-	// Cookie found, extract the value
-	sessionValue := cookie.Value
-
-	// Process the request further for an authenticated user
-	w.WriteHeader(http.StatusOK)
-	fmt.Fprintf(w, "Welcome! Session Value: %s", sessionValue)
+func getJsonCookie(r *http.Request, name string, value interface{}) error {
+	cookie, err := r.Cookie(name)
+	if err != nil {
+		return err
+	}
+	decodedValue, err := url.PathUnescape(cookie.Value)
+	if err != nil {
+		return err
+	}
+	err = json.Unmarshal([]byte(decodedValue), value)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 func clearCookie(db *sqlx.DB) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		http.SetCookie(w, &http.Cookie{
-			Name:    "authCookieName",
+			Name:    "userInfoCookie",
 			Path:    "/",
 			Expires: time.Now().AddDate(0, 0, -1),
 		})
-		log.Println("Cookie is deleted")
+		fmt.Println("Cookie is deleted")
+		w.WriteHeader(200)
 	}
-}
-
-var counter int = 1
-
-func create(w http.ResponseWriter, r *http.Request) {
-	// Read the JSON data from the request body
-	jsonData, err := ioutil.ReadAll(r.Body)
-	if err != nil {
-		http.Error(w, "Error reading JSON data", http.StatusBadRequest)
-		return
-	}
-
-	// Generate the filename with the current counter value
-	filename := "data/movement/" + "test" + strconv.Itoa(counter) + ".txt"
-
-	// Save the JSON data to the generated filename
-	err = ioutil.WriteFile(filename, jsonData, 0644)
-	if err != nil {
-		http.Error(w, "Error saving JSON data to file", http.StatusInternalServerError)
-		return
-	}
-
-	// Increment the counter for the next request
-	counter++
-
-	// Send a response indicating success
-	w.WriteHeader(http.StatusOK)
-	w.Write([]byte("Data saved successfully as " + filename))
 }

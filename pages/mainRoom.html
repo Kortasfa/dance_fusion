@@ -20,12 +20,12 @@
                 <a class="guide__title">Сode room</a>
                 <a class="guide__code" id="CodeRoom">{{ .RoomKey }}</a>
             </div>
-            <img src="../static/svg/question-answer-svgrepo-com.svg" class="header__icon" id="openGuide">
+            <img src="../static/img/question-answer-svgrepo-com.svg" class="header__icon" id="openGuide">
         </div>
     </div>
 </header>
 <div class="content">
-    <img class="btn-back" id="return-button" src="../static/svg/Group 6.svg" onclick="closeSong()">
+    <img class="btn-back hide" id="return-button" src="../static/img/Group%206.svg" onclick="closeSong()">
     <div class="dance-style" id="list-genre">
         {{ range .Styles }}
         <div class="dance-style__button" id="{{ .StyleID }}" onclick="openSong(this)">
@@ -35,7 +35,7 @@
     </div>
     <div id="list-song" class="songs none">
         {{ range .Songs }}
-        <div class="song__section none style-id={{ .StyleID }}" id={{ .StyleID }}>
+        <div class="song__section none style-id={{ .StyleID }}" id={{ .StyleID }} onclick="addCollor(this)">
             <img src="../{{ .ImageSrc }}" class="section__img" id="{{ .SongID}}" onclick="showVideo(this)">
             <div class="section__name">
                 <a class="none" id="9{{ .SongID }}">../{{ .PreviewVideoSrc }}</a>
@@ -49,37 +49,36 @@
         <div class="game-menu__party">
             <div id="needUser" class="party__messege">Join and start playing</div>
             <div class="party__user  none" id="user1">
-                <div class="user__avatar"></div>
+               <img class="user__avatar"/>
                 <div class="user__name" id="userName1">Kirill</div>
             </div>
             <div class="party__user  none" id="user2">
-                <div class="user__avatar"></div>
+               <img class="user__avatar"/>
                 <div class="user__name" id="userName2">Zachar</div>
             </div>
             <div class="party__user  none" id="user3">
-                <div class="user__avatar"></div>
+               <img class="user__avatar"/>
                 <div class="user__name" id="userName3">Maksim</div>
             </div>
             <div class="party__user none" id="user4">
-                <div class="user__avatar"></div>
+               <img class="user__avatar"/>
                 <div class="user__name" id="userName4">Valeryan</div>
             </div>
         </div>
-        <div class="game-menu__line"></div>
-        <video poster="../static/img/618363928f4aef76ef260de7_1080_stackImages_1636000944.png" id="videoPlayer" autoplay loop class="game-menu__preview" src="../static/video/burn.mp4">
+        <video poster="../static/img/618363928f4aef76ef260de7_1080_stackImages_1636000944.png" id="videoPlayer" autoplay
+               loop class="game-menu__preview">
             <source controls="false" type="video/mp4">
         </video>
-        <div class="game-menu__play-button" id="Play"><a class="play-button">Play</a></div>
+        <div class="game-menu__play-button"><a class="play-button" id="Play">Play</a></div>
     </div>
     <div class="page__info" id="guide" onclick="closeGuide()">
-        <h1 class="info__title">Руководство пользователя</h1>
+        <h1 class="info__title">User Guide</h1>
         <div class="info__rmation">
-            <p>1.	Откройте веб-браузер на вашем компьютере и перейдите на сайт игры "Dance Fusion". На главной странице вы увидите опцию "Создать комнату". Щелкните по этой кнопке, чтобы создать новую комнату для игры. </p>
-            <p>2.	После создания комнаты, вам будет предложен выбор песен, под которые вы собираетесь танцевать. Из списка доступных песен выберите ту, которую хотите исполнить. Теперь возьмите свой мобильный телефон и откройте веб-браузер на нем. </p>
-            <p>3.	На странице, открытой на вашем мобильном телефоне, вы увидите поле для ввода кода комнаты. Введите код комнаты, который отображается на экране вашего компьютера. После ввода кода комнаты нажмите кнопку "Присоединиться". Теперь вы подключены к комнате и готовы начать игру. </p>
-            <p>4.	На экране компьютера вы увидите интерфейс игры с выбранной песней. Подготовьтесь держать свой мобильный телефон в руке и следовать инструкциям на экране компьютера. Нажмите кнопку "Играть", чтобы начать танцевать. </p>
-            <p>5.	Следуйте указаниям и двигайтесь синхронно с отображаемыми движениями и ритмами. Ваш прогресс и количество очков будут отображаться на экране компьютера. Постарайтесь повторять движения и ритмы максимально точно, чтобы набрать максимальное количество очков. </p>
-            <p>6.	По окончании песни вы увидите свои результаты и сможете посмотреть свою оценку и достижения. Приятного танца и удачи!</p>
+            <p>Choose a song to start dancing to.</p>
+            <p>On the page open on your mobile phone, log in or register.</p>
+            <p>Enter the room code on the open page.</p>
+            <p>Mirror the dance characters' movements. Your progress and score will be displayed on the computer screen.</p>
+            <p>After the song ends, you will see your results and be able to view your rating and achievements. Enjoy dancing and good luck! </p>
         </div>
     </div>
 </div>

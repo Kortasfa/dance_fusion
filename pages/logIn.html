@@ -1,13 +1,35 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Log In</title>
-    <script src="/static/script/logIn.js" defer></script>
-</head>
-<body>
-    <input class="name-field" type="text" placeholder="Enter your name">
-    <input class="password-field" type="text" placeholder="Enter your password">
-    <button onclick="logIn()">Log In</button>
-</body>
+  <head>
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Log In</title> <!--это потом исправить-->
+      <link rel="stylesheet" href="/static/css/logIn.css"/>
+      <link rel="preconnect" href="https://fonts.googleapis.com">
+      <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+      <script src="/static/script/logIn.js " defer></script>
+  </head>
+  <body class="page">
+    <div class="entrance">
+      <div class="entrance__field">
+        <span class="field__description">Username</span>
+        <input id="name" class="field__input" type="text">
+        <span class="field__warning-wrong hidden">Wrong username or password!</span>
+        <span id="username-empty" class="field__warning hidden">The field is empty</span>
+      </div>
+      <div class="entrance__field">
+        <span class="field__description">Password</span>
+        <input id="password" class="field__input field__input_type-password" type="password">
+        <img class="field__eye hidden" src="/static/img/eye_off.svg">
+        <span class="field__warning-wrong hidden">Wrong username or password!</span>
+        <span id="password-empty" class="field__warning hidden">The field is empty</span>
+      </div>
+      <button id="btn-sign-up" class="entrance__btn">Log In</button>
+      <div class="entrance__signup-text">
+        <span class="signup-text__offer">If you haven't registered, then </span>
+        <span id="sign-up-link" class="signup-text__offer signup-text__offer_link">let's do it</span>
+      </div>
+    </div>
+  </body>
 </html>

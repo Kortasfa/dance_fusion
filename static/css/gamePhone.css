@@ -6,16 +6,6 @@
     flex-direction: column;
     justify-content: center;
     align-items: center;
-
-}
-
-.message-user {
-    font: 400 30px Roboto, sans-serif;
-    color: #FAFCF6;
-    position: absolute;
-    top: 10px;
-    left: 10px;
-
 }
 
 .users {
@@ -48,9 +38,23 @@
     color: #1E1C1C;
 }
 
+.btn-log-out {
+    position: absolute;
+    top: 50px;
+    right: 10px;
+    background: #F20D40;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
 .entrance {
     display: flex;
     flex-direction: column;
+    align-items: center;
     gap: 40px;
 }
 
@@ -61,30 +65,43 @@
 }
 
 .entrance__btn-join {
+    box-sizing: border-box;
+    border: none;
     width: 270px;
-    max-height: 76px;
+    height: 76px;
     border-radius: 10px;
     background: #F20D40;
-    border-color: #F20D40;
-    font: 400 58px Roboto, sans-serif;
+    /*border-color: #F20D40;*/
+    font: 400 42px Roboto, sans-serif;
     color: #FAFCF6;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.entrance__instruction {
+    font: 400 20px Roboto, sans-serif;
+    color: #555452;
+    text-align: center;
 }
 
 .entrance-id-room__field {
     box-sizing: border-box;
+    border: none;
     width: 270px;
     height: 76px;
     border-radius: 10px;
     background: #FAFCF6;
-    border-color: #FAFCF6;
-    shadow: 0;
+    /*border-color: #FAFCF6;*/
     outline: none;
     font: 400 48px Roboto, sans-serif;
     color: rgba(0, 0, 0, 0.70);
+    padding: 0 10px 0 10px
 }
 
 .entrance-id-room__field_warning {
-    border-color:  #F20D40;
+    background: rgb(255, 122, 140);
+
 }
 
 .entrance-id-room__warning {
