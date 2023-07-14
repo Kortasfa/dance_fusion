@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Gyroscope and Accelerometer Data Recorder</title>
+</head>
+<body>
+<h1>Gyroscope and Accelerometer Data Recorder</h1>
+<button id="startBtn">Start Recording</button>
+<button id="stopBtn" disabled>Stop Recording</button>
+
+<script>
+    let gyroData = [];
+    let accelData = [];
+    let isRecording = false;
+    let recordingRate = 1000 / 62.5;
+    let array =[];
+
+    if ('DeviceOrientationEvent' in window && 'DeviceMotionEvent' in window) {
+        let timerId;
+
+        document.getElementById('startBtn').addEventListener('click', function () {
+            document.getElementById('startBtn').disabled = true;
+            document.getElementById('stopBtn').disabled = false;
+
+            window.addEventListener('deviceorientation', handleGyroscope, true);
+            window.addEventListener('devicemotion', handleGyroscope, true);
+
+            setTimeout(function () {
+                handleGyroscope();
+            }, recordingRate);
+
+            // Set a timer to stop recording after 2 seconds
+            timerId = setTimeout(stopRecording, 1500);
+        });
+
+        document.getElementById('stopBtn').addEventListener('click', stopRecording);
+
+        function stopRecording() {
+            document.getElementById('startBtn').disabled = false;
+            document.getElementById('stopBtn').disabled = true;
+
+            isRecording = false;
+
+            window.removeEventListener('deviceorientation', handleGyroscope, true);
+            window.removeEventListener('devicemotion', handleGyroscope, true);
+
+            let combinedData = [];
+            let maxLength = Math.max(accelData.length, gyroData.length);
+
+            for (let i = 0; i < maxLength; i++) {
+                // Add accelerometer data if available
+                if (i < accelData.length) {
+                    let accel = accelData[i];
+                    combinedData.push(accel.x, accel.y, accel.z);
+                }
+
+                // Add gyroscope data if available
+                if (i < gyroData.length) {
+                    let gyro = gyroData[i];
+                    combinedData.push(gyro.alpha, gyro.beta, gyro.gamma);
+                }
+            }
+
+            let combinedString = combinedData.join(', ');
+
+            document.write('Combined Data: ', JSON.stringify(array));
+            sendDataToServer(combinedString);
+
+            array =[];
+            gyroData = [];
+            accelData = [];
+
+            // Clear the timer if it's still running
+            if (timerId) {
+                clearTimeout(timerId);
+            }
+        }
+    } else {
+        alert('This browser does not support the necessary features for recording gyroscope and accelerometer data.');
+    }
+
+    function handleGyroscope(event) {
+        array.push({
+            x: MyRound10(event.accelerationIncludingGravity.x),
+            y: MyRound10(event.accelerationIncludingGravity.y),
+            z: MyRound10(event.accelerationIncludingGravity.z),
+            alpha: MyRound10(event.alpha),
+            beta: MyRound10(event.beta),
+            gamma: MyRound10(event.gamma),
+        });
+    }
+
+
+    function MyRound10(val) {
+        const roundedVal = Math.round(val * 10) / 10;
+        const formattedVal = roundedVal.toFixed(4);
+        return formattedVal.padStart(6, '0');
+    }
+
+    function sendDataToServer(data) {
+        // Replace the URL with the appropriate endpoint to handle the data on your server
+        let url = 'api/post';
+
+        fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: data
+        })
+            .then(function (response) {
+                if (response.ok) {
+                    console.log('Data sent successfully.');
+                } else {
+                    console.log('Error sending data. Status:', response.status);
+                }
+            })
+            .catch(function (error) {
+                console.log('Error sending data:', error);
+            });
+    }
+</script>
+</body>
+</html>
