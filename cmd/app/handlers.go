@@ -339,6 +339,11 @@ func gameField(w http.ResponseWriter, r *http.Request) {
 }
 
 func signUp(w http.ResponseWriter, r *http.Request) {
+	_, err := r.Cookie("userInfoCookie")
+	if err == nil {
+		http.Redirect(w, r, "/join", http.StatusFound)
+		return
+	}
 	ts, err := template.ParseFiles("pages/signUp.html")
 	if err != nil {
 		http.Error(w, "Internal Server Error", 500)
@@ -370,7 +375,7 @@ func userExists(db *sqlx.DB, userName string) (bool, error) {
 	return false, nil
 }
 
-func insertNewUser(db *sqlx.DB, userName string, password string) error {
+func insertNewUser(db *sqlx.DB, userName string, password string) (int, error) {
 	user := struct {
 		UserName     string
 		Password     string
@@ -383,11 +388,15 @@ func insertNewUser(db *sqlx.DB, userName string, password string) error {
 	query := `
 		INSERT INTO users(name, password, img_src)
 		VALUES (?, ?, ?)`
-	_, err := db.Exec(query, user.UserName, user.Password, user.UserImageSrc)
+	result, err := db.Exec(query, user.UserName, user.Password, user.UserImageSrc)
 	if err != nil {
-		return err
+		return 0, err
 	}
-	return nil
+	userID, err := result.LastInsertId()
+	if err != nil {
+		return 0, err
+	}
+	return int(userID), nil
 }
 
 func getRegisteredUserData(db *sqlx.DB) func(w http.ResponseWriter, r *http.Request) {
@@ -418,13 +427,31 @@ func getRegisteredUserData(db *sqlx.DB) func(w http.ResponseWriter, r *http.Requ
 		if exists {
 			w.WriteHeader(409)
 			return
-		} else {
-			err = insertNewUser(db, userName, data.Password)
-			if err != nil {
-				http.Error(w, "Internal Server Error", 500)
-				log.Println(err.Error())
-				return
-			}
+		}
+		userID, err := insertNewUser(db, userName, data.Password)
+		if err != nil {
+			http.Error(w, "Internal Server Error", 500)
+			log.Println(err.Error())
+			return
+		}
+
+		_, imgSrc, err := getUserInfo(db, fmt.Sprintf("%d", userID))
+		if err != nil {
+			http.Error(w, "Internal Server Error", 500)
+			log.Println(err.Error())
+			return
+		}
+		user := userInfo{
+			UserID:       userID,
+			UserName:     userName,
+			ImgSrc:       imgSrc,
+			SelectedRoom: "",
+		}
+		err = setJsonCookie(w, "userInfoCookie", user, 24*time.Hour)
+		if err != nil {
+			http.Error(w, "Internal Server Error", 500)
+			log.Println(err.Error())
+			return
 		}
 		w.WriteHeader(200)
 	}
