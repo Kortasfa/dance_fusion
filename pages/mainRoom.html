@@ -39,7 +39,7 @@
             <img src="../{{ .ImageSrc }}" class="section__img" id="{{ .SongID}}" onclick="showVideo(this)">
             <div class="section__name">
                 <a class="none" id="9{{ .SongID }}">../{{ .PreviewVideoSrc }}</a>
-                <div class="name__title">{{ .SongName }}</div>
+                <div class="name__title song{{ .SongID}}">{{ .SongName }}</div>
                 <div class="name__subtitle">{{ .SongAuthor }}</div>
             </div>
         </div>
