@@ -186,4 +186,5 @@ function addCollor(thisis) {
 
 function changeCollor(thisiss) {
     thisiss.classList.add('button_yellow');
+    console.log("yellow")
 }
