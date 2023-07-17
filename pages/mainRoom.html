@@ -16,73 +16,74 @@
 </head>
 <body class="page">
 <header class="header">
-    <div>
-        <div class="header__guide">
-            <div>
-                <a class="guide__title">Сode room</a>
-                <a class="guide__code" id="CodeRoom">{{ .RoomKey }}</a>
-            </div>
-            <img src="../static/img/question-answer-svgrepo-com.svg" class="header__icon" id="openGuide">
-        </div>
-    </div>
+	<div>
+		<div class="header__guide">
+			<div>
+				<a class="guide__title">Сode room</a>
+				<a class="guide__code" id="CodeRoom">{{ .RoomKey }}</a>
+			</div>
+			<img src="../static/img/question-answer-svgrepo-com.svg" class="header__icon" id="openGuide" alt="">
+		</div>
+	</div>
 </header>
 <div class="content">
-    <img class="btn-back hide" id="return-button" src="../static/img/Group%206.svg" onclick="closeSong()">
-    <div class="dance-style" id="list-genre">
-        {{ range .Styles }}
-        <div class="dance-style__button" id="{{ .StyleID }}" onclick="openSong(this)">
-            <a href="#" class="button__text">{{ .StyleName }}</a>
-        </div>
-        {{ end }}
-    </div>
-    <div id="list-song" class="songs none">
-        {{ range .Songs }}
-        <div class="song__section none style-id={{ .StyleID }}" id={{ .StyleID }} onclick="addCollor(this)">
-            <img src="../{{ .ImageSrc }}" class="section__img" id="{{ .SongID}}" onclick="showVideo(this)">
-            <div class="section__name">
-                <a class="none" id="9{{ .SongID }}">../{{ .PreviewVideoSrc }}</a>
-                <div class="name__title song{{ .SongID}}">{{ .SongName }}</div>
-                <div class="name__subtitle">{{ .SongAuthor }}</div>
-            </div>
-        </div>
-        {{ end }}
-    </div>
-    <div class="game-menu">
-        <div class="game-menu__party">
-            <div id="needUser" class="party__messege">Join and start playing</div>
-            <div class="party__user  none" id="user1">
-               <img class="user__avatar"/>
-                <div class="user__name" id="userName1">Kirill</div>
-            </div>
-            <div class="party__user  none" id="user2">
-               <img class="user__avatar"/>
-                <div class="user__name" id="userName2">Zachar</div>
-            </div>
-            <div class="party__user  none" id="user3">
-               <img class="user__avatar"/>
-                <div class="user__name" id="userName3">Maksim</div>
-            </div>
-            <div class="party__user none" id="user4">
-               <img class="user__avatar"/>
-                <div class="user__name" id="userName4">Valeryan</div>
-            </div>
-        </div>
-        <video poster="../static/img/618363928f4aef76ef260de7_1080_stackImages_1636000944.png" id="videoPlayer" autoplay
-               loop class="game-menu__preview">
-            <source controls="false" type="video/mp4">
-        </video>
-        <div class="game-menu__play-button"><a class="play-button" id="Play">Play</a></div>
-    </div>
-    <div class="page__info" id="guide" onclick="closeGuide()">
-        <h1 class="info__title">User Guide</h1>
-        <div class="info__rmation">
-            <p>Choose a song to start dancing to.</p>
-            <p>On the page open on your mobile phone, log in or register.</p>
-            <p>Enter the room code on the open page.</p>
-            <p>Mirror the dance characters' movements. Your progress and score will be displayed on the computer screen.</p>
-            <p>After the song ends, you will see your results and be able to view your rating and achievements. Enjoy dancing and good luck! </p>
-        </div>
-    </div>
+	<img class="btn-back hide" id="return-button" src="../static/img/Group%206.svg" onclick="closeSong()" alt="">
+	<div class="dance-style" id="list-genre">
+		{{ range .Styles }}
+		<div class="dance-style__button" id="{{ .StyleID }}" onclick="openSong(this)">
+			<a href="#" class="button__text">{{ .StyleName }}</a>
+		</div>
+		{{ end }}
+	</div>
+	<div id="list-song" class="songs none">
+		{{ range .Songs }}
+		<div class="song__section none style-id={{ .StyleID }}" id={{ .StyleID }} onclick="addColor(this)">
+			<img src="../{{ .ImageSrc }}" class="section__img" id="{{ .SongID}}" onclick="showVideo(this)"  alt="">
+			<div class="section__name">
+				<a class="none" id="9{{ .SongID }}">../{{ .PreviewVideoSrc }}</a>
+				<div class="name__title song{{ .SongID}}">{{ .SongName }}</div>
+				<div class="name__subtitle">{{ .SongAuthor }}</div>
+			</div>
+		</div>
+		{{ end }}
+	</div>
+	<div class="game-menu">
+		<div class="game-menu__party">
+			<div id="needUser" class="party__message">Join and start playing</div>
+			<div class="party__user  none" id="user1">
+				<img class="user__avatar" src="" alt="" />
+				<div class="user__name" id="userName1">Kirill</div>
+			</div>
+			<div class="party__user  none" id="user2">
+				<img class="user__avatar" src="" alt=""/>
+				<div class="user__name" id="userName2"></div>
+			</div>
+			<div class="party__user  none" id="user3">
+				<img class="user__avatar" src="" alt="" />
+				<div class="user__name" id="userName3"></div>
+			</div>
+			<div class="party__user none" id="user4">
+				<img class="user__avatar" src="" alt="" />
+				<div class="user__name" id="userName4"></div>
+			</div>
+		</div>
+		<video poster="../static/img/618363928f4aef76ef260de7_1080_stackImages_1636000944.png" id="videoPlayer" autoplay
+		       loop class="game-menu__preview">
+			<source controls="false" type="video/mp4">
+		</video>
+		<div class="game-menu__play-button"><a class="play-button" id="Play">Play</a></div>
+	</div>
+	<div class="page__info" id="guide" onclick="closeGuide()">
+		<h1 class="info__title">User Guide</h1>
+		<div class="information">
+			<p>Choose a song to start dancing to.</p>
+			<p>On the page open on your mobile phone, log in or register.</p>
+			<p>Enter the room code on the open page.</p>
+			<p>Mirror the dance characters' movements. Your progress and score will be displayed on the computer screen.</p>
+			<p>After the song ends, you will see your results and be able to view your rating and achievements. Enjoy dancing
+				and good luck! </p>
+		</div>
+	</div>
 </div>
 </body>
 </html>
