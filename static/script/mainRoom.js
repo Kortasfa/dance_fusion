@@ -36,7 +36,7 @@ function getUsersByCookie() {
             indexUserImg.src = '../' + imgSrc;
             indexUserName.innerText = userName;
             readyPlayer = true;
-            changeButton();
+                changeButton();
         }
     }
 }

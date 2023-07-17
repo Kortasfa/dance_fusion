@@ -20,12 +20,12 @@
 				<a class="guide__title">Сode room</a>
 				<a class="guide__code" id="CodeRoom">{{ .RoomKey }}</a>
 			</div>
-			<img src="../static/img/question-answer-svgrepo-com.svg" class="header__icon" id="openGuide">
+			<img src="../static/img/question-answer-svgrepo-com.svg" class="header__icon" id="openGuide" alt="">
 		</div>
 	</div>
 </header>
 <div class="content">
-	<img class="btn-back hide" id="return-button" src="../static/img/Group%206.svg" onclick="closeSong()">
+	<img class="btn-back hide" id="return-button" src="../static/img/Group%206.svg" onclick="closeSong()" alt="">
 	<div class="dance-style" id="list-genre">
 		{{ range .Styles }}
 		<div class="dance-style__button" id="{{ .StyleID }}" onclick="openSong(this)">
@@ -36,7 +36,7 @@
 	<div id="list-song" class="songs none">
 		{{ range .Songs }}
 		<div class="song__section none style-id={{ .StyleID }}" id={{ .StyleID }} onclick="addColor(this)">
-			<img src="../{{ .ImageSrc }}" class="section__img" id="{{ .SongID}}" onclick="showVideo(this)">
+			<img src="../{{ .ImageSrc }}" class="section__img" id="{{ .SongID}}" onclick="showVideo(this)"  alt="">
 			<div class="section__name">
 				<a class="none" id="9{{ .SongID }}">../{{ .PreviewVideoSrc }}</a>
 				<div class="name__title song{{ .SongID}}">{{ .SongName }}</div>
@@ -49,19 +49,19 @@
 		<div class="game-menu__party">
 			<div id="needUser" class="party__message">Join and start playing</div>
 			<div class="party__user  none" id="user1">
-				<img class="user__avatar"/>
+				<img class="user__avatar" src="" alt="" />
 				<div class="user__name" id="userName1">Kirill</div>
 			</div>
 			<div class="party__user  none" id="user2">
-				<img class="user__avatar"/>
+				<img class="user__avatar" src="" alt=""/>
 				<div class="user__name" id="userName2"></div>
 			</div>
 			<div class="party__user  none" id="user3">
-				<img class="user__avatar"/>
+				<img class="user__avatar" src="" alt="" />
 				<div class="user__name" id="userName3"></div>
 			</div>
 			<div class="party__user none" id="user4">
-				<img class="user__avatar"/>
+				<img class="user__avatar" src="" alt="" />
 				<div class="user__name" id="userName4"></div>
 			</div>
 		</div>

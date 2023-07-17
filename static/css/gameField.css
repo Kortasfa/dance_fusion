@@ -135,3 +135,33 @@
     display: none;
 }
 
+.hero__rating-good{
+    width: 270px;
+    position: absolute;
+    margin-top: 140px;
+}
+
+.hero__rating-ok{
+    width: 270px;
+    position: absolute;
+    margin-top: 150px;
+}
+
+.hero__rating-perfect{
+    width: 323px;
+    position: absolute;
+    margin-top: 145px;
+}
+
+.hero__rating_visible{
+    animation-duration: 1s;
+    animation-name: score;
+}
+
+@keyframes score {
+    0% { opacity: 0; width: 0px;}
+    10%{opacity: 1; width: 250px;}
+    50% { width: 323px;}
+    90% { opacity: 1; width: 250px;}
+    100% { opacity: 0; width: 0px;}
+}

@@ -121,6 +121,7 @@ func getFacesData(db *sqlx.DB) ([]faceData, error) {
 		FROM
 			faces
 	`
+
 	var data []faceData
 
 	err := db.Select(&data, query)
