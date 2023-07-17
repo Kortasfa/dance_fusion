@@ -57,21 +57,6 @@ type menuPageData struct {
 	WssURL  string
 }
 
-/*func test(w http.ResponseWriter, r *http.Request) {
-	tmpl, err := template.ParseFiles("pages/test.html")
-	if err != nil {
-		http.Error(w, "Internal Server Error", 500)
-		log.Println(err.Error())
-		return
-	}
-	err = tmpl.Execute(w, nil)
-	if err != nil {
-		http.Error(w, "Internal Server Error", 500)
-		log.Println(err.Error())
-		return
-	}
-}*/
-
 func homePageHandler(w http.ResponseWriter, r *http.Request) {
 	tmpl, err := template.ParseFiles("pages/homePage.html")
 	if err != nil {

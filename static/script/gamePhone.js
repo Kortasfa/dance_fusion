@@ -1,6 +1,7 @@
-const btnGo = document.getElementById("btn-join")
-const enterInRoom = document.querySelector(".entrance-id-room__field")
-const connectionText = document.querySelector(".connection")
+const btnGo = document.getElementById("btn-join");
+const enterInRoom = document.querySelector(".entrance-id-room__field");
+const connectionText = document.querySelector(".connection");
+const entranceField = document.querySelector(".entrance");
 const warningID = document.getElementById("id-warning");
 const emptyID = document.getElementById("id-empty");
 const fullID = document.getElementById("id-full");
@@ -66,8 +67,7 @@ function sendMessage() {
         XHR.open("POST", "/api/joinToRoom");
         XHR.onload = function () {
             if (XHR.status === 200) {
-                btnGo.classList.add("hidden");
-                enterInRoom.classList.add("hidden");
+                entranceField.classList.add("hidden");
                 connectionText.classList.remove("hidden");
                 emptyID.classList.add("hidden");
                 fullID.classList.add("hidden");

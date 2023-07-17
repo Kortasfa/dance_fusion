@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
+  <head>
     <meta charset="utf-8">
     <title>Dance Fusion</title>
     <link rel="stylesheet" href="/static/css/gameField.css"/>
@@ -12,44 +12,43 @@
     <script>
         let WssURL = "{{ .WssURL }}";
     </script>
-</head>
-<body class="main">
-<div class="rank">
-    <div class="rank__hero" id="hero1" onclick="getUsersByCooki()">
+  </head>
+  <body class="main">
+    <div class="rank">
+      <div class="rank__hero" id="hero1" onclick="getUsersByCooki()">
         <img class="hero__avatar" id="heroImg1">
         <span class="hero__name" id="heroName1">Name 1</span>
         <span class="hero__score">0</span>
-    </div>
-    <div class="rank__hero hidden" id="hero2">
+      </div>
+      <div class="rank__hero hidden" id="hero2">
         <img class="hero__avatar" id="heroImg2">
         <span class="hero__name" id="heroName2">Name 2</span>
         <span class="hero__score">0</span>
-    </div>
-    <div class="rank__hero hidden" id="hero3">
+      </div>
+      <div class="rank__hero hidden" id="hero3">
         <img class="hero__avatar" id="heroImg3">
         <span class="hero__name" id="heroName3">Name 3</span>
         <span class="hero__score">0</span>
-    </div>
-    <div class="rank__hero hidden" id="hero4">
+      </div>
+      <div class="rank__hero hidden" id="hero4">
         <img class="hero__avatar" id="heroImg4">
         <span class="hero__name" id="heroName4">Name 4</span>
         <span class="hero__score">0</span>
+      </div>
     </div>
-</div>
-<div class="btn-exit">
-    <img src="/static/img/log_out.svg">
-</div>
-<div class="pop-up" id="pop-up">
-    <div class="pop-up__pop-up-box">
-        <span class="pop-up-box__question">Are you ready to go?</span>
-        <span class="pop-up-box__pressing">Press GO!</span>
-        <button id="btn-go" class="pop-up-box__start-btn" type="button">GO!</button>
+    <div class="btn-exit">
+      <img src="/static/img/log_out.svg">
     </div>
-</div>
-<
-<video id="video-dance" class="video-dance" type="video/mp4" width="100%" autoplay="autoplay">
-    <source id="video-src" src="../video/americanGirl.mp4">
-</video>
-<div class="dance-movements"></div>
-</body>
+<!--    <div class="pop-up" id="pop-up">-->
+<!--      <div class="pop-up__pop-up-box">-->
+<!--        <span class="pop-up-box__question">Are you ready to go?</span>-->
+<!--        <span class="pop-up-box__pressing">Press GO!</span>-->
+<!--        <button id="btn-go" class="pop-up-box__start-btn" type="button">GO!</button>-->
+<!--      </div>-->
+<!--    </div>-->
+    <<video id="video-dance" class="video-dance" type="video/mp4" width="100%" autoplay="autoplay">
+      <source id="video-src" src="../video/americanGirl.mp4">
+    </video>
+    <div class="dance-movements"></div>
+  </body>
 </html>
