@@ -25,7 +25,6 @@ func main() {
 	dbx := sqlx.NewDb(db, dbDriverName)
 
 	r := mux.NewRouter()
-	/*r.HandleFunc("/test", test)*/
 	r.HandleFunc("/join", joinPageHandler).Methods("GET")
 	r.HandleFunc("/", homePageHandler)
 	r.HandleFunc("/home", homePageHandler)
