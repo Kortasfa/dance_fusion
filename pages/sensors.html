@@ -108,6 +108,40 @@
                 console.log('Error sending data:', error);
             });
     }
+
+    // Function to handle danceData sequentially
+    function handleDanceData(index, danceData) {
+        if (index >= danceData.length) {
+            // If all danceData objects have been processed, stop recording and exit
+            stopRecording();
+            return;
+        }
+
+        const currentDanceData = danceData[index];
+        const { start_time, duration, name } = currentDanceData;
+
+        // Start recording after the start time
+        setTimeout(() => {
+            startRecording();
+            // Stop recording after the duration
+            setTimeout(() => {
+                // Send data to the server
+                stopRecording();
+                // Move to the next danceData object
+                handleDanceData(index + 1, danceData);
+            }, duration * 1000);
+        }, (start_time - danceData[0].start_time) * 1000);
+    }
+
+    fetch('static/moves/forgetYou.json')
+        .then(response => response.json())
+        .then(danceData => {
+            // Start handling danceData from the beginning (index 0)
+            handleDanceData(0, danceData);
+        })
+        .catch(error => {
+            console.error('Error fetching JSON:', error);
+        });
 </script>
 </body>
 </html>

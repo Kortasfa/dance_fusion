@@ -74,7 +74,7 @@ function closeSong() {
 function openGuide() {
   guide.classList.add('play');
   guide.classList.remove('unplay');
-}
+  }
 
 function closeGuide() {
   guide.classList.add('unplay');
@@ -153,6 +153,9 @@ socket.onmessage = function(event) {
   let userID = parts[0];
   let userName = parts[1];
   let imgSrc = parts[2];
+  console.log('Пользователь присоединился: ' + userID);
+  console.log('Его имя: ' + userName);
+  console.log('Его фотка: ' + imgSrc);
   numberOfUser = numberOfUser + 1;
   document.cookie = "User" + numberOfUser + '=' + parts + ';path=/';
   userMSG.classList.add('none');
@@ -164,9 +167,9 @@ socket.onmessage = function(event) {
   redyPlayer = true;
   ChengeBtn();
   indexUserName.innerText = userName;
-  console.log('Пользователь присоединился: ' + userID);
-  console.log('Его имя: ' + userName);
-  console.log('Его фотка: ' + imgSrc);
+  // console.log('Пользователь присоединился: ' + userID);
+  // console.log('Его имя: ' + userName);
+  // console.log('Его фотка: ' + imgSrc);
 };
 
 socket.onclose = function(event) {
