@@ -91,7 +91,7 @@ function sendMessage() {
                     else {
                         console.log('Motions:');
                         console.log(JSON.parse(receivedData))//////////////////////////////
-                        record()
+                        //record()
 
                     }
                 };

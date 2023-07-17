@@ -1511,7 +1511,7 @@ function createExportWrapper(name, fixedasm) {
 }
 
 var wasmBinaryFile;
-  wasmBinaryFile = '../../static/test/edge-impulse-standalone.wasm';
+  wasmBinaryFile = 'edge-impulse-standalone.wasm';
   if (!isDataURI(wasmBinaryFile)) {
     wasmBinaryFile = locateFile(wasmBinaryFile);
   }

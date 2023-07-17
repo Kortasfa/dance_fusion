@@ -17,62 +17,38 @@
     </style>
 </head>
 <body>
-    <h1></h1>
+<h1></h1>
 
-    <p>
-        <input type="text" id="features" placeholder="Paste your features here">
-    </p>
-    <p>
-        <button id="run-inference">Run inference</button>
-    </p>
-    <p id="results"></p>
+<p>
+    <input type="text" id="features" placeholder="Paste your features here">
+</p>
+<p>
+    <button id="run-inference">Run inference</button>
+</p>
+<p id="results"></p>
 
-    <script src="edge-impulse-standalone.js"></script>
-    <script src="run-impulse.js"></script>
-    <script>
-        (async () => {
-            var classifier = new EdgeImpulseClassifier();
-            await classifier.init();
+<script src="edge-impulse-standalone.js"></script>
+<script src="run-impulse.js"></script>
+<script>
+    (async () => {
+        var classifier = new EdgeImpulseClassifier();
+        await classifier.init();
 
-            let project = classifier.getProjectInfo();
-            document.querySelector('h1').textContent = project.owner + ' / ' + project.name + ' (version ' + project.deploy_version + ')';
+        let project = classifier.getProjectInfo();
+        document.querySelector('h1').textContent = project.owner + ' / ' + project.name + ' (version ' + project.deploy_version + ')';
 
+        document.querySelector('#run-inference').onclick = () => {
+            try {
+                let features = document.querySelector('#features').value.split(',').map(x => Number(x.trim()));
+                let res = classifier.classify(features);
+                document.querySelector('#results').textContent = JSON.stringify(res, null, 4);
+            }
+            catch (ex) {
+                alert('Failed to classify: ' + (ex.message || ex.toString()));
+            }
+        };
+    })();
 
-            let socket = new WebSocket("wss://" + window.location.hostname + "/neuralWS");
-
-            socket.onopen = function(event) {
-                console.log("WebSocket connection established.");
-            };
-
-            socket.onmessage = function(event) {
-                try {
-                    let features = event.data.split(',').map(x => Number(x.trim()));
-                    let res = classifier.classify(features);
-                    socket.send(JSON.stringify(res, null, 4));
-                }
-                catch (ex) {
-                    alert('Failed to classify: ' + (ex.message || ex.toString()));
-                    socket.send("error");
-                }
-            };
-
-            socket.onclose = function(event) {
-                console.log("WebSocket connection closed.");
-            };
-
-
-            /*document.querySelector('#run-inference').onclick = () => {
-                try {
-                    let features = document.querySelector('#features').value.split(',').map(x => Number(x.trim()));
-                    let res = classifier.classify(features);
-                    document.querySelector('#results').textContent = JSON.stringify(res, null, 4);
-                }
-                catch (ex) {
-                    alert('Failed to classify: ' + (ex.message || ex.toString()));
-                }
-            };*/
-        })();
-
-    </script>
+</script>
 </body>
 </html>
