@@ -7,26 +7,39 @@
     <link rel="stylesheet" href="/static/css/signUp.css"/>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cherry+Bomb+One&family=Roboto&display=swap" rel="stylesheet">
     <script src="/static/script/signUp.js " defer></script>
   </head>
   <body class="page">
+<!--    <img class="logo__item" src="/static/img/logo__item.gif">-->
+    <div class="logo">
+      <span style="--i:1" class="logo__item">D</span>
+      <span style="--i:2" class="logo__item">a</span>
+      <span style="--i:3" class="logo__item">n</span>
+      <span style="--i:4" class="logo__item">c</span>
+      <span style="--i:5" class="logo__item">e</span>
+      <span style="--i:6" class="logo__item">⠀</span>
+      <span style="--i:7" class="logo__item">F</span>
+      <span style="--i:8" class="logo__item">u</span>
+      <span style="--i:9" class="logo__item">s</span>
+      <span style="--i:10" class="logo__item">i</span>
+      <span style="--i:11" class="logo__item">o</span>
+      <span style="--i:12" class="logo__item">n</span>
+    </div>
     <div class="entrance">
       <div class="entrance__field">
         <span class="field__description">Username</span>
         <input id="name" class="field__input" type="text">
-        <span class="field__warning hidden">Username is taken</span>
+        <span id="username-taken" class="field__warning hidden">Username is taken</span>
+        <span id="username-empty" class="field__warning hidden">The field is empty</span>
       </div>
       <div class="entrance__field">
         <span class="field__description">Password</span>
         <input id="password" class="field__input field__input_type-password" type="password">
         <img class="field__eye hidden" src="/static/img/eye_off.svg">
+        <span id="password-empty" class="field__warning hidden">The field is empty</span>
       </div>
       <button id="btn-sign-up" class="entrance__btn">Sign Up</button>
-    </div>
-    <div class="message-log-in hidden">
-      <span class="message-log-in__sign-up">OK! Let`s log in</span>
-      <button id="btn-log-in" class="message-log-in__btn">Log In</button>
     </div>
   </body>
 </html>
