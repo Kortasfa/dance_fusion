@@ -1,41 +1,55 @@
-const btnGo = document.getElementById("btn-join")
-const enterInRoom = document.querySelector(".entrance-id-room__field")
-const connectionText = document.querySelector(".connection")
+const btnGo = document.getElementById("btn-join");
+const enterInRoom = document.querySelector(".entrance-id-room__field");
+const connectionText = document.querySelector(".connection");
+const entranceField = document.querySelector(".entrance");
 const warningID = document.getElementById("id-warning");
 const emptyID = document.getElementById("id-empty");
-function getCookieValue(cookieName) {
-    let allCookies = document.cookie;
-    let cookiesArray = allCookies.split(';');
-    let name = cookieName + "=";
-    for (let i = 0; i < cookiesArray.length; i++) {
-        let cookie = cookiesArray[i].trim();
-        if (cookie.indexOf(name) === 0) {
-            return cookie.substring(name.length, cookie.length);
+const fullID = document.getElementById("id-full");
+const btnLogOut = document.querySelector(".btn-log-out");
+
+function setJsonCookie(name, value, expirationDays) {
+    const jsonValue = JSON.stringify(value);
+    const encodedValue = encodeURIComponent(jsonValue);
+    document.cookie = `${name}=${encodedValue}; path=/; expires=${getExpirationDate(expirationDays)}`;
+}
+
+function getJsonCookie(name) {
+    const cookies = document.cookie.split(';');
+    for (let i = 0; i < cookies.length; i++) {
+        const cookie = cookies[i].trim();
+        if (cookie.startsWith(name + '=')) {
+            const encodedValue = cookie.substring(name.length + 1);
+            const decodedValue = decodeURIComponent(encodedValue);
+            return JSON.parse(decodedValue);
         }
     }
-    return "";
+    return null;
 }
-function setCookie(cookieName, value, days) {
-    let d = new Date();
-    d.setTime(d.getTime() + (days*24*60*60*1000));
-    let expires = "expires="+ d.toUTCString();
-    document.cookie = cookieName + "=" + value + ";" + expires + ";path=/";
+
+function getExpirationDate(expirationDays) {
+    const date = new Date();
+    date.setDate(date.getDate() + expirationDays);
+    return date.toUTCString();
 }
+
+const userInfo = getJsonCookie("userInfoCookie");
+document.querySelector('.user__name').textContent = userInfo.UserName;
+document.querySelector('.user__avatar').src = userInfo.ImgSrc;
+
 function sendMessage() {
     if (enterInRoom.value === "") {
         warningID.classList.add("hidden");
+        fullID.classList.add("hidden");
         emptyID.classList.remove("hidden");
         enterInRoom.classList.add("entrance-id-room__field_warning");
     }
     else {
-        let authCookieValue = getCookieValue("authCookieName");
-        if (authCookieValue === "") {
+        if (userInfo === null) {
             console.log("Login to your account!");
             return
         }
-        let roomCookieValue = getCookieValue("roomCookieName");
-        if (roomCookieValue !== "") {
-            if (enterInRoom.value !== roomCookieValue) {
+        if (userInfo.SelectedRoom !== "") {
+            if (enterInRoom.value !== userInfo.SelectedRoom) {
                 console.log("You are already connected to another room!");
             }
             else {
@@ -43,11 +57,9 @@ function sendMessage() {
             }
             return
         }
-        warningID.classList.add("hidden")
-        enterInRoom.classList.remove("entrance-id-room__field_warning")
         let IDField = document.getElementById("id-field");
         let postInfo = {
-            "userID": authCookieValue,
+            "userID": userInfo.UserID,
             "roomID": enterInRoom.value
         }
         let messageContent = JSON.stringify(postInfo);
@@ -55,25 +67,63 @@ function sendMessage() {
         XHR.open("POST", "/api/joinToRoom");
         XHR.onload = function () {
             if (XHR.status === 200) {
-                btnGo.classList.add("hidden");
-                enterInRoom.classList.add("hidden");
+                entranceField.classList.add("hidden");
                 connectionText.classList.remove("hidden");
                 emptyID.classList.add("hidden");
+                fullID.classList.add("hidden");
+                warningID.classList.add("hidden");
                 console.log("Connected to the room!");
-                setCookie("roomCookieName", enterInRoom.value, 1)
+
+                let socket = new WebSocket("wss://" + window.location.hostname + "/ws/joinToRoom/" + userInfo.UserID);
+
+                socket.onopen = function(event) {
+                    console.log("WebSocket connection established.");
+                };
+
+                socket.onmessage = function(event) {
+                    let receivedData = event.data;
+                    if (receivedData === 'pause') {
+                        console.log('pause');
+                    }
+                    else if (receivedData === 'resume') {
+                        console.log('resume');
+                    }
+                    else {
+                        console.log('Motions:');
+                        console.log(JSON.parse(receivedData))
+                    }
+                };
+
+                socket.onclose = function(event) {
+                    console.log("WebSocket connection closed.");
+                };
+
             } else if (XHR.status === 404) {
                 emptyID.classList.add("hidden");
                 warningID.classList.remove("hidden");
+                fullID.classList.add("hidden");
                 enterInRoom.classList.add("entrance-id-room__field_warning");
                 console.log("Room ID not found!");
             } else if (XHR.status === 409) {
+                emptyID.classList.add("hidden");
+                fullID.classList.remove("hidden");
+                warningID.classList.add("hidden");
+                enterInRoom.classList.add("entrance-id-room__field_warning");
                 console.log("The room is full!");
             } else {
-                console.log("Failed to send room id");
+                alert("Failed to send room id");
             }
         };
         XHR.send(messageContent);
     }
 }
 
+async function logout() {
+    const response = await fetch("/clear");
+    if (response.ok) {
+        window.location.href = "/logIn";
+    }
+}
+
+btnLogOut.addEventListener("click", logout)
 btnGo.addEventListener("click", sendMessage);

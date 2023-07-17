@@ -25,16 +25,19 @@ func main() {
 	dbx := sqlx.NewDb(db, dbDriverName)
 
 	r := mux.NewRouter()
+	/*r.HandleFunc("/test", test)*/
 	r.HandleFunc("/join", joinPageHandler).Methods("GET")
 	r.HandleFunc("/", homePageHandler)
 	r.HandleFunc("/home", homePageHandler)
 	r.HandleFunc("/room", handleCreateRoom)
 	r.HandleFunc("/room/", handleCreateRoom)
 	r.HandleFunc("/room/{id}", handleRoom(dbx))
-	r.HandleFunc("/roomWS/{id}", roomWSHandler)
 	r.HandleFunc("/gameField/id", gameField)
 	r.HandleFunc("/signUp", signUp)
-	r.HandleFunc("/login", logIn)
+	r.HandleFunc("/logIn", logIn)
+
+	r.HandleFunc("/roomWS/{id}", roomWSHandler(dbx))
+	r.HandleFunc("/ws/joinToRoom/{id}", joinPageWSHandler)
 
 	r.HandleFunc("/api/joinToRoom", getJoinedUserData(dbx)).Methods("POST")
 	r.HandleFunc("/api/signUp", getRegisteredUserData(dbx)).Methods("POST")
@@ -42,6 +45,7 @@ func main() {
 	r.HandleFunc("/clear", clearCookie(dbx))
 
 	go handleRoomWSMessages()
+	go handleJoinPageWSMessages()
 
 	r.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir("./static"))))
 

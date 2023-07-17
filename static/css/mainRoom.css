@@ -5,14 +5,8 @@
     margin: 0;
 }
 
-.game-menu__line{
-    height: 2px;
-    background: #D20835;
-    filter: blur(2px);
-}
-
 .page{
-    background-color: #0DF2BF;
+    background-color: #FFE973;
     position: relative;
 }
 
@@ -85,6 +79,7 @@
     display: flex;
     text-align: center;
     border-radius: 0 0 0 10px;
+    flex-wrap: nowrap;
 }
 
 .header__icon{
@@ -107,10 +102,14 @@
 }
 
 .dance-style__button{
+
     margin: 24px;
 }
 
 .button__text{
+    border-style: dashed;
+    border-width: 5px;
+    border-color: #BD63D4;
     display: block;
     font: normal 400 47px/1.54 'Roboto';
     border-radius: 10px;
@@ -125,11 +124,14 @@
 }
 
 .button__text:hover{
-    background: #DBFF00;
+    background: #AEF26D;
 }
 
 .play-button
 {
+    border-style: dashed;
+    border-width: 5px;
+    border-color: #FFE973;
     display: block;
     font: normal 400 47px/1.54 'Roboto';
     border-radius: 10px;
@@ -143,10 +145,6 @@
     box-shadow: 0 6px 4px -4px rgba(0, 0, 0, .2);
 }
 
-.play-button:hover{
-    background: #DBFF00;
-}
-
 .game-menu__play-button{
     margin-top: auto;
     margin-bottom: 5px;
@@ -155,10 +153,11 @@
 .game-menu{
     width: 642px;
     min-height: 600px;
-    background-color: #F20D40;
+    background-color: #BD63D4;
     display: flex;
     flex-direction: column;
     border-radius: 10px;
+    box-shadow: 0 6px 4px -4px rgba(0, 0, 0, .2);
 }
 
 .game-menu__party{
@@ -166,14 +165,6 @@
     height: 164px;
     flex-direction: row;
     justify-content: center;
-}
-
-.active{
-    background-color: yellow;
-}
-
-.actived{
-    background-color: yellow;
 }
 
 .party__user{
@@ -202,12 +193,16 @@
 .section__img{
     border-radius: 10px;
     width: 107px;
-    height: 107px;
+    height: 105px;
     position: absolute;
     padding-right: 245px;
 }
 
 .song__section{
+    border-style: dashed;
+    border-width: 5px;
+    border-color: #BD63D4;
+    width: 290px;
     border-radius: 10px;
     position: relative;
     width: 352px;
@@ -217,7 +212,7 @@
     box-shadow: 0 6px 4px -4px rgba(0, 0, 0, .2);
 }
 .song__section:hover{
-    background: #DBFF00;
+    background: #AEF26D;
 }
 
 .name__title{
@@ -248,23 +243,24 @@
 
 .info__title{
     text-align: center;
-    margin: 10px;
+    margin: 35px;
+    font: normal 400 48px 'Roboto';
 }
 
 .info__rmation{
-    font: normal 400 22px 'Roboto';
+    font: normal 400 40px 'Roboto';
 }
 
 .info__rmation p{
-    margin: 14px
+    margin: 35px;
 }
 
-.section__name{
+.section__name {
     margin: 24px 24px 24px 134px;
 }
 
 .btn-back{
-    margin-bottom: 515px;
+    margin-bottom: 500px;
 }
 
 .party__messege{
@@ -275,12 +271,16 @@
     animation: blink 1s infinite;
 }
 
-.game-menu__play-button_yellow{
-    background: #DBFF00;
-}
-
 .none{
     display: none;
+}
+
+.hide{
+    visibility: hidden;
+}
+
+.button_yellow{
+    background: #AEF26D;
 }
 
 .songs::-webkit-scrollbar {
@@ -351,3 +351,32 @@
         margin-bottom: 10px;
     }
   }
+@media screen and (max-width: 642px) {
+    .game-menu {
+        width: 355px;
+    }
+
+    .game-menu__party {
+        height: 90px;
+    }
+
+    .game-menu {
+        width: 355px;
+        min-height: 420px;
+    }
+
+    .party__messege {
+        font: normal 400 32px/1.54 'Roboto';
+    }
+
+    .game-menu__preview {
+        width: 340px;
+        height: 192px;
+    }
+
+    .play-button {
+        padding: 4px 31px;
+        width: 150px;
+        margin: 0 auto 12px;
+    }
+}
