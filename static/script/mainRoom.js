@@ -13,7 +13,6 @@ let readySong = false;
 btnOpenInfo.addEventListener('click', openGuide);
 
 document.addEventListener("DOMContentLoaded", getUsersByCookie);
-
 function getUsersByCookie() {
     let allCookies = document.cookie;
     let cookiesArray = allCookies.split(';');
@@ -46,7 +45,7 @@ function changeButton() {
         readyGame = true;
     }
     if (readyGame) {
-        PlayBtn.classList.add('button_yellow');
+        PlayBtn.classList.add('button_ready');
     }
 }
 
@@ -112,7 +111,7 @@ $(document).ready(function () {
 
   // Fire on click
   trigger.on('click', function() {
-    if (PlayBtn.classList.contains('button_yellow')) {
+    if (readyGame) {
 
       socket.send(songName);
       console.log(songName)// Можно отправить pause или resume
