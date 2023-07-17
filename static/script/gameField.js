@@ -1,12 +1,13 @@
-// const danceVideo = document.getElementById("video-dance");
-// const modalElem = document.getElementById("pop-up");
-// const btnGo = document.getElementById("btn-go");
 let isBtnClicked = false;
 let scoreGood = 50;
 let scoreOk = 20;
 let scorePerfect = 90;
 
+const danceVideo = document.getElementById("video-dance");
+const modalElem = document.getElementById("pop-up");
+const btnContinue = document.getElementById("btn-continue");
 function getUsersByCookie() {
+    console.log('lol')
     let numberOfUser = 0;
     let allCookies = document.cookie;
     let cookiesArray = allCookies.split(';');
@@ -20,9 +21,12 @@ function getUsersByCookie() {
             let userName = parts[1];
             let imgSrc = parts[2];
             numberOfUser = numberOfUser + 1;
+            let userScore = document.getElementById('user-score' + numberOfUser);
             let indexUser = document.getElementById('hero' + numberOfUser);
             let indexUserName = document.getElementById('heroName' + numberOfUser);
             let indexUserImg = document.getElementById('heroImg' + numberOfUser);
+            userScore.innerText = userName + ":";
+            userScore.classList.remove('hidden');
             indexUser.classList.remove('hidden');
             indexUser.id = userID;
             indexUserImg.src =  '../' + imgSrc;
@@ -33,12 +37,23 @@ function getUsersByCookie() {
     }
 }
 
+function showStats() {
+    modalElem.classList.remove("hidden");
+    modalElem.classList.add("open");
+    console.log("end video")
+}
+
 getUsersByCookie();
+
+danceVideo.addEventListener('ended', showStats);
+btnContinue.addEventListener("click", function () {
+    window.location.href = "/room";
+})
+
+
 // function openModalElem() {
 //     modalElem.classList.add("open");
 // }
-
-let test = document.getElementById('test');
 
 // x
 
@@ -88,8 +103,6 @@ function AddScore(userID, Score){
 //         danceVideo.play();
 //     }, 500);
 // }
-
-// window.onload = openModalElem();
 /*window.onload = emulateClick(btnGo);
 
 /*function test() {

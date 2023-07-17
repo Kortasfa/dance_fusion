@@ -8,6 +8,7 @@ import (
 	"github.com/jmoiron/sqlx"
 	"html/template"
 	"io"
+	"io/ioutil"
 	"log"
 	"math/rand"
 	"net/http"
@@ -20,10 +21,13 @@ var upgrader = websocket.Upgrader{
 	WriteBufferSize: 1024,
 }
 
-var roomWSDict = make(map[*websocket.Conn]string)
-var broadcastJoiningUserID = make(chan []string)
-var roomIDDict = make(map[string]int)
+var roomWSDict = make(map[*websocket.Conn]string) // {WSConnection: roomID, WSConnection: roomID, WSConnection: roomID, ...}
+var broadcastJoiningUserID = make(chan []string)  // [RoomID, UserID, userName, imgSrc]
+var roomIDDict = make(map[string][]string)        // {roomID: [userID, userID, userID, userID]}
 var maxUsers int = 4
+
+var joinPageWSDict = make(map[*websocket.Conn]string) // {WSConnection: UserID, WSConnection: UserID, WSConnection: UserID, ...}
+var broadcastJoinPageWSMessage = make(chan []string)  // [UserID, Data]
 
 type stylesData struct {
 	StyleID   int    `db:"id"`
@@ -53,131 +57,20 @@ type menuPageData struct {
 	WssURL  string
 }
 
-type hatData struct {
-	recommendedLevel int    `db:"recommended_level"`
-	hatSrc           string `db:"hat_src"`
-}
-
-type bodyData struct {
-	recommendedLevel int    `db:"recommended_level"`
-	bodySrc          string `db:"body_src"`
-}
-
-type faceData struct {
-	recommendedLevel int    `db:"recommended_level"`
-	faceSrc          string `db:"face_src"`
-}
-
-type customPageData struct {
-	Hats   []hatData
-	Bodies []bodyData
-	Faces  []faceData
-}
-
-
-func getHatsData(db *sqlx.DB) ([]hatData, error) {
-	const query = `
-		SELECT
-			recommended_level,
-			hat_src
-		FROM
-			hats
-	`
-	var data []hatData
-
-	err := db.Select(&data, query)
-
+/*func test(w http.ResponseWriter, r *http.Request) {
+	tmpl, err := template.ParseFiles("pages/test.html")
 	if err != nil {
-		return nil, err
+		http.Error(w, "Internal Server Error", 500)
+		log.Println(err.Error())
+		return
 	}
-
-	return data, nil
-}
-
-func getBodiesData(db *sqlx.DB) ([]bodyData, error) {
-	const query = `
-		SELECT
-			recommended_level,
-			body_src
-		FROM
-			bodies
-	`
-	var data []bodyData
-
-	err := db.Select(&data, query)
-
+	err = tmpl.Execute(w, nil)
 	if err != nil {
-		return nil, err
+		http.Error(w, "Internal Server Error", 500)
+		log.Println(err.Error())
+		return
 	}
-
-	return data, nil
-}
-
-func getFacesData(db *sqlx.DB) ([]faceData, error) {
-	const query = `
-		SELECT
-			recommended_level,
-			face_src
-		FROM
-			faces
-	`
-
-	var data []faceData
-
-	err := db.Select(&data, query)
-
-	if err != nil {
-		return nil, err
-	}
-
-	return data, nil
-}
-
-func customUser(db *sqlx.DB) func(w http.ResponseWriter, r *http.Request) {
-	return func(w http.ResponseWriter, r *http.Request) {
-
-		tmpl, err := template.ParseFiles("pages/userAccount.html")
-		if err != nil {
-			http.Error(w, "Internal Server Error", 501)
-			log.Println(err.Error())
-			return
-		}
-
-		hats, err := getHatsData(db)
-		if err != nil {
-			http.Error(w, "Internal Server Error", 502)
-			log.Println(err)
-			return
-		}
-
-		bodies, err := getBodiesData(db)
-		if err != nil {
-			http.Error(w, "Internal Server Error", 503)
-			log.Println(err)
-			return
-		}
-
-		faces, err := getFacesData(db)
-		if err != nil {
-			http.Error(w, "Internal Server Error", 504)
-			log.Println(err)
-			return
-		}
-
-		data := customPageData{
-			Hats:   hats,
-			Bodies: bodies,
-			Faces:  faces,
-		}
-
-		err = tmpl.Execute(w, data)
-		if err != nil {
-			http.Error(w, "Internal Server Error", 505)
-			log.Println(err.Error())
-			return
-		}
-	}
-}
+}*/
 
 func homePageHandler(w http.ResponseWriter, r *http.Request) {
 	tmpl, err := template.ParseFiles("pages/homePage.html")
@@ -295,7 +188,7 @@ func handleCreateRoom(w http.ResponseWriter, r *http.Request) {
 			break
 		}
 	}
-	roomIDDict[fmt.Sprintf("%d", roomID)] = 0
+	roomIDDict[fmt.Sprintf("%d", roomID)] = []string{}
 	http.Redirect(w, r, fmt.Sprintf("/room/%d", roomID), http.StatusFound)
 }
 
@@ -343,6 +236,52 @@ func getUserInfo(db *sqlx.DB, userID string) (string, string, error) {
 	return data.UserName, data.ImgSrc, nil
 }
 
+func joinPageWSHandler(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	websocketID := vars["id"]
+	conn, err := upgrader.Upgrade(w, r, nil)
+	if err != nil {
+		log.Println("Failed to upgrade websocket connection:", err)
+		return
+	}
+	defer func(conn *websocket.Conn) {
+		err := conn.Close()
+		if err != nil {
+		}
+	}(conn)
+
+	joinPageWSDict[conn] = websocketID
+
+	for {
+		_, _, err := conn.ReadMessage()
+		if err != nil {
+			delete(roomWSDict, conn)
+			break
+		}
+	}
+}
+
+func handleJoinPageWSMessages() { // broadcastJoinPageWSMessage <- []string{UserID, Data}
+	for mesArr := range broadcastJoinPageWSMessage {
+		for wsConnect := range joinPageWSDict {
+			userID := mesArr[0]
+			data := mesArr[1]
+
+			if joinPageWSDict[wsConnect] == userID {
+				//log.Println("ОТПРАВИЛ", userID, data)
+				err := wsConnect.WriteMessage(websocket.TextMessage, []byte(data))
+				if err != nil {
+					err := wsConnect.Close()
+					if err != nil {
+						return
+					}
+					delete(roomWSDict, wsConnect)
+				}
+			}
+		}
+	}
+}
+
 func getJoinedUserData(db *sqlx.DB) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		reqData, err := io.ReadAll(r.Body)
@@ -366,11 +305,12 @@ func getJoinedUserData(db *sqlx.DB) func(w http.ResponseWriter, r *http.Request)
 			w.WriteHeader(404)
 			return
 		}
-		if roomIDDict[data.RoomID] >= maxUsers {
+		if len(roomIDDict[data.RoomID]) >= maxUsers {
 			w.WriteHeader(409)
 			return
 		}
-		roomIDDict[data.RoomID] = roomIDDict[data.RoomID] + 1
+		slice := roomIDDict[data.RoomID]
+		roomIDDict[data.RoomID] = append(slice, fmt.Sprintf("%d", data.UserID))
 		userName, imgSrc, err := getUserInfo(db, fmt.Sprintf("%d", data.UserID))
 		if err != nil {
 			http.Error(w, "Internal server error", 500)
@@ -419,28 +359,78 @@ func handleRoomWSMessages() {
 	}
 }
 
-func roomWSHandler(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	websocketID := vars["id"]
-	conn, err := upgrader.Upgrade(w, r, nil)
-	if err != nil {
-		log.Println("Failed to upgrade websocket connection:", err)
-		return
-	}
-	defer func(conn *websocket.Conn) {
-		err := conn.Close()
+func roomWSHandler(db *sqlx.DB) func(w http.ResponseWriter, r *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
+		vars := mux.Vars(r)
+		websocketID := vars["id"]
+		conn, err := upgrader.Upgrade(w, r, nil)
 		if err != nil {
+			log.Println("Failed to upgrade websocket connection:", err)
+			return
 		}
-	}(conn)
+		defer func(conn *websocket.Conn) {
+			err := conn.Close()
+			if err != nil {
+			}
+		}(conn)
 
-	roomWSDict[conn] = websocketID
+		roomWSDict[conn] = websocketID
 
-	for {
-		_, _, err := conn.ReadMessage()
+		_, message, err := conn.ReadMessage() // Чтение названия песни
 		if err != nil {
 			delete(roomWSDict, conn)
-			break
+			return
 		}
+		const query = `
+			SELECT
+				motion_list_path
+			FROM
+				songs
+			WHERE
+			   song_name=?
+		`
+
+		var motionListPath string
+		err = db.QueryRow(query, string(message)).Scan(&motionListPath)
+		if err != nil {
+			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+			log.Println(err.Error())
+			return
+		}
+
+		fileContent, err := ioutil.ReadFile(motionListPath)
+		if err != nil {
+			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+			fmt.Println("Ошибка при открытии файла:", err)
+			return
+		}
+		//log.Println(string(fileContent))
+		for roomID, userSlice := range roomIDDict {
+			if roomID == websocketID {
+				for _, userID := range userSlice {
+					broadcastJoinPageWSMessage <- []string{userID, string(fileContent)}
+					//fmt.Println(userID, "Пишем")
+				}
+				break
+			}
+		}
+
+		for { // Чтение действия (pause / resume)
+			_, message, err = conn.ReadMessage()
+			if err != nil {
+				delete(roomWSDict, conn)
+				break
+			}
+			for roomID, userSlice := range roomIDDict {
+				if roomID == websocketID {
+					for _, userID := range userSlice {
+						broadcastJoinPageWSMessage <- []string{userID, string(message)}
+					}
+					break
+				}
+			}
+		}
+
 	}
 }
 

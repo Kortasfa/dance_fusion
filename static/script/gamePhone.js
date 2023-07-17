@@ -1,6 +1,7 @@
-const btnGo = document.getElementById("btn-join")
-const enterInRoom = document.querySelector(".entrance-id-room__field")
-const connectionText = document.querySelector(".connection")
+const btnGo = document.getElementById("btn-join");
+const enterInRoom = document.querySelector(".entrance-id-room__field");
+const connectionText = document.querySelector(".connection");
+const entranceField = document.querySelector(".entrance");
 const warningID = document.getElementById("id-warning");
 const emptyID = document.getElementById("id-empty");
 const fullID = document.getElementById("id-full");
@@ -66,13 +67,37 @@ function sendMessage() {
         XHR.open("POST", "/api/joinToRoom");
         XHR.onload = function () {
             if (XHR.status === 200) {
-                btnGo.classList.add("hidden");
-                enterInRoom.classList.add("hidden");
+                entranceField.classList.add("hidden");
                 connectionText.classList.remove("hidden");
                 emptyID.classList.add("hidden");
                 fullID.classList.add("hidden");
                 warningID.classList.add("hidden");
                 console.log("Connected to the room!");
+
+                let socket = new WebSocket("wss://" + window.location.hostname + "/ws/joinToRoom/" + userInfo.UserID);
+
+                socket.onopen = function(event) {
+                    console.log("WebSocket connection established.");
+                };
+
+                socket.onmessage = function(event) {
+                    let receivedData = event.data;
+                    if (receivedData === 'pause') {
+                        console.log('pause');
+                    }
+                    else if (receivedData === 'resume') {
+                        console.log('resume');
+                    }
+                    else {
+                        console.log('Motions:');
+                        console.log(JSON.parse(receivedData))
+                    }
+                };
+
+                socket.onclose = function(event) {
+                    console.log("WebSocket connection closed.");
+                };
+
             } else if (XHR.status === 404) {
                 emptyID.classList.add("hidden");
                 warningID.classList.remove("hidden");

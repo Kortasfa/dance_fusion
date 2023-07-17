@@ -84,56 +84,54 @@ function closeGuide() {
     guide.classList.remove('play');
 }
 
+let songName = '';
 let test = document.getElementsByClassName("section__img");
 let testing = '';
 // Iterate over each element in the collection
 Array.from(test).forEach(function (element) {
-    element.addEventListener('click', function () {
-        let videoSrcID = '9' + element.id;
-        let video = document.getElementById(videoSrcID);
-        let videoPlayer = document.getElementById('videoPlayer');
-
-        // let menuItem = parent.querySelectorAll('.button_yellow');
-        // // Отлавливаем элемент в родители на который мы нажали
-        // for(let i = 0; i < menuItem.length; i++) {
-        //   menuItem[i].classList.remove('button_yellow');
-        // }
-        readySong = true;
-        changeButton();
-        videoPlayer.src = video.innerText;
-        testing = video.innerText;
-    });
+  element.addEventListener('click', function () {
+    let videoSrcID = '9' + element.id;
+    let video = document.getElementById(videoSrcID);
+    let videoPlayer = document.getElementById('videoPlayer');
+    songName = document.querySelector('.song' + element.id).innerHTML;
+    // let menuItem = parent.querySelectorAll('.button_yellow');
+    // // Отлавливаем элемент в родители на который мы нажали
+    // for(let i = 0; i < menuItem.length; i++) {
+    //   menuItem[i].classList.remove('button_yellow');
+    // }
+    readySong = true;
+    changeButton();
+    videoPlayer.src = video.innerText;
+    testing = video.innerText;
+  });
 });
 
 $(document).ready(function () {
     let trigger = $('#Play');
     let container = $('#content');
 
-    // Fire on click
-    trigger.on('click', function () {
-        if (PlayBtn.classList.contains('button_yellow')) {
-            container.load("/static/html/game.html", function () {
-                let video = $('#video-dance').get(0);
-                let src = $('#video-src').get(0);
-                src.setAttribute('src', testing);
+  // Fire on click
+  trigger.on('click', function() {
+    if (PlayBtn.classList.contains('button_yellow')) {
+
+      socket.send(songName);
+      console.log(songName)// Можно отправить pause или resume
+
+
+      container.load("/static/html/game.html", function () {
+        let video = $('#video-dance').get(0);
+        let src = $('#video-src').get(0);
+        src.setAttribute('src', testing);
 
                 video.addEventListener('loadeddata', function () {
                     video.play();
                 });
-
-                video.addEventListener('ended', function () {
-                    showStats();
-                });
             });
-
             return false;
         }
     });
 });
 
-function showStats() {
-    document.getElementById('video-dance').style.display = "none";
-}
 
 function showVideo(videoID) {
     let videoSrcID = '9' + videoID.id;
