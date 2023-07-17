@@ -73,6 +73,31 @@ function sendMessage() {
                 fullID.classList.add("hidden");
                 warningID.classList.add("hidden");
                 console.log("Connected to the room!");
+
+                let socket = new WebSocket("wss://" + window.location.hostname + "/ws/joinToRoom/" + userInfo.UserID);
+
+                socket.onopen = function(event) {
+                    console.log("WebSocket connection established.");
+                };
+
+                socket.onmessage = function(event) {
+                    let receivedData = event.data;
+                    if (receivedData === 'pause') {
+                        console.log('pause');
+                    }
+                    else if (receivedData === 'resume') {
+                        console.log('resume');
+                    }
+                    else {
+                        console.log('Motions:');
+                        console.log(JSON.parse(receivedData))
+                    }
+                };
+
+                socket.onclose = function(event) {
+                    console.log("WebSocket connection closed.");
+                };
+
             } else if (XHR.status === 404) {
                 emptyID.classList.add("hidden");
                 warningID.classList.remove("hidden");
