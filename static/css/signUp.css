@@ -10,14 +10,14 @@
 
 .logo {
     display: flex;
-    margin: 30px;
+    margin:  0 0 30px 0;
 }
 
 .logo__item {
     font: 400 42px Cherry Bomb One, cursive;
     color: #BD63D4;
 
-    animation: waviy 1s infinite;
+    animation: wavy 1s infinite;
     animation-delay: calc(.1s * var(--i));;
 }
 
@@ -30,8 +30,8 @@
 .entrance__field {
     display: flex;
     flex-direction: column;
-    margin: 0 0 5px 0;
     position: relative;
+    gap: 5px;
 }
 
 .field__description {
@@ -52,7 +52,8 @@
     outline: none;
     font: 400 32px Roboto, sans-serif;
     color: rgba(0, 0, 0, 0.70);
-    padding: 0 10px 0 10px
+    padding: 0 10px 0 10px;
+    box-shadow: 0 6px 4px -4px rgba(0, 0, 0, .2);
 }
 
 .field__input_type-password {
@@ -81,22 +82,21 @@
     width: 270px;
     height: 76px;
     border-radius: 10px;
-    background: #AEF26D;
-    border-style: dashed;
-    border-width: 5px;
-    border-color: #BD63D4;
+    border-style: none;
+    background: #BD63D4;
     font: 400 42px Roboto, sans-serif;
     color: #FAFCF6;
     display: flex;
     justify-content: center;
     align-items: center;
+    box-shadow: 0 6px 4px -4px rgba(0, 0, 0, .2);
 }
 
 .hidden {
     display: none;
 }
 
-@keyframes waviy {
+@keyframes wavy {
     0%, 40%, 100% {
         transform: translateY(0)
     }
