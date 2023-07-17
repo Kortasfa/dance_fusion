@@ -180,7 +180,7 @@ func handleCreateRoom(w http.ResponseWriter, r *http.Request) {
 func joinPageHandler(w http.ResponseWriter, r *http.Request) {
 	_, err := r.Cookie("userInfoCookie")
 	if err != nil {
-		http.Redirect(w, r, "/login", http.StatusFound)
+		http.Redirect(w, r, "/logIn", http.StatusFound)
 		return
 	}
 	tmpl, err := template.ParseFiles("pages/gamePhone.html")
@@ -344,6 +344,25 @@ func handleRoomWSMessages() {
 	}
 }
 
+func getMotionListPath(db *sqlx.DB, songName string) (string, error) {
+	const query = `
+		SELECT
+			motion_list_path
+		FROM
+			songs
+		WHERE
+		   song_name=?
+	`
+
+	var motionListPath string
+	err := db.QueryRow(query, songName).Scan(&motionListPath)
+	if err != nil {
+		return "", err
+	}
+
+	return motionListPath, nil
+}
+
 func roomWSHandler(db *sqlx.DB) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
@@ -363,23 +382,17 @@ func roomWSHandler(db *sqlx.DB) func(w http.ResponseWriter, r *http.Request) {
 
 		_, message, err := conn.ReadMessage() // Чтение названия песни
 		if err != nil {
+			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+			log.Println(err.Error())
 			delete(roomWSDict, conn)
 			return
 		}
-		const query = `
-			SELECT
-				motion_list_path
-			FROM
-				songs
-			WHERE
-			   song_name=?
-		`
 
-		var motionListPath string
-		err = db.QueryRow(query, string(message)).Scan(&motionListPath)
+		motionListPath, err := getMotionListPath(db, string(message))
 		if err != nil {
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 			log.Println(err.Error())
+			delete(roomWSDict, conn)
 			return
 		}
 
@@ -387,6 +400,7 @@ func roomWSHandler(db *sqlx.DB) func(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 			fmt.Println("Ошибка при открытии файла:", err)
+			delete(roomWSDict, conn)
 			return
 		}
 		//log.Println(string(fileContent))
@@ -400,7 +414,7 @@ func roomWSHandler(db *sqlx.DB) func(w http.ResponseWriter, r *http.Request) {
 			}
 		}
 
-		for { // Чтение действия (pause / resume)
+		for { // Чтение действия (pause / resume) + end game
 			_, message, err = conn.ReadMessage()
 			if err != nil {
 				delete(roomWSDict, conn)
