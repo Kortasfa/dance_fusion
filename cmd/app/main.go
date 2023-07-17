@@ -34,7 +34,6 @@ func main() {
 	r.HandleFunc("/gameField/id", gameField)
 	r.HandleFunc("/signUp", signUp)
 	r.HandleFunc("/logIn", logIn)
-    r.HandleFunc("/customization", customUser(dbx))
 
 	r.HandleFunc("/roomWS/{id}", roomWSHandler(dbx))
 	r.HandleFunc("/ws/joinToRoom/{id}", joinPageWSHandler)
