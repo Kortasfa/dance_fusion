@@ -44,15 +44,6 @@ func main() {
 	go handleRoomWSMessages()
 
 	r.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir("./static"))))
-	// Start file server in a separate Goroutine
-	go func() {
-		port := ":8082"
-		directory := "/home/korta/Downloads/dance_fusion/static/test" // Update this line with the desired directory path
-		http.Handle("/", http.FileServer(http.Dir(directory)))
-
-		log.Printf("File server running at http://localhost%s\n", port)
-		log.Fatal(http.ListenAndServe(port, nil))
-	}()
 
 	fmt.Println("Start server")
 	srv := &http.Server{

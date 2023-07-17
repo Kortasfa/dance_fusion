@@ -8,11 +8,9 @@ import (
 	"github.com/jmoiron/sqlx"
 	"html/template"
 	"io"
-	"io/ioutil"
 	"log"
 	"math/rand"
 	"net/http"
-	"strconv"
 	"time"
 )
 
@@ -538,28 +536,43 @@ func clearCookie(db *sqlx.DB) func(w http.ResponseWriter, r *http.Request) {
 
 var counter int = 1
 
+//func create(w http.ResponseWriter, r *http.Request) {
+//	// Read the JSON data from the request body
+//	jsonData, err := ioutil.ReadAll(r.Body)
+//	if err != nil {
+//		http.Error(w, "Error reading JSON data", http.StatusBadRequest)
+//		return
+//	}
+//
+//	// Generate the filename with the current counter value
+//	filename := "data/movement/" + "test" + strconv.Itoa(counter) + ".txt"
+//
+//	// Save the JSON data to the generated filename
+//	err = ioutil.WriteFile(filename, jsonData, 0644)
+//	if err != nil {
+//		http.Error(w, "Error saving JSON data to file", http.StatusInternalServerError)
+//		return
+//	}
+//
+//	// Increment the counter for the next request
+//	counter++
+//
+//	// Send a response indicating success
+//	w.WriteHeader(http.StatusOK)
+//	w.Write([]byte("Data saved successfully as " + filename))
+//}
+
 func create(w http.ResponseWriter, r *http.Request) {
-	// Read the JSON data from the request body
-	jsonData, err := ioutil.ReadAll(r.Body)
+	tmpl, err := template.ParseFiles("pages/test.html")
 	if err != nil {
-		http.Error(w, "Error reading JSON data", http.StatusBadRequest)
+		http.Error(w, "Internal Server Error", 500)
+		log.Println(err.Error())
 		return
 	}
-
-	// Generate the filename with the current counter value
-	filename := "data/movement/" + "test" + strconv.Itoa(counter) + ".txt"
-
-	// Save the JSON data to the generated filename
-	err = ioutil.WriteFile(filename, jsonData, 0644)
+	err = tmpl.Execute(w, tmpl)
 	if err != nil {
-		http.Error(w, "Error saving JSON data to file", http.StatusInternalServerError)
+		http.Error(w, "Internal Server Error", 500)
+		log.Println(err.Error())
 		return
 	}
-
-	// Increment the counter for the next request
-	counter++
-
-	// Send a response indicating success
-	w.WriteHeader(http.StatusOK)
-	w.Write([]byte("Data saved successfully as " + filename))
 }
