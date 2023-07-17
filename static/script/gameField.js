@@ -55,6 +55,30 @@ btnContinue.addEventListener("click", function () {
     window.location.href = "/room";
 })
 
+//(async () => {
+    //var classifier = new EdgeImpulseClassifier();
+   // /*await*/ classifier.init();
+
+    //let project = classifier.getProjectInfo();
+    //document.querySelector('h1').textContent = project.owner + ' / ' + project.name + ' (version ' + project.deploy_version + ')';
+
+
+
+
+
+    /*document.querySelector('#run-inference').onclick = () => {
+        try {
+            let features = document.querySelector('#features').value.split(',').map(x => Number(x.trim()));
+            let res = classifier.classify(features);
+            document.querySelector('#results').textContent = JSON.stringify(res, null, 4);
+        }
+        catch (ex) {
+            alert('Failed to classify: ' + (ex.message || ex.toString()));
+        }
+    };*/
+//})();
+
+
 
 // function openModalElem() {
 //     modalElem.classList.add("open");

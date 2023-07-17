@@ -37,10 +37,12 @@ func main() {
 
 	r.HandleFunc("/roomWS/{id}", roomWSHandler(dbx))
 	r.HandleFunc("/ws/joinToRoom/{id}", joinPageWSHandler)
+	r.HandleFunc("/neuralWS", neuralWSHandler)
 
 	r.HandleFunc("/api/joinToRoom", getJoinedUserData(dbx)).Methods("POST")
 	r.HandleFunc("/api/signUp", getRegisteredUserData(dbx)).Methods("POST")
 	r.HandleFunc("/api/logIn", getLoginUserData(dbx)).Methods("POST")
+	r.HandleFunc("/api/motion", getMotion).Methods("POST")
 	r.HandleFunc("/clear", clearCookie(dbx))
 
 	go handleRoomWSMessages()
