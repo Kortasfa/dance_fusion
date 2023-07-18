@@ -14,7 +14,7 @@ COLLATE utf8mb4_unicode_ci;
 
 INSERT INTO songs(song_name, author_name, image_src, video_src, preview_video_src, style_id, motion_list_path)
 VALUES
-	("Forget You", "ceeLoGreen", "static/img/forgetYou.jpg", "static/video/forgetYou.mp4", "static/video/forgetYou.mp4", 3, "static/motion_list/forgetYou.json"),
+	("Forget You", "ceeLoGreen", "static/img/forgetYou.jpg", 'static/video/forgetYouFull.mp4', "static/video/forgetYou.mp4", 3, "static/motion_list/forgetYou.json"),
     ("1999", "charlXCX&troyeSivan", "static/img/1999.jpg", "static/video/1999.mp4", "static/video/1999.mp4", 1, "static/motion_list/forgetYou.json"),
     ("American Girl", "bonnieMcKeeSong", "static/img/americanGirl.jpg", "static/video/americanGirl.mp4", "static/video/americanGirl.mp4", 2, "static/motion_list/forgetYou.json"),
     ("Burn", "ellieGoulding", "static/img/burn.jpg", "static/video/burn.mp4", "static/video/burn.mp4", 1, "static/motion_list/forgetYou.json"),
