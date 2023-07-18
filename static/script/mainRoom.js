@@ -91,6 +91,7 @@ Array.from(test).forEach(function (element) {
   element.addEventListener('click', function () {
     let videoSrcID = '9' + element.id;
     let video = document.getElementById(videoSrcID);
+    let fullVideo = document.getElementById('full' + videoSrcID);
     let videoPlayer = document.getElementById('videoPlayer');
     songName = document.querySelector('.song' + element.id).innerHTML;
     // let menuItem = parent.querySelectorAll('.button_yellow');
@@ -101,7 +102,7 @@ Array.from(test).forEach(function (element) {
     readySong = true;
     changeButton();
     videoPlayer.src = video.innerText;
-    testing = video.innerText;
+    testing = fullVideo.innerText;
   });
 });
 
