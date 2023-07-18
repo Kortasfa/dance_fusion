@@ -76,16 +76,38 @@
         try {
           let jsonData = JSON.parse(event.data);
           //console.log(jsonData);
-          let songName = jsonData.name;
+          let moveName = jsonData.name;
           //let userID = mesData["userID"];
           let motionString = jsonData.motionString;
           let userID = jsonData.userID;
           //console.log(motionString);
           let features = motionString.split(',').map(x => Number(x.trim()));
-          let res = classifier.classify(features);
+          let res = classifier.classify(features); // результат оценки нейросетью JSON
+          let sameMotionNamesList = [["broad_back", "hands_up_and_down"],
+                                ["gold_turn", "gold_circle"]];
+
+          let score = 0;
+          for (let sameMotionNames of sameMotionNamesList) {
+            if (moveName in sameMotionNames) {
+              for (let motionDict of res["results"]) {
+                if (motionDict["label"] in sameMotionNames) {
+                  if (motionDict["value"] >= score) {
+                    score = motionDict["value"];
+                  }
+                }
+              }
+            }
+          }
+
           for (let motionDict of res["results"]) {
-            if (motionDict["label"] === songName) {
-              console.log(userID, songName, motionDict["value"]);
+            if (motionDict["label"] === moveName) {
+              let score = 0;
+              console.log(userID, moveName, motionDict["value"]);
+              if (moveName === "Broad_back")
+              {
+                score = Math.max(Math.round(motionDict["value"]);
+
+              }
               AddScore(userID.toString(), Math.round(motionDict["value"] * 100));
             }
           }

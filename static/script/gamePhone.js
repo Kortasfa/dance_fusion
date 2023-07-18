@@ -97,7 +97,7 @@ function sendMessage() {
                     else {
                         //console.log('Motions:');
                         //console.log(JSON.parse(receivedData))//////////////////////////////
-                        document.querySelector('.connection').innerText = 'Работаем';
+                        document.querySelector('.connection').innerText = 'Dance you';
                         handleDanceData(JSON.parse(receivedData))
 
                     }
