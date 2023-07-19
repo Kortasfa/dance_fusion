@@ -12,34 +12,6 @@ let readySong = false;
 
 btnOpenInfo.addEventListener('click', openGuide);
 
-document.addEventListener("DOMContentLoaded", getUsersByCookie);
-function getUsersByCookie() {
-    let allCookies = document.cookie;
-    let cookiesArray = allCookies.split(';');
-    for (let i = 0; i < cookiesArray.length; i++) {
-        let name = cookiesArray[i].split('=');
-        let mane = name[0];
-        let n = mane.indexOf('User');
-        if (n === 1) {
-            let parts = name[1].split(',');
-            let userID = parts[0];
-            let userName = parts[1];
-            let imgSrc = parts[2];
-            numberOfUser = numberOfUser + 1;
-            let userMSG = document.getElementById('needUser');
-            userMSG.classList.add('none');
-            let indexUser = document.getElementById('user' + numberOfUser);
-            let indexUserName = document.getElementById('userName' + numberOfUser);
-            let indexUserImg = indexUser.querySelector(".user__avatar");
-            indexUser.classList.remove('none');
-            indexUserImg.src = '../' + imgSrc;
-            indexUserName.innerText = userName;
-            readyPlayer = true;
-                changeButton();
-        }
-    }
-}
-
 function changeButton() {
     if (readyPlayer && readySong) {
         readyGame = true;
@@ -150,23 +122,29 @@ socket.onmessage = function (event) {
     let userMessage = document.getElementById('needUser');
     let message = event.data;
     let parts = message.split('|');
-    let userID = parts[0];
-    let userName = parts[1];
-    let imgSrc = parts[2];
-    numberOfUser = numberOfUser + 1;
-    document.cookie = "User" + numberOfUser + '=' + parts + ';path=/';
-    userMessage.classList.add('none');
-    let indexUser = document.getElementById('user' + numberOfUser);
-    let indexUserName = document.getElementById('userName' + numberOfUser);
-    let indexUserImg = indexUser.querySelector(".user__avatar");
-    indexUser.classList.remove('none');
-    indexUserImg.src = '../' + imgSrc;
-    readyPlayer = true;
-    changeButton();
-    indexUserName.innerText = userName;
-    console.log('Пользователь присоединился: ' + userID);
-    console.log('Его имя: ' + userName);
-    console.log('Его фотка: ' + imgSrc);
+    let action = parts[0];
+    let userID = parts[1];
+    if (action === "add") {
+        let userName = parts[2];
+        let imgSrc = parts[3];
+        numberOfUser = numberOfUser + 1;
+        userMessage.classList.add('none');
+        let indexUser = document.getElementById('user' + numberOfUser);
+        let indexUserName = document.getElementById('userName' + numberOfUser);
+        let indexUserImg = indexUser.querySelector(".user__avatar");
+        indexUser.classList.remove('none');
+        indexUserImg.src = '../' + imgSrc;
+        readyPlayer = true;
+        changeButton();
+        indexUserName.innerText = userName;
+        console.log('Пользователь присоединился: ' + userID);
+        console.log('Его имя: ' + userName);
+        console.log('Его фотка: ' + imgSrc);
+    } else if (action === "remove") {
+        numberOfUser = numberOfUser - 1;
+        console.log('Пользователь вышел: ' + userID);
+    }
+
 };
 
 socket.onclose = function (event) {

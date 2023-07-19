@@ -13,6 +13,7 @@ import (
 	"math/rand"
 	"net/http"
 	"net/url"
+	"strconv"
 	"time"
 )
 
@@ -48,10 +49,9 @@ type songsData struct {
 }
 
 type userInfo struct {
-	UserID       int
-	UserName     string
-	ImgSrc       string
-	SelectedRoom string
+	UserID   int
+	UserName string
+	ImgSrc   string
 }
 
 type menuPageData struct {
@@ -190,6 +190,35 @@ func getSongsData(db *sqlx.DB) ([]songsData, error) {
 	return data, nil
 }
 
+func sendConnectedUserInfo(db *sqlx.DB, roomID string) error {
+	userIDs := roomIDDict[roomID]
+	for _, userID := range userIDs {
+		const query = `
+			SELECT
+				name,
+				img_src
+			FROM
+				users
+			WHERE id = ?`
+
+		var data struct {
+			UserName string `db:"name"`
+			ImgSrc   string `db:"img_src"`
+		}
+
+		id, err := strconv.Atoi(userID)
+		if err != nil {
+			return err
+		}
+		err = db.Get(&data, query, id)
+		if err != nil {
+			return err
+		}
+		broadcastJoiningUserID <- []string{"add", roomID, userID, data.UserName, data.ImgSrc}
+	}
+	return nil
+}
+
 func handleRoom(db *sqlx.DB) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
@@ -218,6 +247,7 @@ func handleRoom(db *sqlx.DB) func(w http.ResponseWriter, r *http.Request) {
 			log.Println(err)
 			return
 		}
+
 		data := menuPageData{
 			Styles:  styles,
 			Songs:   songs,
@@ -231,6 +261,16 @@ func handleRoom(db *sqlx.DB) func(w http.ResponseWriter, r *http.Request) {
 			log.Println(err.Error())
 			return
 		}
+
+		go func() {
+			time.Sleep(1000 * time.Millisecond)
+			err = sendConnectedUserInfo(db, roomID)
+			if err != nil {
+				http.Error(w, "Internal Server Error", 500)
+				log.Println(err.Error())
+				return
+			}
+		}()
 	}
 }
 
@@ -338,6 +378,29 @@ func handleJoinPageWSMessages() { // broadcastJoinPageWSMessage <- []string{User
 	}
 }
 
+func retrieveUserRoom(userID string) (string, bool) {
+	for key, userIDSlice := range roomIDDict {
+		for _, currUserID := range userIDSlice {
+			if currUserID == userID {
+				return key, true
+			}
+		}
+	}
+	return "", false
+}
+
+func removeValueFromSlice(words []string, valueToRemove string) []string {
+	var result []string
+
+	for _, word := range words {
+		if word != valueToRemove {
+			result = append(result, word)
+		}
+	}
+
+	return result
+}
+
 func getJoinedUserData(db *sqlx.DB) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		reqData, err := io.ReadAll(r.Body)
@@ -361,34 +424,29 @@ func getJoinedUserData(db *sqlx.DB) func(w http.ResponseWriter, r *http.Request)
 			w.WriteHeader(404)
 			return
 		}
-		if len(roomIDDict[data.RoomID]) >= maxUsers {
+		currRoomID, found := retrieveUserRoom(fmt.Sprintf("%d", data.UserID))
+		if len(roomIDDict[data.RoomID]) >= maxUsers || (found && currRoomID == data.RoomID && (len(roomIDDict[data.RoomID])-1) >= maxUsers) { // Если пользователь подключается к той же комнате, к которой уже подключен, то позволить
 			w.WriteHeader(409)
 			return
 		}
-		slice := roomIDDict[data.RoomID]
-		roomIDDict[data.RoomID] = append(slice, fmt.Sprintf("%d", data.UserID))
+
+		if found {
+			if currRoomID == data.RoomID {
+				w.WriteHeader(200)
+				return
+			} else { // Удалить пользователя из комнаты, прописать функцию удаления пользователя через ws
+				broadcastJoiningUserID <- []string{"remove", currRoomID, strconv.Itoa(data.UserID)}
+				roomIDDict[currRoomID] = removeValueFromSlice(roomIDDict[currRoomID], fmt.Sprintf("%d", data.UserID))
+			}
+		}
+		roomIDDict[data.RoomID] = append(roomIDDict[data.RoomID], fmt.Sprintf("%d", data.UserID)) //////////// Мы добавляем туда ID пользователя
 		userName, imgSrc, err := getUserInfo(db, fmt.Sprintf("%d", data.UserID))
 		if err != nil {
 			http.Error(w, "Internal server error", 500)
 			log.Println(err.Error())
 			return
 		}
-		broadcastJoiningUserID <- []string{data.RoomID, fmt.Sprintf("%d", data.UserID), userName, imgSrc}
-
-		var user userInfo
-		err = getJsonCookie(r, "userInfoCookie", &user)
-		if err != nil {
-			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-			log.Println(err.Error())
-			return
-		}
-		user.SelectedRoom = data.RoomID
-		err = setJsonCookie(w, "userInfoCookie", user, 24*time.Hour)
-		if err != nil {
-			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-			log.Println(err.Error())
-			return
-		}
+		broadcastJoiningUserID <- []string{"add", data.RoomID, fmt.Sprintf("%d", data.UserID), userName, imgSrc}
 		w.WriteHeader(200)
 	}
 }
@@ -396,12 +454,19 @@ func getJoinedUserData(db *sqlx.DB) func(w http.ResponseWriter, r *http.Request)
 func handleRoomWSMessages() {
 	for mesArr := range broadcastJoiningUserID {
 		for wsConnect := range roomWSDict {
-			roomID := mesArr[0]
-			userID := mesArr[1]
-			userName := mesArr[2]
-			imgSrc := mesArr[3]
+			action := mesArr[0]
+			roomID := mesArr[1]
+			userID := mesArr[2]
+			message := ""
+			if action == "add" {
+				userName := mesArr[3]
+				imgSrc := mesArr[4]
+				message = action + "|" + userID + "|" + userName + "|" + imgSrc
+			} else {
+				message = action + "|" + userID
+			}
+
 			if roomWSDict[wsConnect] == roomID {
-				message := userID + "|" + userName + "|" + imgSrc
 				err := wsConnect.WriteMessage(websocket.TextMessage, []byte(message))
 				if err != nil {
 					err := wsConnect.Close()
@@ -628,10 +693,9 @@ func getRegisteredUserData(db *sqlx.DB) func(w http.ResponseWriter, r *http.Requ
 			return
 		}
 		user := userInfo{
-			UserID:       userID,
-			UserName:     userName,
-			ImgSrc:       imgSrc,
-			SelectedRoom: "",
+			UserID:   userID,
+			UserName: userName,
+			ImgSrc:   imgSrc,
 		}
 		err = setJsonCookie(w, "userInfoCookie", user, 24*time.Hour)
 		if err != nil {
@@ -711,10 +775,9 @@ func getLoginUserData(db *sqlx.DB) func(w http.ResponseWriter, r *http.Request) 
 				return
 			}
 			user := userInfo{
-				UserID:       userID,
-				UserName:     data.UserName,
-				ImgSrc:       imgSrc,
-				SelectedRoom: "",
+				UserID:   userID,
+				UserName: data.UserName,
+				ImgSrc:   imgSrc,
 			}
 			err = setJsonCookie(w, "userInfoCookie", user, 24*time.Hour)
 			if err != nil {
@@ -760,14 +823,24 @@ func getJsonCookie(r *http.Request, name string, value interface{}) error {
 	return nil
 }
 
-func clearCookie(db *sqlx.DB) func(w http.ResponseWriter, r *http.Request) {
-	return func(w http.ResponseWriter, r *http.Request) {
-		http.SetCookie(w, &http.Cookie{
-			Name:    "userInfoCookie",
-			Path:    "/",
-			Expires: time.Now().AddDate(0, 0, -1),
-		})
-		fmt.Println("Cookie is deleted")
-		w.WriteHeader(200)
+func clearCookie(w http.ResponseWriter, r *http.Request) {
+	var user userInfo
+	err := getJsonCookie(r, "userInfoCookie", &user)
+	if err != nil {
+		http.Error(w, "Internal Server Error", 500)
+		log.Println(err.Error())
+		return
 	}
+	roomID, found := retrieveUserRoom(strconv.Itoa(user.UserID))
+	if found {
+		roomIDDict[roomID] = removeValueFromSlice(roomIDDict[roomID], strconv.Itoa(user.UserID))
+		broadcastJoiningUserID <- []string{"remove", roomID, strconv.Itoa(user.UserID)}
+	}
+	http.SetCookie(w, &http.Cookie{
+		Name:    "userInfoCookie",
+		Path:    "/",
+		Expires: time.Now().AddDate(0, 0, -1),
+	})
+	fmt.Println("Cookie is deleted")
+	w.WriteHeader(200)
 }
