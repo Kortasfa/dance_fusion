@@ -29,6 +29,9 @@ var maxUsers int = 4
 var joinPageWSDict = make(map[*websocket.Conn]string) // {WSConnection: UserID, WSConnection: UserID, WSConnection: UserID, ...}
 var broadcastJoinPageWSMessage = make(chan []string)  // [UserID, Data]
 
+var gameFieldWSDict = make(map[*websocket.Conn]string) // {WSConnection: gameFieldID, WSConnection: gameFieldID, WSConnection: gameFieldID, ...}
+//var broadcastGameFieldWSMessage = make(chan []string)
+
 type stylesData struct {
 	StyleID   int    `db:"id"`
 	StyleName string `db:"name"`
@@ -39,6 +42,7 @@ type songsData struct {
 	SongName        string `db:"song_name"`
 	SongAuthor      string `db:"author_name"`
 	PreviewVideoSrc string `db:"preview_video_src"`
+	VideoSrc        string `db:"video_src"`
 	ImageSrc        string `db:"image_src"`
 	StyleID         int    `db:"style_id"`
 }
@@ -57,20 +61,71 @@ type menuPageData struct {
 	WssURL  string
 }
 
-/*func test(w http.ResponseWriter, r *http.Request) {
-	tmpl, err := template.ParseFiles("pages/test.html")
+func getMotion(w http.ResponseWriter, r *http.Request) {
+	reqData, err := io.ReadAll(r.Body)
 	if err != nil {
-		http.Error(w, "Internal Server Error", 500)
+		http.Error(w, "Parsing error", 500)
 		log.Println(err.Error())
 		return
 	}
-	err = tmpl.Execute(w, nil)
+	var data struct {
+		Name           string
+		MotionString   string
+		SelectedRoomID string
+		UserID         int
+	}
+	err = json.Unmarshal(reqData, &data)
 	if err != nil {
-		http.Error(w, "Internal Server Error", 500)
+		http.Error(w, "JSON parsing error", 500)
 		log.Println(err.Error())
 		return
 	}
-}*/
+	for conn, gameFieldID := range gameFieldWSDict {
+		if gameFieldID == data.SelectedRoomID {
+			//fmt.Println("отправляем", gameFieldID, data.SelectedRoomID)
+			err := conn.WriteMessage(websocket.TextMessage, reqData)
+			if err != nil {
+				err := conn.Close()
+				if err != nil {
+					w.WriteHeader(409)
+					return
+				}
+				delete(roomWSDict, conn)
+			}
+			w.WriteHeader(200)
+			return
+		}
+	}
+	w.WriteHeader(409)
+}
+
+func neuralWSHandler(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	gameFieldID := vars["id"]
+	var upgrader = websocket.Upgrader{
+		ReadBufferSize:  1024 * 2,
+		WriteBufferSize: 1024 * 2,
+	}
+	conn, err := upgrader.Upgrade(w, r, nil)
+	if err != nil {
+		log.Println("Failed to upgrade websocket connection:", err)
+		return
+	}
+	defer func(conn *websocket.Conn) {
+		err := conn.Close()
+		if err != nil {
+		}
+	}(conn)
+	gameFieldWSDict[conn] = gameFieldID
+	for {
+		_, _, err := conn.ReadMessage()
+		if err != nil {
+			log.Println(err)
+			delete(gameFieldWSDict, conn)
+			break
+		}
+	}
+}
 
 func homePageHandler(w http.ResponseWriter, r *http.Request) {
 	tmpl, err := template.ParseFiles("pages/homePage.html")
@@ -117,6 +172,7 @@ func getSongsData(db *sqlx.DB) ([]songsData, error) {
 			id,
 			song_name,
 			author_name,
+			video_src,
 			preview_video_src,
 			image_src,
 			style_id
@@ -195,7 +251,7 @@ func handleCreateRoom(w http.ResponseWriter, r *http.Request) {
 func joinPageHandler(w http.ResponseWriter, r *http.Request) {
 	_, err := r.Cookie("userInfoCookie")
 	if err != nil {
-		http.Redirect(w, r, "/login", http.StatusFound)
+		http.Redirect(w, r, "/logIn", http.StatusFound)
 		return
 	}
 	tmpl, err := template.ParseFiles("pages/gamePhone.html")
@@ -359,6 +415,25 @@ func handleRoomWSMessages() {
 	}
 }
 
+func getMotionListPath(db *sqlx.DB, songName string) (string, error) {
+	const query = `
+		SELECT
+			motion_list_path
+		FROM
+			songs
+		WHERE
+		   song_name=?
+	`
+
+	var motionListPath string
+	err := db.QueryRow(query, songName).Scan(&motionListPath)
+	if err != nil {
+		return "", err
+	}
+
+	return motionListPath, nil
+}
+
 func roomWSHandler(db *sqlx.DB) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
@@ -378,23 +453,17 @@ func roomWSHandler(db *sqlx.DB) func(w http.ResponseWriter, r *http.Request) {
 
 		_, message, err := conn.ReadMessage() // Чтение названия песни
 		if err != nil {
+			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+			log.Println(err.Error())
 			delete(roomWSDict, conn)
 			return
 		}
-		const query = `
-			SELECT
-				motion_list_path
-			FROM
-				songs
-			WHERE
-			   song_name=?
-		`
 
-		var motionListPath string
-		err = db.QueryRow(query, string(message)).Scan(&motionListPath)
+		motionListPath, err := getMotionListPath(db, string(message))
 		if err != nil {
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 			log.Println(err.Error())
+			delete(roomWSDict, conn)
 			return
 		}
 
@@ -402,6 +471,7 @@ func roomWSHandler(db *sqlx.DB) func(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 			fmt.Println("Ошибка при открытии файла:", err)
+			delete(roomWSDict, conn)
 			return
 		}
 		//log.Println(string(fileContent))
@@ -415,7 +485,7 @@ func roomWSHandler(db *sqlx.DB) func(w http.ResponseWriter, r *http.Request) {
 			}
 		}
 
-		for { // Чтение действия (pause / resume)
+		for { // Чтение действия (pause / resume) + end game
 			_, message, err = conn.ReadMessage()
 			if err != nil {
 				delete(roomWSDict, conn)

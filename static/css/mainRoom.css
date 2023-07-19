@@ -35,7 +35,7 @@
       }
 }
 
-.unplay {
+.unPlay {
     animation-duration: 1s;
     animation-name: unslidein;
     margin-left: calc(-96% + 590px);
@@ -244,14 +244,16 @@
 .info__title{
     text-align: center;
     margin: 35px;
-    font: normal 400 48px 'Roboto';
+    font: normal 400 28px 'Roboto';
+    color: #1E1C1C;
 }
 
-.info__rmation{
-    font: normal 400 40px 'Roboto';
+.information{
+    font: normal 400 24px 'Roboto';
+    color: #1E1C1C;
 }
 
-.info__rmation p{
+.information p{
     margin: 35px;
 }
 
@@ -263,7 +265,7 @@
     margin-bottom: 500px;
 }
 
-.party__messege{
+.party__message{
     font: normal 400 46px/1.54 'Roboto';
     text-align: center;
     margin: auto;
@@ -281,6 +283,11 @@
 
 .button_yellow{
     background: #AEF26D;
+}
+
+.button_ready{
+    background: #AEF26D;
+    color: #111111;
 }
 
 .songs::-webkit-scrollbar {
@@ -318,6 +325,7 @@
         animation-name: slidein;
         margin-left: 0;
     }
+
     @keyframes slidein {
         from {
             margin-left: -200%;
@@ -327,7 +335,7 @@
             margin-left: 0;
           }
     }
-    .unplay {
+    .unPlay {
         animation-duration: 1s;
         animation-name: unslidein;
         margin-left: -200%;
@@ -365,7 +373,7 @@
         min-height: 420px;
     }
 
-    .party__messege {
+    .party__message {
         font: normal 400 32px/1.54 'Roboto';
     }
 

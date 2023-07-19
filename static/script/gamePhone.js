@@ -33,6 +33,9 @@ function getExpirationDate(expirationDays) {
 }
 
 const userInfo = getJsonCookie("userInfoCookie");
+let userID = userInfo.UserID;
+let selectedRoomID = userInfo.SelectedRoom;
+
 document.querySelector('.user__name').textContent = userInfo.UserName;
 document.querySelector('.user__avatar').src = userInfo.ImgSrc;
 
@@ -74,6 +77,9 @@ function sendMessage() {
                 warningID.classList.add("hidden");
                 console.log("Connected to the room!");
 
+                const userInfo = getJsonCookie("userInfoCookie");
+                selectedRoomID = userInfo.SelectedRoom;
+
                 let socket = new WebSocket("wss://" + window.location.hostname + "/ws/joinToRoom/" + userInfo.UserID);
 
                 socket.onopen = function(event) {
@@ -89,8 +95,11 @@ function sendMessage() {
                         console.log('resume');
                     }
                     else {
-                        console.log('Motions:');
-                        console.log(JSON.parse(receivedData))
+                        //console.log('Motions:');
+                        //console.log(JSON.parse(receivedData))//////////////////////////////
+                        document.querySelector('.connection').innerText = 'Работаем';
+                        handleDanceData(JSON.parse(receivedData))
+
                     }
                 };
 
@@ -127,3 +136,96 @@ async function logout() {
 
 btnLogOut.addEventListener("click", logout)
 btnGo.addEventListener("click", sendMessage);
+
+
+if (window.DeviceMotionEvent && window.DeviceOrientationEvent) {
+    const sensorFrequency = 62.5;
+    const interval = 1000 / sensorFrequency;
+
+    let sensorData = [];
+
+    function handleSensorData(event) {
+        try {
+            const { alpha, beta, gamma } = event.rotationRate;
+            const { x, y, z } = event.accelerationIncludingGravity;
+            sensorData.push({
+                alpha,
+                beta,
+                gamma,
+                x,
+                y,
+                z,
+            });
+        } catch (error) {
+            //document.writeln('Ошибка при обработке данных сенсора:', error);
+        }
+    }
+
+    function startRecording(name, duration) {
+        window.addEventListener('devicemotion', handleSensorData, true);
+        window.addEventListener('deviceorientation', handleSensorData, true);
+        setTimeout(function () {stopRecording(name);}, duration * 1300); // 1000 /// // / / /// / / / / / / / / / / /  / /              /////
+    }
+
+    function stopRecording(name) {
+        window.removeEventListener('devicemotion', handleSensorData, true);
+        window.removeEventListener('deviceorientation', handleSensorData, true);
+        let pointCount = 12; // 1146
+        let outputString = '0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000';
+
+        for (let i = 0; i < sensorData.length; i++) {
+            const {x, y, z, alpha, beta, gamma} = sensorData[i];
+            outputString += `, ${MyRound10(x)}, ${MyRound10(y)}, ${MyRound10(z)}, ${MyRound10(alpha)}, ${MyRound10(beta)}, ${MyRound10(gamma)}`;
+            pointCount += 6;
+        }
+        for (pointCount; pointCount < 1146; pointCount++){
+            outputString += ', 0.0000';
+        }
+        sensorData = [];
+        //document.write(outputString);
+
+        let data = JSON.stringify({"name": name, "motionString": outputString, "selectedRoomID": selectedRoomID, "userID": userID});
+        //document.writeln(data);
+        sendDataToServer(data);
+    }
+} else {
+    console.log('The device does not support required sensors.');
+}
+
+function MyRound10(val) {
+    const roundedVal = Math.round(val * 10) / 10;
+    const formattedVal = roundedVal.toFixed(4);
+    return formattedVal.padStart(6, '0');
+}
+
+function sendDataToServer(data) {
+    // Replace the URL with the appropriate endpoint to handle the data on your server
+    let url = '/api/motion';
+
+    fetch(url, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: data
+    })
+        .then(function (response) {
+            if (response.ok) {
+                console.log('Данные успешно отправлены.');
+            } else {
+                console.log('Ошибка при отправке данных. Статус:', response.status);
+            }
+        })
+        .catch(function (error) {
+            console.log('Ошибка при отправке данных:', error);
+        });
+}
+
+function handleDanceData(danceDataJson) {
+    //let oldStartTime = 0;
+    for (let danceData of danceDataJson) {
+        setTimeout(function () {startRecording(danceData['name'], danceData['duration']);},
+            (danceData['start_time']) * 1000);
+        //oldStartTime += danceData['start_time'];
+    }
+}

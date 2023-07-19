@@ -5,15 +5,14 @@ const guide = document.getElementById('guide');
 const returnBtn = document.getElementById('return-button');
 const PlayBtn = document.getElementById('Play');
 
-let redyGame = false;
+let readyGame = false;
 let numberOfUser = 0;
-let redyPlayer = false;
-let redysong = false;
+let readyPlayer = false;
+let readySong = false;
 
 btnOpenInfo.addEventListener('click', openGuide);
 
 document.addEventListener("DOMContentLoaded", getUsersByCookie);
-
 function getUsersByCookie() {
     let allCookies = document.cookie;
     let cookiesArray = allCookies.split(';');
@@ -35,18 +34,18 @@ function getUsersByCookie() {
             indexUser.classList.remove('none');
             indexUserImg.src = '../' + imgSrc;
             indexUserName.innerText = userName;
-            redyPlayer = true;
-            ChengeBtn();
+            readyPlayer = true;
+                changeButton();
         }
     }
 }
 
-function ChengeBtn() {
-    if (redyPlayer && redysong) {
-        redyGame = true;
+function changeButton() {
+    if (readyPlayer && readySong) {
+        readyGame = true;
     }
-    if (redyGame) {
-        PlayBtn.classList.add('button_yellow');
+    if (readyGame) {
+        PlayBtn.classList.add('button_ready');
     }
 }
 
@@ -76,11 +75,11 @@ function closeSong() {
 
 function openGuide() {
     guide.classList.add('play');
-    guide.classList.remove('unplay');
+    guide.classList.remove('unPlay');
 }
 
 function closeGuide() {
-    guide.classList.add('unplay');
+    guide.classList.add('unPlay');
     guide.classList.remove('play');
 }
 
@@ -92,6 +91,7 @@ Array.from(test).forEach(function (element) {
   element.addEventListener('click', function () {
     let videoSrcID = '9' + element.id;
     let video = document.getElementById(videoSrcID);
+    let fullVideo = document.getElementById('full' + videoSrcID);
     let videoPlayer = document.getElementById('videoPlayer');
     songName = document.querySelector('.song' + element.id).innerHTML;
     // let menuItem = parent.querySelectorAll('.button_yellow');
@@ -99,10 +99,10 @@ Array.from(test).forEach(function (element) {
     // for(let i = 0; i < menuItem.length; i++) {
     //   menuItem[i].classList.remove('button_yellow');
     // }
-    redysong = true;
-    ChengeBtn();
+    readySong = true;
+    changeButton();
     videoPlayer.src = video.innerText;
-    testing = video.innerText;
+    testing = fullVideo.innerText;
   });
 });
 
@@ -112,7 +112,7 @@ $(document).ready(function () {
 
   // Fire on click
   trigger.on('click', function() {
-    if (PlayBtn.classList.contains('button_yellow')) {
+    if (readyGame) {
 
       socket.send(songName);
       console.log(songName)// Можно отправить pause или resume
@@ -147,7 +147,7 @@ socket.onopen = function (event) {
 };
 
 socket.onmessage = function (event) {
-    let userMSG = document.getElementById('needUser');
+    let userMessage = document.getElementById('needUser');
     let message = event.data;
     let parts = message.split('|');
     let userID = parts[0];
@@ -155,14 +155,14 @@ socket.onmessage = function (event) {
     let imgSrc = parts[2];
     numberOfUser = numberOfUser + 1;
     document.cookie = "User" + numberOfUser + '=' + parts + ';path=/';
-    userMSG.classList.add('none');
+    userMessage.classList.add('none');
     let indexUser = document.getElementById('user' + numberOfUser);
     let indexUserName = document.getElementById('userName' + numberOfUser);
     let indexUserImg = indexUser.querySelector(".user__avatar");
     indexUser.classList.remove('none');
     indexUserImg.src = '../' + imgSrc;
-    redyPlayer = true;
-    ChengeBtn();
+    readyPlayer = true;
+    changeButton();
     indexUserName.innerText = userName;
     console.log('Пользователь присоединился: ' + userID);
     console.log('Его имя: ' + userName);
@@ -175,16 +175,15 @@ socket.onclose = function (event) {
 
 let parent = document.querySelector('.songs');
 
-function addCollor(thisis) {
+function addColor(song) {
     let menuItem = parent.querySelectorAll('.button_yellow');
     for (let i = 0; i < menuItem.length; i++) {
         // Убираем у других
         menuItem[i].classList.remove('button_yellow');
     }
-    setTimeout(changeCollor(thisis), 1000);
+    setTimeout(changeColor(song), 1000);
 }
 
-function changeCollor(thisiss) {
-    thisiss.classList.add('button_yellow');
-    console.log("yellow")
+function changeColor(song) {
+    song.classList.add('button_yellow');
 }
