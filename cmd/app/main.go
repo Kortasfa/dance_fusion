@@ -44,6 +44,8 @@ func main() {
 	r.HandleFunc("/api/logIn", getLoginUserData(dbx)).Methods("POST")
 	r.HandleFunc("/clear", clearCookie(dbx))
 
+	r.HandleFunc("/test", test)
+
 	go handleRoomWSMessages()
 	go handleJoinPageWSMessages()
 

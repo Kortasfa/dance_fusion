@@ -1,0 +1,30 @@
+/*.block {*/
+/*    width: 100px;*/
+/*    height: 100px;*/
+/*    background: #FFE973;*/
+/*    box-sizing: border-box;*/
+/*    display: block;*/
+/*    background-size: cover;*/
+
+/*}*/
+
+/*.hidden {*/
+/*    display: none;*/
+/*}*/
+/*.block {*/
+/*    width: 200px;*/
+/*    height: 200px;*/
+/*    background-color: blue;*/
+/*    transition: background-color 1s ease; !* Задаем анимацию смены цвета в течение 1 секунды с эффектом плавности *!*/
+/*}*/
+/*.block.filled {*/
+/*    background-color: green; !* Задаем конечный цвет блока *!*/
+/*}*/
+
+
+.block {
+    width: 200px;
+    height: 200px;
+    background-color: red;
+    transition: height 0.3s linear; /* Задаем анимацию изменения высоты блока в течение 0.3 секунд с линейным эффектом (равномерное изменение) */
+}
