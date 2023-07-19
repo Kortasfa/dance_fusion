@@ -57,6 +57,30 @@ type menuPageData struct {
 	WssURL  string
 }
 
+type facesData struct {
+	FaceID    int     `db:"id"`
+	FaceLevel int     `db:"recommended_level"`
+	FaceSrc   string  `db:"face_src"`
+}
+
+type bodyData struct {
+	BodyID    int     `db:"id"`
+	BodyLevel int     `db:"recommended_level"`
+	BodySrc   string  `db:"body_src"`
+}
+
+type hatData struct {
+	HatID    int     `db:"id"`
+	HatLevel int     `db:"recommended_level"`
+	HatSrc   string  `db:"hat_src"`
+}
+
+type customPageData struct {
+	Faces  []facesData
+	Bodies []bodyData
+	Hats   []hatData
+}
+
 func homePageHandler(w http.ResponseWriter, r *http.Request) {
 	tmpl, err := template.ParseFiles("pages/homePage.html")
 	if err != nil {
@@ -590,6 +614,109 @@ func logIn(w http.ResponseWriter, r *http.Request) {
 		log.Println(err.Error())
 		return
 	}
+}
+func getHatData(db *sqlx.DB) ([]hatData, error) {
+	const query = `
+		SELECT
+			id,
+			recommended_level,
+			hat_src
+		FROM
+			hats
+	`
+	var data []hatData
+
+	err := db.Select(&data, query)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return data, nil
+}
+
+func getFaceData(db *sqlx.DB) ([]facesData, error) {
+	const query = `
+		SELECT
+			id,
+			recommended_level,
+			face_src
+		FROM
+			faces
+	`
+	var data []facesData
+
+	err := db.Select(&data, query)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return data, nil
+}
+
+func getBodyData(db *sqlx.DB) ([]bodyData, error) {
+	const query = `
+		SELECT
+			id,
+			recommended_level,
+			body_src
+		FROM
+			bodies
+	`
+	var data []bodyData
+
+	err := db.Select(&data, query)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return data, nil
+}
+
+func custom(db *sqlx.DB) func(w http.ResponseWriter, r *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
+        tmpl, err := template.ParseFiles("pages/userAccount.html")
+        if err != nil {
+            http.Error(w, "Internal Server Error", 500)
+            log.Println(err.Error())
+            return
+        }
+        faces, err := getFaceData(db)
+        if err != nil {
+            http.Error(w, "Internal Server Error", 500)
+            log.Println(err)
+            return
+        }
+
+        bodies, err := getBodyData(db)
+        if err != nil {
+            http.Error(w, "Internal Server Error", 500)
+            log.Println(err)
+            return
+        }
+
+        hats, err := getHatData(db)
+        if err != nil {
+            http.Error(w, "Internal Server Error", 500)
+            log.Println(err)
+            return
+        }
+
+        data := customPageData{
+            Faces:   faces,
+            Bodies:  bodies,
+            Hats:    hats,
+        }
+
+        err = tmpl.Execute(w, data)
+        if err != nil {
+            http.Error(w, "Internal Server Error", 500)
+            log.Println(err.Error())
+            return
+        }
+    }
 }
 
 func credentialExists(db *sqlx.DB, userName string, password string) (int, bool, error) {

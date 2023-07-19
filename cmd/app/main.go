@@ -34,7 +34,6 @@ func main() {
 	r.HandleFunc("/gameField/id", gameField)
 	r.HandleFunc("/signUp", signUp)
 	r.HandleFunc("/logIn", logIn)
-    r.HandleFunc("/customization", customUser(dbx))
 
 	r.HandleFunc("/roomWS/{id}", roomWSHandler(dbx))
 	r.HandleFunc("/ws/joinToRoom/{id}", joinPageWSHandler)
@@ -43,6 +42,8 @@ func main() {
 	r.HandleFunc("/api/signUp", getRegisteredUserData(dbx)).Methods("POST")
 	r.HandleFunc("/api/logIn", getLoginUserData(dbx)).Methods("POST")
 	r.HandleFunc("/clear", clearCookie(dbx))
+
+	r.HandleFunc("/custom", custom(dbx))
 
 	go handleRoomWSMessages()
 	go handleJoinPageWSMessages()
