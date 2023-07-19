@@ -7,7 +7,7 @@
 <body class="main">
   <div class="rank">
     <div class="rank__hero" id="hero1">
-      <img id="test" class="hero__rating-good hidden" src="/static/img/good.gif" alt="">
+      <img class="hero__rating-good hidden" src="/static/img/good.gif" alt="">
       <img class="hero__rating-perfect hidden" src="/static/img/perfect.gif" alt="">
       <img class="hero__rating-ok hidden" src="/static/img/OK.gif" alt="">
       <img class="hero__rating-x hidden" src="/static/img/X.png" alt="">
@@ -17,16 +17,28 @@
     </div>
     <div class="rank__hero hidden" id="hero2">
       <img class="hero__avatar" id="heroImg2" src=""  alt="">
+      <img class="hero__rating-good hidden" src="/static/img/good.gif" alt="">
+      <img class="hero__rating-perfect hidden" src="/static/img/perfect.gif" alt="">
+      <img class="hero__rating-ok hidden" src="/static/img/OK.gif" alt="">
+      <img class="hero__rating-x hidden" src="/static/img/X.png" alt="">
       <span class="hero__name" id="heroName2">Name 2</span>
       <span class="hero__score">0</span>
     </div>
     <div class="rank__hero hidden" id="hero3">
       <img class="hero__avatar" id="heroImg3" src=""  alt="">
+      <img class="hero__rating-good hidden" src="/static/img/good.gif" alt="">
+      <img class="hero__rating-perfect hidden" src="/static/img/perfect.gif" alt="">
+      <img class="hero__rating-ok hidden" src="/static/img/OK.gif" alt="">
+      <img class="hero__rating-x hidden" src="/static/img/X.png" alt="">
       <span class="hero__name" id="heroName3">Name 3</span>
       <span class="hero__score">0</span>
     </div>
     <div class="rank__hero hidden" id="hero4">
       <img class="hero__avatar" id="heroImg4" src=""  alt="">
+      <img class="hero__rating-good hidden" src="/static/img/good.gif" alt="">
+      <img class="hero__rating-perfect hidden" src="/static/img/perfect.gif" alt="">
+      <img class="hero__rating-ok hidden" src="/static/img/OK.gif" alt="">
+      <img class="hero__rating-x hidden" src="/static/img/X.png" alt="">
       <span class="hero__name" id="heroName4">Name 4</span>
       <span class="hero__score">0</span>
     </div>
@@ -47,8 +59,6 @@
       <button id="btn-continue" class="pop-up-box__start-btn" type="button">Continue</button>
     </div>
   </div>
-  <!--<script src="../static/test/edge-impulse-standalone.js"></script>
-  <script src="../static/test/run-impulse.js"></script>-->
   <script>
     (async () => {
       let classifier = new EdgeImpulseClassifier();
@@ -56,7 +66,7 @@
       let project = classifier.getProjectInfo();
       console.log(project.owner + ' / ' + project.name + ' (version ' + project.deploy_version + ')');
 
-      let socket = new WebSocket("wss://" + window.location.hostname + "/neuralWS");
+      let socket = new WebSocket("wss://" + window.location.hostname + "/neuralWS/" + WssURL.split("/").pop().trim());
 
       socket.onopen = function (event) {
         console.log("WebSocket connection established.");
@@ -64,20 +74,54 @@
 
       socket.onmessage = function (event) {
         try {
-          let songName = 'gold-turn';
-          let mesData = JSON.parse(event.data);
-
-          let userID = mesData["userID"];
-          let motionString = mesData["motion"];
+          let jsonData = JSON.parse(event.data);
+          //console.log(jsonData);
+          let songName = jsonData.name;
+          //let userID = mesData["userID"];
+          let motionString = jsonData.motionString;
+          let userID = jsonData.userID;
+          //console.log(motionString);
           let features = motionString.split(',').map(x => Number(x.trim()));
-          let res = classifier.classify(features);
-          for (let motionDict of res["results"]) {
-            if (motionDict["label"] === songName) {
-              console.log(userID, motionDict["value"]);
+
+          let deviationCount = 0;
+          let startValues = [0, 0, 0];
+          let indexInOneRecord = 0;
+          for (let value of features) {
+            //console.log(value);
+            if (value !== 0 && (indexInOneRecord > 2)) {
+              if (startValues[5 - indexInOneRecord] === 0) {
+                startValues[5 - indexInOneRecord] = value;
+              }
+              else if (Math.abs(Math.abs(value) - Math.abs(startValues[5 - indexInOneRecord])) > 4.5) {
+                deviationCount += 1;
+              }
+              if (deviationCount > 5) {
+                break;
+              }
+            }
+            indexInOneRecord += 1;
+            if (indexInOneRecord === 6) {
+              indexInOneRecord = 0;
             }
           }
+          if (deviationCount > 5) {
+            console.log('Двигается', deviationCount);
+            let res = classifier.classify(features);
+            for (let motionDict of res["results"]) {
+              if (motionDict["label"] === songName) {
+                console.log(userID, songName, motionDict["value"]);
+                AddScore(userID.toString(), Math.round(motionDict["value"] * 100));
+              }
+            }
+          }
+          else {
+            console.log('Лежит', deviationCount);
+            AddScore(userID.toString(), 0);
+          }
+
+
         } catch (ex) {
-          alert('Failed to classify: ' + (ex.message || ex.toString()));
+          //alert('Failed to classify: ' + (ex.message || ex.toString()));
         }
       };
 
