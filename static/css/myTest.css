@@ -23,7 +23,7 @@
 
 
 .block {
-    width: 200px;
+    width: 0px;
     height: 200px;
     background-color: red;
     transition: height 0.3s linear; /* Задаем анимацию изменения высоты блока в течение 0.3 секунд с линейным эффектом (равномерное изменение) */

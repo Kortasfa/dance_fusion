@@ -2,7 +2,6 @@
     background-color: #FFE973;
     display: flex;
     height: 100vh;
-    overflow: hidden;
     flex-direction: column;
     justify-content: center;
     align-items: center;
@@ -21,7 +20,7 @@
 
 .users {
     position: absolute;
-    top: 50px;
+    top: 20px;
     left: 10px;
     width: fit-content;
     padding: 9px;
@@ -51,7 +50,7 @@
 
 .btn-log-out {
     position: absolute;
-    top: 50px;
+    top: 20px;
     right: 10px;
     background: #BD63D4;
     width: 50px;
@@ -90,11 +89,7 @@
     align-items: center;
 }
 
-.entrance__instruction {
-    font: 400 20px Roboto, sans-serif;
-    color: #555452;
-    text-align: center;
-}
+
 
 .entrance-id-room__field {
     box-sizing: border-box;
@@ -122,9 +117,29 @@
     color: #F20D40;
 }
 
-.connection {
+.dance-block {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+}
+
+.dance-block__connection {
     font: 400 48px Roboto, sans-serif;
     color: #F20D40;
+    text-align: center;
+}
+
+.dance-block__instruction {
+    font: 400 20px Roboto, sans-serif;
+    color: #555452;
+    text-align: center;
+}
+
+.dance-block__ratingScale {
+    width: 30px;
+    height: 250px;
+    background-color: #0DF2BF;
 }
 
 .hidden {

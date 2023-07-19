@@ -1,6 +1,6 @@
 const btnGo = document.getElementById("btn-join");
 const enterInRoom = document.querySelector(".entrance-id-room__field");
-const connectionText = document.querySelector(".connection");
+const danceField = document.querySelector(".dance-block");
 const entranceField = document.querySelector(".entrance");
 const warningID = document.getElementById("id-warning");
 const emptyID = document.getElementById("id-empty");
@@ -71,7 +71,7 @@ function sendMessage() {
         XHR.onload = function () {
             if (XHR.status === 200) {
                 entranceField.classList.add("hidden");
-                connectionText.classList.remove("hidden");
+                danceField.classList.remove("hidden");
                 emptyID.classList.add("hidden");
                 fullID.classList.add("hidden");
                 warningID.classList.add("hidden");
@@ -97,7 +97,8 @@ function sendMessage() {
                     else {
                         //console.log('Motions:');
                         //console.log(JSON.parse(receivedData))//////////////////////////////
-                        document.querySelector('.connection').innerText = 'Работаем';
+                        document.querySelector('.dance-block__connection').innerText = 'Работаем';
+
                         handleDanceData(JSON.parse(receivedData))
 
                     }
@@ -133,6 +134,10 @@ async function logout() {
         window.location.href = "/logIn";
     }
 }
+
+// function ratingScale() {
+//     const
+// }
 
 btnLogOut.addEventListener("click", logout)
 btnGo.addEventListener("click", sendMessage);

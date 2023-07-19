@@ -16,14 +16,16 @@
 //
 // avatarInput.addEventListener("input", addAvatar)
 
-let value = 0;
-const maxValue = 1000;
-const percentageStep = 0.1;
+
+const maxValue = 1000; value / MaxValue
+let lenArray = (forgetYou); // длина массива - кол-во движений
+let parametr=  Math.floor((lenArray / MaxValue) * 1000) / 1000);
+let value = ;
 
 function startAnimation() {
     if (value >= maxValue) return;
-
-    value += 1;
+x
+    value = 1;
     const percentage = (value / maxValue) * 100;
     const block = document.querySelector('.block');
     block.style.height = percentage + '%';
