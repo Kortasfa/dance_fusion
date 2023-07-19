@@ -13,6 +13,7 @@ import (
 	"math/rand"
 	"net/http"
 	"net/url"
+	"strconv"
 	"time"
 )
 
@@ -29,6 +30,9 @@ var maxUsers int = 4
 var joinPageWSDict = make(map[*websocket.Conn]string) // {WSConnection: UserID, WSConnection: UserID, WSConnection: UserID, ...}
 var broadcastJoinPageWSMessage = make(chan []string)  // [UserID, Data]
 
+var gameFieldWSDict = make(map[*websocket.Conn]string) // {WSConnection: gameFieldID, WSConnection: gameFieldID, WSConnection: gameFieldID, ...}
+//var broadcastGameFieldWSMessage = make(chan []string)
+
 type stylesData struct {
 	StyleID   int    `db:"id"`
 	StyleName string `db:"name"`
@@ -39,15 +43,15 @@ type songsData struct {
 	SongName        string `db:"song_name"`
 	SongAuthor      string `db:"author_name"`
 	PreviewVideoSrc string `db:"preview_video_src"`
+	VideoSrc        string `db:"video_src"`
 	ImageSrc        string `db:"image_src"`
 	StyleID         int    `db:"style_id"`
 }
 
 type userInfo struct {
-	UserID       int
-	UserName     string
-	ImgSrc       string
-	SelectedRoom string
+	UserID   int
+	UserName string
+	ImgSrc   string
 }
 
 type menuPageData struct {
@@ -65,8 +69,10 @@ func getMotion(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	var data struct {
-		MotionString string
-		MotionName   string
+		Name           string
+		MotionString   string
+		SelectedRoomID string
+		UserID         int
 	}
 	err = json.Unmarshal(reqData, &data)
 	if err != nil {
@@ -74,12 +80,28 @@ func getMotion(w http.ResponseWriter, r *http.Request) {
 		log.Println(err.Error())
 		return
 	}
-	fmt.Println(data.MotionString, data.MotionName)
-	fmt.Println(data)
-	w.WriteHeader(200)
+	for conn, gameFieldID := range gameFieldWSDict {
+		if gameFieldID == data.SelectedRoomID {
+			//fmt.Println("отправляем", gameFieldID, data.SelectedRoomID)
+			err := conn.WriteMessage(websocket.TextMessage, reqData)
+			if err != nil {
+				err := conn.Close()
+				if err != nil {
+					w.WriteHeader(409)
+					return
+				}
+				delete(roomWSDict, conn)
+			}
+			w.WriteHeader(200)
+			return
+		}
+	}
+	w.WriteHeader(409)
 }
 
 func neuralWSHandler(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	gameFieldID := vars["id"]
 	var upgrader = websocket.Upgrader{
 		ReadBufferSize:  1024 * 2,
 		WriteBufferSize: 1024 * 2,
@@ -94,25 +116,15 @@ func neuralWSHandler(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 		}
 	}(conn)
-	message := `{
-		"userID": "1",
-		"motion": "0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 6.0000, 1.7000, 7.8000, -10.4000, 9.6000, 24.0000, 6.2000, 1.5000, 8.0000, -13.3000, 11.2000, 28.6000, 6.2000, 1.5000, 8.2000, -16.9000, 12.9000, 35.8000, 6.2000, 1.7000, 8.3000, -24.8000, 16.3000, 45.3000, 6.7000, 2.0000, 7.8000, -27.2000, 18.7000, 53.7000, 7.2000, 2.0000, 7.1000, -27.3000, 19.0000, 54.4000, 7.2000, 2.0000, 7.1000, -27.3000, 19.0000, 54.4000, 7.4000, 1.9000, 6.9000, -27.6000, 19.8000, 51.6000, 8.0000, 1.8000, 6.9000, -39.8000, 20.3000, 48.6000, 8.6000, 1.9000, 7.0000, -54.4000, 16.5000, 47.7000, 8.6000, 1.9000, 7.0000, -54.4000, 16.5000, 47.7000, 9.3000, 2.2000, 7.7000, -78.6000, -0.8000, 60.7000, 9.3000, 2.2000, 7.7000, -78.6000, -0.8000, 60.7000, 9.4000, 2.1000, 6.8000, -79.0000, -10.5000, 67.0000, 8.8000, 2.1000, 4.1000, -56.5000, -28.7000, 51.8000, 8.2000, 2.0000, 3.8000, -48.6000, -32.4000, 33.6000, 7.8000, 2.1000, 4.2000, -50.3000, -36.3000, 21.7000, 7.1000, 2.0000, 3.9000, -54.7000, -40.7000, 14.9000, 6.1000, 1.8000, 3.6000, -57.1000, -41.3000, 8.2000, 6.1000, 1.8000, 3.6000, -57.1000, -41.3000, 8.2000, 5.0000, 1.5000, 4.0000, -75.2000, -27.8000, 0.8000, 5.2000, 1.3000, 4.5000, -87.9000, -18.5000, 2.0000, 5.2000, 1.3000, 4.5000, -87.9000, -18.5000, 2.0000, 4.7000, 0.6000, 5.0000, -104.7000, 1.6000, 12.7000, 4.7000, 0.6000, 5.0000, -104.7000, 1.6000, 12.7000, 4.9000, 0.6000, 5.0000, -102.2000, 14.6000, 22.6000, 2.1000, -0.6000, 2.9000, -77.7000, 36.9000, 50.0000, 1.3000, -1.8000, 1.5000, -74.3000, 61.5000, 51.7000, 1.1000, -2.9000, 0.3000, -63.2000, 96.3000, 44.8000, 2.3000, -4.1000, 0.0000, -49.1000, 137.0000, 33.0000, 5.9000, -5.1000, 0.2000, -33.1000, 181.8000, 15.8000, 5.9000, -5.1000, 0.2000, -33.1000, 181.8000, 15.8000, 5.9000, -5.1000, 0.2000, -33.1000, 181.8000, 15.8000, 11.8000, -5.0000, 0.3000, -43.4000, 207.7000, -5.7000, 28.4000, -3.5000, 6.3000, -107.2000, 217.5000, -89.3000, 28.4000, -3.5000, 6.3000, -107.2000, 217.5000, -89.3000, 37.0000, 0.5000, 13.6000, -114.4000, 215.2000, -85.7000, 41.5000, 3.9000, 15.8000, -77.1000, 155.4000, -65.6000, 36.6000, 4.0000, 17.0000, 43.1000, 56.2000, -39.4000, 24.4000, 3.8000, 15.0000, 142.3000, -13.4000, 11.8000, 5.7000, 4.8000, 5.6000, 47.5000, -27.9000, 104.7000, 5.7000, 4.8000, 5.6000, 47.5000, -27.9000, 104.7000, 1.3000, 5.9000, 2.4000, -46.3000, -19.7000, 138.0000, -3.0000, 7.3000, -3.7000, -107.7000, -11.9000, 148.6000, -3.5000, 7.4000, -6.8000, -91.4000, -22.1000, 116.7000, -3.5000, 7.4000, -6.8000, -91.4000, -22.1000, 116.7000, -5.8000, 4.9000, -9.4000, -51.1000, -59.0000, -3.8000, -8.7000, 3.1000, -6.5000, -62.7000, -55.1000, -51.2000, -8.7000, 3.1000, -6.5000, -62.7000, -55.1000, -51.2000, -10.2000, 1.4000, -3.2000, -90.7000, -31.3000, -69.1000, -10.6000, -0.7000, 0.4000, -126.1000, 43.0000, -47.2000, -10.4000, -1.5000, 1.2000, -119.9000, 99.1000, -29.7000, -6.5000, -2.4000, 1.0000, -94.3000, 158.1000, -16.2000, 0.0000, -3.8000, 0.5000, -62.6000, 198.3000, -9.5000, 8.5000, -7.1000, 0.1000, -42.1000, 217.8000, -8.1000, 18.1000, -14.2000, 0.7000, -32.8000, 230.1000, -7.9000, 18.1000, -14.2000, 0.7000, -32.8000, 230.1000, -7.9000, 27.5000, -21.3000, 0.7000, -16.2000, 285.4000, -4.1000, 27.5000, -21.3000, 0.7000, -16.2000, 285.4000, -4.1000, 63.0000, -10.5000, -3.7000, 87.2000, 303.1000, -90.0000, 63.0000, -10.5000, -3.7000, 87.2000, 303.1000, -90.0000, 64.9000, 0.0000, 2.1000, 105.5000, 85.3000, -123.2000, 47.7000, -3.7000, 11.8000, 76.4000, -120.8000, -90.0000, 19.7000, -14.1000, 14.2000, 133.1000, -175.1000, 212.0000, 14.8000, -14.1000, 2.8000, 102.1000, -166.2000, 310.3000, 7.5000, -10.8000, -6.1000, 34.8000, -156.4000, 306.4000, 1.3000, -6.0000, -9.2000, -31.5000, -141.2000, 243.8000, -4.0000, -2.1000, -7.9000, -95.5000, -121.7000, 174.4000, -6.5000, 0.3000, -5.0000, -132.3000, -103.8000, 130.4000, -7.9000, 1.2000, -4.8000, -121.8000, -107.9000, 101.4000, -7.9000, 1.2000, -4.8000, -121.8000, -107.9000, 101.4000, -12.5000, -0.1000, -8.4000, -78.0000, -128.0000, -2.9000, -14.0000, -0.9000, -7.1000, -62.7000, -97.7000, -70.7000, -14.0000, -0.9000, -7.1000, -62.7000, -97.7000, -70.7000, -13.3000, -1.2000, 0.3000, -33.2000, 11.8000, -122.2000, -13.3000, -1.2000, 0.3000, -33.2000, 11.8000, -122.2000, -10.6000, -1.8000, 2.6000, -4.7000, 146.9000, -88.7000, -6.2000, -3.2000, 3.5000, 8.0000, 217.7000, -61.5000, 0.6000, -5.3000, 2.6000, 19.9000, 265.8000, -34.0000, 9.5000, -9.0000, 0.8000, 27.7000, 283.2000, -17.1000, 20.1000, -14.5000, -1.3000, 15.7000, 271.7000, -17.1000, 20.1000, -14.5000, -1.3000, 15.7000, 271.7000, -17.1000, 29.6000, -22.0000, -1.9000, -30.4000, 279.9000, -31.2000, 29.6000, -22.0000, -1.9000, -30.4000, 279.9000, -31.2000, 42.9000, -14.6000, -2.4000, -87.1000, 346.8000, -102.6000, 42.9000, -14.6000, -2.4000, -87.1000, 346.8000, -102.6000, 52.8000, -5.5000, 0.1000, -69.9000, 225.1000, -148.2000, 36.4000, -9.9000, 13.9000, 181.1000, -214.5000, -96.4000, 36.4000, -9.9000, 13.9000, 181.1000, -214.5000, -96.4000, 22.4000, -15.5000, 14.6000, 300.3000, -261.7000, 46.7000, 12.7000, -15.8000, -0.9000, 230.3000, -198.1000, 249.4000, 6.7000, -11.2000, -5.3000, 106.7000, -175.1000, 252.7000, 6.7000, -11.2000, -5.3000, -20.1000, -146.7000, 226.9000, -3.5000, -2.9000, -5.0000, -126.6000, -112.0000, 196.7000, -3.9000, -0.8000, -3.8000, -173.5000, -96.7000, 176.9000, -3.9000, -0.8000, -3.8000, -173.5000, -96.7000, 176.9000, -7.5000, 0.2000, -9.0000, -125.1000, -134.2000, 103.0000, -10.4000, -0.5000, -9.9000, -75.7000, -148.7000, 23.9000, -10.4000, -0.5000, -9.9000, -75.7000, -148.7000, 23.9000, -14.3000, -1.8000, -5.4000, 19.7000, -66.2000, -118.4000, -14.3000, -1.8000, -5.4000, 19.7000, -66.2000, -118.4000, -13.4000, -2.0000, -2.5000, 44.5000, 4.9000, -144.4000, -10.6000, -3.3000, -0.5000, 54.0000, 147.8000, -151.8000, -10.6000, -3.3000, -0.5000, 54.0000, 147.8000, -151.8000, -1.7000, -7.3000, 0.8000, 23.1000, 284.1000, -146.3000, 9.5000, -11.5000, 1.4000, 12.4000, 316.8000, -141.6000, 9.5000, -11.5000, 1.4000, 12.4000, 316.8000, -141.6000, 20.6000, -17.0000, 2.3000, -35.4000, 292.1000, -127.4000, 20.6000, -17.0000, 2.3000, -35.4000, 292.1000, -127.4000, 38.7000, -26.7000, 8.2000, -145.8000, 326.0000, -77.9000, 48.2000, -13.4000, 6.6000, -149.0000, 301.0000, -59.6000, 48.2000, -13.4000, 6.6000, -149.0000, 301.0000, -59.6000, 49.9000, -3.3000, 13.3000, 39.4000, -132.8000, -76.0000, 30.1000, -14.0000, 17.1000, 195.2000, -270.2000, 30.4000, 17.0000, -19.2000, 11.4000, 243.1000, -253.8000, 172.9000, 11.4000, -19.1000, 0.5000, 170.9000, -189.9000, 259.2000, 7.4000, -14.6000, -6.1000, 56.5000, -146.8000, 257.5000, 4.3000, -9.0000, -6.6000, -27.6000, -132.2000, 223.2000"
-	}`
-
-	//for {
-	err = conn.WriteMessage(websocket.TextMessage, []byte(message))
-	if err != nil {
-		log.Println("Failed to write message to websocket:", err)
-		//break
-	}
-	/*	_, answer, err := conn.ReadMessage()
+	gameFieldWSDict[conn] = gameFieldID
+	for {
+		_, _, err := conn.ReadMessage()
 		if err != nil {
-			log.Println("Failed to read message from websocket:", err)
+			log.Println(err)
+			delete(gameFieldWSDict, conn)
 			break
 		}
-		fmt.Println(string(answer))
-		break
-	}*/
+	}
 }
 
 func homePageHandler(w http.ResponseWriter, r *http.Request) {
@@ -160,6 +172,7 @@ func getSongsData(db *sqlx.DB) ([]songsData, error) {
 			id,
 			song_name,
 			author_name,
+			video_src,
 			preview_video_src,
 			image_src,
 			style_id
@@ -175,6 +188,35 @@ func getSongsData(db *sqlx.DB) ([]songsData, error) {
 	}
 
 	return data, nil
+}
+
+func sendConnectedUserInfo(db *sqlx.DB, roomID string) error {
+	userIDs := roomIDDict[roomID]
+	for _, userID := range userIDs {
+		const query = `
+			SELECT
+				name,
+				img_src
+			FROM
+				users
+			WHERE id = ?`
+
+		var data struct {
+			UserName string `db:"name"`
+			ImgSrc   string `db:"img_src"`
+		}
+
+		id, err := strconv.Atoi(userID)
+		if err != nil {
+			return err
+		}
+		err = db.Get(&data, query, id)
+		if err != nil {
+			return err
+		}
+		broadcastJoiningUserID <- []string{"add", roomID, userID, data.UserName, data.ImgSrc}
+	}
+	return nil
 }
 
 func handleRoom(db *sqlx.DB) func(w http.ResponseWriter, r *http.Request) {
@@ -205,6 +247,7 @@ func handleRoom(db *sqlx.DB) func(w http.ResponseWriter, r *http.Request) {
 			log.Println(err)
 			return
 		}
+
 		data := menuPageData{
 			Styles:  styles,
 			Songs:   songs,
@@ -218,6 +261,16 @@ func handleRoom(db *sqlx.DB) func(w http.ResponseWriter, r *http.Request) {
 			log.Println(err.Error())
 			return
 		}
+
+		go func() {
+			time.Sleep(1000 * time.Millisecond)
+			err = sendConnectedUserInfo(db, roomID)
+			if err != nil {
+				http.Error(w, "Internal Server Error", 500)
+				log.Println(err.Error())
+				return
+			}
+		}()
 	}
 }
 
@@ -325,6 +378,29 @@ func handleJoinPageWSMessages() { // broadcastJoinPageWSMessage <- []string{User
 	}
 }
 
+func retrieveUserRoom(userID string) (string, bool) {
+	for key, userIDSlice := range roomIDDict {
+		for _, currUserID := range userIDSlice {
+			if currUserID == userID {
+				return key, true
+			}
+		}
+	}
+	return "", false
+}
+
+func removeValueFromSlice(words []string, valueToRemove string) []string {
+	var result []string
+
+	for _, word := range words {
+		if word != valueToRemove {
+			result = append(result, word)
+		}
+	}
+
+	return result
+}
+
 func getJoinedUserData(db *sqlx.DB) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		reqData, err := io.ReadAll(r.Body)
@@ -348,34 +424,29 @@ func getJoinedUserData(db *sqlx.DB) func(w http.ResponseWriter, r *http.Request)
 			w.WriteHeader(404)
 			return
 		}
-		if len(roomIDDict[data.RoomID]) >= maxUsers {
+		currRoomID, found := retrieveUserRoom(fmt.Sprintf("%d", data.UserID))
+		if len(roomIDDict[data.RoomID]) >= maxUsers || (found && currRoomID == data.RoomID && (len(roomIDDict[data.RoomID])-1) >= maxUsers) { // Если пользователь подключается к той же комнате, к которой уже подключен, то позволить
 			w.WriteHeader(409)
 			return
 		}
-		slice := roomIDDict[data.RoomID]
-		roomIDDict[data.RoomID] = append(slice, fmt.Sprintf("%d", data.UserID))
+
+		if found {
+			if currRoomID == data.RoomID {
+				w.WriteHeader(200)
+				return
+			} else { // Удалить пользователя из комнаты, прописать функцию удаления пользователя через ws
+				broadcastJoiningUserID <- []string{"remove", currRoomID, strconv.Itoa(data.UserID)}
+				roomIDDict[currRoomID] = removeValueFromSlice(roomIDDict[currRoomID], fmt.Sprintf("%d", data.UserID))
+			}
+		}
+		roomIDDict[data.RoomID] = append(roomIDDict[data.RoomID], fmt.Sprintf("%d", data.UserID)) //////////// Мы добавляем туда ID пользователя
 		userName, imgSrc, err := getUserInfo(db, fmt.Sprintf("%d", data.UserID))
 		if err != nil {
 			http.Error(w, "Internal server error", 500)
 			log.Println(err.Error())
 			return
 		}
-		broadcastJoiningUserID <- []string{data.RoomID, fmt.Sprintf("%d", data.UserID), userName, imgSrc}
-
-		var user userInfo
-		err = getJsonCookie(r, "userInfoCookie", &user)
-		if err != nil {
-			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-			log.Println(err.Error())
-			return
-		}
-		user.SelectedRoom = data.RoomID
-		err = setJsonCookie(w, "userInfoCookie", user, 24*time.Hour)
-		if err != nil {
-			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-			log.Println(err.Error())
-			return
-		}
+		broadcastJoiningUserID <- []string{"add", data.RoomID, fmt.Sprintf("%d", data.UserID), userName, imgSrc}
 		w.WriteHeader(200)
 	}
 }
@@ -383,12 +454,19 @@ func getJoinedUserData(db *sqlx.DB) func(w http.ResponseWriter, r *http.Request)
 func handleRoomWSMessages() {
 	for mesArr := range broadcastJoiningUserID {
 		for wsConnect := range roomWSDict {
-			roomID := mesArr[0]
-			userID := mesArr[1]
-			userName := mesArr[2]
-			imgSrc := mesArr[3]
+			action := mesArr[0]
+			roomID := mesArr[1]
+			userID := mesArr[2]
+			message := ""
+			if action == "add" {
+				userName := mesArr[3]
+				imgSrc := mesArr[4]
+				message = action + "|" + userID + "|" + userName + "|" + imgSrc
+			} else {
+				message = action + "|" + userID
+			}
+
 			if roomWSDict[wsConnect] == roomID {
-				message := userID + "|" + userName + "|" + imgSrc
 				err := wsConnect.WriteMessage(websocket.TextMessage, []byte(message))
 				if err != nil {
 					err := wsConnect.Close()
@@ -615,10 +693,9 @@ func getRegisteredUserData(db *sqlx.DB) func(w http.ResponseWriter, r *http.Requ
 			return
 		}
 		user := userInfo{
-			UserID:       userID,
-			UserName:     userName,
-			ImgSrc:       imgSrc,
-			SelectedRoom: "",
+			UserID:   userID,
+			UserName: userName,
+			ImgSrc:   imgSrc,
 		}
 		err = setJsonCookie(w, "userInfoCookie", user, 24*time.Hour)
 		if err != nil {
@@ -698,10 +775,9 @@ func getLoginUserData(db *sqlx.DB) func(w http.ResponseWriter, r *http.Request) 
 				return
 			}
 			user := userInfo{
-				UserID:       userID,
-				UserName:     data.UserName,
-				ImgSrc:       imgSrc,
-				SelectedRoom: "",
+				UserID:   userID,
+				UserName: data.UserName,
+				ImgSrc:   imgSrc,
 			}
 			err = setJsonCookie(w, "userInfoCookie", user, 24*time.Hour)
 			if err != nil {
@@ -747,14 +823,24 @@ func getJsonCookie(r *http.Request, name string, value interface{}) error {
 	return nil
 }
 
-func clearCookie(db *sqlx.DB) func(w http.ResponseWriter, r *http.Request) {
-	return func(w http.ResponseWriter, r *http.Request) {
-		http.SetCookie(w, &http.Cookie{
-			Name:    "userInfoCookie",
-			Path:    "/",
-			Expires: time.Now().AddDate(0, 0, -1),
-		})
-		fmt.Println("Cookie is deleted")
-		w.WriteHeader(200)
+func clearCookie(w http.ResponseWriter, r *http.Request) {
+	var user userInfo
+	err := getJsonCookie(r, "userInfoCookie", &user)
+	if err != nil {
+		http.Error(w, "Internal Server Error", 500)
+		log.Println(err.Error())
+		return
 	}
+	roomID, found := retrieveUserRoom(strconv.Itoa(user.UserID))
+	if found {
+		roomIDDict[roomID] = removeValueFromSlice(roomIDDict[roomID], strconv.Itoa(user.UserID))
+		broadcastJoiningUserID <- []string{"remove", roomID, strconv.Itoa(user.UserID)}
+	}
+	http.SetCookie(w, &http.Cookie{
+		Name:    "userInfoCookie",
+		Path:    "/",
+		Expires: time.Now().AddDate(0, 0, -1),
+	})
+	fmt.Println("Cookie is deleted")
+	w.WriteHeader(200)
 }
