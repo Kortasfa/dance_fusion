@@ -61,74 +61,193 @@
   </div>
   <script>
     (async () => {
-      let classifier = new EdgeImpulseClassifier();
-      await classifier.init();
-      let project = classifier.getProjectInfo();
-      console.log(project.owner + ' / ' + project.name + ' (version ' + project.deploy_version + ')');
+        let classifier = new EdgeImpulseClassifier();
+        await classifier.init();
+        let project = classifier.getProjectInfo();
+        console.log(project.owner + ' / ' + project.name + ' (version ' + project.deploy_version + ')');
 
-      let socket = new WebSocket("wss://" + window.location.hostname + "/neuralWS/" + WssURL.split("/").pop().trim());
+        let socket = new WebSocket("wss://" + window.location.hostname + "/neuralWS/" + WssURL.split("/").pop().trim());
 
-      socket.onopen = function (event) {
-        console.log("WebSocket connection established.");
-      };
+        socket.onopen = function (event) {
+            console.log("WebSocket connection established.");
+        };
 
-      socket.onmessage = function (event) {
-        try {
-          let jsonData = JSON.parse(event.data);
-          //console.log(jsonData);
-          let songName = jsonData.name;
-          //let userID = mesData["userID"];
-          let motionString = jsonData.motionString;
-          let userID = jsonData.userID;
-          //console.log(motionString);
-          let features = motionString.split(',').map(x => Number(x.trim()));
+        socket.onmessage = function (event) {
+            try {
+                let jsonData = JSON.parse(event.data);
+                //console.log(jsonData);
+                let moveName = jsonData.name;
+                //let userID = mesData["userID"];
+                let motionString = jsonData.motionString;
+                let userID = jsonData.userID;
+                //console.log(motionString);
+                let features = motionString.split(',').map(x => Number(x.trim()));
+                let res = classifier.classify(features); // результат оценки нейросетью JSON
+                console.log(res["results"]);
+                let score = -1;
+                for (let motionDict of res["results"]) {
+                    if (motionDict["label"] === moveName) {
+                        score = motionDict["value"];
+                        if (moveName === "up-down-click") {
+                            let sameMoveOne = res["results"].find(item => item.label === "hands-up-and-down");
+                            let sameMoveTwo = res["results"].find(item => item.label === "up-down-hands");
+                            score = Math.max(motionDict["value"], sameMoveOne.value, sameMoveTwo.value);
+                            if (score > 0.01 && score < 0.1) {
+                                score = 0.1;
+                            }
+                        }
+                        if (moveName === "up-down-hands") {
+                            let sameMoveOne = res["results"].find(item => item.label === "hands-up-and-down");
+                            score = Math.max(motionDict["value"], sameMoveOne.value);
+                            if (score > 0.01 && score < 0.1) {
+                                score = 0.2;
+                            }
+                        }
+                        if (moveName === "collapsing-breeding-locks"){
+                            if (score > 0.001 && score < 0.005) {
+                                score = 0.2
+                            }
+                            if (score >= 0.005 && score < 0.01) {
+                                score = 0.3;
+                            }
+                            if (score >= 0.01) {
+                                score = 0.4;
+                            }
 
-          let deviationCount = 0;
-          let startValues = [0, 0, 0];
-          let indexInOneRecord = 0;
-          for (let value of features) {
-            //console.log(value);
-            if (value !== 0 && (indexInOneRecord > 2)) {
-              if (startValues[5 - indexInOneRecord] === 0) {
-                startValues[5 - indexInOneRecord] = value;
-              }
-              else if (Math.abs(Math.abs(value) - Math.abs(startValues[5 - indexInOneRecord])) > 4.5) {
-                deviationCount += 1;
-              }
-              if (deviationCount > 5) {
-                break;
-              }
+                        }
+                        if (moveName === "going-to-the-side-with-clapping"){
+                            if (score > 0.001 && score < 0.05) {
+                                score = 0.2;
+                            }
+                            if (score >= 0.05 & score < 0.1) {
+                                score = 0.3;
+                            }
+                            if (score >= 0.1) {
+                                score = 0.4;
+                            }
+
+                        }
+                        if (moveName === "hands-up-and-down") {
+                            let sameMoveOne = res["results"].find(item => item.label === "up-down-click");
+                            let sameMoveTwo = res["results"].find(item => item.label === "up-down-hands");
+                            score = Math.max(motionDict["value"], sameMoveOne.value, sameMoveTwo.value);
+                            if (score > 0.01 && score < 0.1) {
+                                score = 0.1;
+                            }
+                        }
+                        if (moveName === "hands-up-down-sideways") {
+                            if (score > 0.001 && score < 0.05) {
+                                score = 0.2;
+                            }
+                            if (score >= 0.05 && score < 0.1) {
+                                score = 0.3;
+                            }
+                            if (score >= 0.1) {
+                                score = 0.4;
+                            }
+
+                        }
+                        if (moveName === "side-hit") {
+                            let sameMoveOne = res["results"].find(item => item.label === "hands-up-and-down");
+                            score = Math.max(motionDict["value"], sameMoveOne.value);
+                            if (score > 0.01 && score < 0.05) {
+                                score = 0.2;
+                            }
+                            if (score >= 0.05 & score < 0.1) {
+                                score = 0.3;
+                            }
+                            if (score >= 0.1) {
+                                score = 0.4;
+
+                            }
+                        }
+                        if (moveName === "down-from-the-middle-in-arc") {
+                            let sameMoveOne = res["results"].find(item => item.label === "hands-up-and-down");
+                            score = Math.max(motionDict["value"], sameMoveOne.value);
+                            if (score > 0.01 && score < 0.1) {
+                                score = 0.1;
+                            }
+                        }
+                        if (moveName === "collapsing-breeding-locks") {
+                            let sameMoveOne = res["results"].find(item => item.label === "up-down-hands");
+                            score = Math.max(motionDict["value"], sameMoveOne.value);
+                            if (score > 0.01 && score < 0.1) {
+                                score = 0.1;
+                            }
+                        }
+                        if (moveName === "draw-circle") {
+                            let sameMoveOne = res["results"].find(item => item.label === "hands-up-and-down");
+                            let sameMoveTwo = res["results"].find(item => item.label === "up-down-hands");
+                            score = Math.max(motionDict["value"], sameMoveOne.value, sameMoveTwo.value);
+                            if (score > 0.01 && score < 0.1) {
+                                score = 0.1;
+                            }
+                        }
+                        if (moveName === "i-am-strong"){
+                            let sameMoveOne = res["results"].find(item => item.label === "gold-turn");
+                            let sameMoveTwo = res["results"].find(item => item.label === "gold-circle");
+                            score = Math.max(motionDict["value"], sameMoveOne.value, sameMoveTwo.value);
+                            if (score > 0.01 && score < 0.1) {
+                                score = 0.1;
+                            }
+                        }
+                        if (moveName === "broad-back"){
+                            let sameMoveOne = res["results"].find(item => item.label === "hands-up-and-down");
+                            score = Math.max(motionDict["value"], sameMoveOne.value);
+                            if (score > 0.01 && score < 0.1) {
+                                score = 0.1;
+                            }
+                        }
+                        if (moveName === "like-a-chicken"){
+                            let sameMoveOne = res["results"].find(item => item.label === "hands-up-and-down");
+                            score = Math.max(motionDict["value"], sameMoveOne.value);
+                            if (score > 0.01 && score < 0.1) {
+                                score = 0.1;
+                            }
+                        }
+                        if (moveName === "gold-circle"){
+                            let sameMoveOne = res["results"].find(item => item.label === "up-down-click");
+                            score = Math.max(motionDict["value"], sameMoveOne.value);
+                            if (score > 0.01 && score < 0.1) {
+                                score = 0.1;
+                            }
+                        }
+                        if (moveName === "gold-turn"){
+                            let sameMoveOne = res["results"].find(item => item.label === "down-from-the-middle-in-arc");
+                            let sameMoveTwo = res["results"].find(item => item.label === "gold-circle");
+                            score = Math.max(motionDict["value"], sameMoveOne.value, sameMoveTwo.value);
+                            if (score > 0.01 && score < 0.1) {
+                                score = 0.1;
+                            }
+                        }
+                    }
+                }
+                console.log(moveName);
+                console.log(score);
+                if (score >= 0.4) {
+                    AddScore(userID.toString(), 40);
+                }
+                if (score >= 0.3 && score < 0.4) {
+                    AddScore(userID.toString(), Math.round(score * 400 / 4));
+                }
+                if (score >= 0.2 && score < 0.3) {
+                    AddScore(userID.toString(), Math.round(score * 100) + 3);
+                }
+                if (score > 0.1 && score < 0.2) {
+                    AddScore(userID.toString(), Math.round(score * 100) + 5);
+                }
+                if (score <= 0.1 && score > 0) {
+                    AddScore(userID.toString(), Math.round(score * 100) + 7);
+                }
+            } catch (ex) {
+                //alert('Failed to classify: ' + (ex.message || ex.toString()));
             }
-            indexInOneRecord += 1;
-            if (indexInOneRecord === 6) {
-              indexInOneRecord = 0;
-            }
-          }
-          if (deviationCount > 5) {
-            console.log('Двигается', deviationCount);
-            let res = classifier.classify(features);
-            for (let motionDict of res["results"]) {
-              if (motionDict["label"] === songName) {
-                console.log(userID, songName, motionDict["value"]);
-                AddScore(userID.toString(), Math.round(motionDict["value"] * 100));
-              }
-            }
-          }
-          else {
-            console.log('Лежит', deviationCount);
-            AddScore(userID.toString(), 0);
-          }
+        };
 
-
-        } catch (ex) {
-          //alert('Failed to classify: ' + (ex.message || ex.toString()));
-        }
-      };
-
-      socket.onclose = function (event) {
-        console.log("WebSocket connection closed.");
-      };
+        socket.onclose = function (event) {
+            console.log("WebSocket connection closed.");
+        };
     })();
-  </script>
+</script>
 </body>
 </html>

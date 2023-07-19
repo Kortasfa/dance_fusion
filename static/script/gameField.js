@@ -1,7 +1,7 @@
 let isBtnClicked = false;
-let scoreGood = 50;
-let scoreOk = 20;
-let scorePerfect = 90;
+let scoreGood = 25;
+let scoreOk = 13;
+let scorePerfect = 33;
 
 const danceVideo = document.getElementById("video-dance");
 const modalElem = document.getElementById("pop-up");
