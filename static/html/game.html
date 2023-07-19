@@ -82,13 +82,44 @@
           let userID = jsonData.userID;
           //console.log(motionString);
           let features = motionString.split(',').map(x => Number(x.trim()));
-          let res = classifier.classify(features);
-          for (let motionDict of res["results"]) {
-            if (motionDict["label"] === songName) {
-              console.log(userID, songName, motionDict["value"]);
-              AddScore(userID.toString(), Math.round(motionDict["value"] * 100));
+
+          let deviationCount = 0;
+          let startValues = [0, 0, 0];
+          let indexInOneRecord = 0;
+          for (let value of features) {
+            //console.log(value);
+            if (value !== 0 && (indexInOneRecord > 2)) {
+              if (startValues[5 - indexInOneRecord] === 0) {
+                startValues[5 - indexInOneRecord] = value;
+              }
+              else if (Math.abs(Math.abs(value) - Math.abs(startValues[5 - indexInOneRecord])) > 4.5) {
+                deviationCount += 1;
+              }
+              if (deviationCount > 5) {
+                break;
+              }
+            }
+            indexInOneRecord += 1;
+            if (indexInOneRecord === 6) {
+              indexInOneRecord = 0;
             }
           }
+          if (deviationCount > 5) {
+            console.log('Двигается', deviationCount);
+            let res = classifier.classify(features);
+            for (let motionDict of res["results"]) {
+              if (motionDict["label"] === songName) {
+                console.log(userID, songName, motionDict["value"]);
+                AddScore(userID.toString(), Math.round(motionDict["value"] * 100));
+              }
+            }
+          }
+          else {
+            console.log('Лежит', deviationCount);
+            AddScore(userID.toString(), 0);
+          }
+
+
         } catch (ex) {
           //alert('Failed to classify: ' + (ex.message || ex.toString()));
         }
