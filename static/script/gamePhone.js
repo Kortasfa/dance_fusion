@@ -1,11 +1,13 @@
 const btnGo = document.getElementById("btn-join");
 const enterInRoom = document.querySelector(".entrance-id-room__field");
-const connectionText = document.querySelector(".connection");
+const danceField = document.querySelector(".dance-block");
 const entranceField = document.querySelector(".entrance");
 const warningID = document.getElementById("id-warning");
 const emptyID = document.getElementById("id-empty");
 const fullID = document.getElementById("id-full");
-const btnLogOut = document.querySelector(".btn-log-out");
+const btnLogOut = document.getElementById("logout");
+const user = document.querySelector(".users");
+const menu = document.querySelector(".menu")
 
 function setJsonCookie(name, value, expirationDays) {
     const jsonValue = JSON.stringify(value);
@@ -44,7 +46,8 @@ function sendMessage() {
         fullID.classList.add("hidden");
         emptyID.classList.remove("hidden");
         enterInRoom.classList.add("entrance-id-room__field_warning");
-    } else {
+    }
+    else {
         if (userInfo === null) {
             console.log("Login to your account!");
             return
@@ -59,7 +62,7 @@ function sendMessage() {
         XHR.onload = function () {
             if (XHR.status === 200) {
                 entranceField.classList.add("hidden");
-                connectionText.classList.remove("hidden");
+                danceField.classList.remove("hidden");
                 emptyID.classList.add("hidden");
                 fullID.classList.add("hidden");
                 warningID.classList.add("hidden");
@@ -87,30 +90,85 @@ function sendMessage() {
 
 function joinRoom(userID) {
     let socket = new WebSocket("wss://" + window.location.hostname + "/ws/joinToRoom/" + userID);
-    socket.onopen = function (event) {
+    socket.onopen = function(event) {
         console.log("WebSocket connection established.");
     };
 
-    socket.onmessage = function (event) {
+    socket.onmessage = function(event) {
         let receivedData = event.data;
         document.querySelector('.connection').innerText = 'Работаем';
         handleDanceData(JSON.parse(receivedData))
     };
 
-    socket.onclose = function (event) {
+    socket.onclose = function(event) {
         console.log("WebSocket connection closed.");
     };
 }
 
-window.onbeforeunload = logout;
 
-async function logout() {
-    fetch("/api/exit").then(r => 'log out');
-    window.location.href = "/join";
+async function exitFromGame() {
+    const response = await fetch("/api/exitFromGame", {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({"userID": userID}),
+    });
+    if (!response.ok) {
+        console.log('Не удалось выйти из игры');
+    } else {
+        console.log('Вышел из игры');
+    }
 }
 
-btnLogOut.addEventListener("click", logout)
+async function exitFromRoom() {
+    const response = await fetch("/api/exitFromRoom", {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({"userID": userID}),
+    });
+    if (!response.ok) {
+        console.log('Не удалось выйти из комнаты');
+    } else {
+        console.log('Вышел из комнаты');
+    }
+}
+
+async function exitFromAccount() {
+    const response = await fetch("/api/exitFromAccount", {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({"userID": userID}),
+    });
+    if (!response.ok) {
+        console.log('Не удалось выйти из аккаунта');
+    } else {
+        console.log('Вышел из аккаунта');
+    }
+}
+
+let isOpen = false;
+function userMenu() {
+    if (!isOpen) {
+        menu.classList.remove("menu-hidden");
+        menu.classList.add("menu-open");
+        isOpen = true;
+    }
+    else {
+        menu.classList.add("menu-hidden");
+        menu.classList.remove("menu-open");
+        isOpen = false;
+    }
+}
+
+
+btnLogOut.addEventListener("click", exitFromAccount)
 btnGo.addEventListener("click", sendMessage);
+user.addEventListener("click", userMenu);
 
 
 if (window.DeviceMotionEvent && window.DeviceOrientationEvent) {
@@ -121,8 +179,8 @@ if (window.DeviceMotionEvent && window.DeviceOrientationEvent) {
 
     function handleSensorData(event) {
         try {
-            const {alpha, beta, gamma} = event.rotationRate;
-            const {x, y, z} = event.accelerationIncludingGravity;
+            const { alpha, beta, gamma } = event.rotationRate;
+            const { x, y, z } = event.accelerationIncludingGravity;
             sensorData.push({
                 alpha,
                 beta,
@@ -139,9 +197,7 @@ if (window.DeviceMotionEvent && window.DeviceOrientationEvent) {
     function startRecording(name, duration) {
         window.addEventListener('devicemotion', handleSensorData, true);
         window.addEventListener('deviceorientation', handleSensorData, true);
-        setTimeout(function () {
-            stopRecording(name);
-        }, duration * 1300); // 1000 /// // / / /// / / / / / / / / / / /  / /              /////
+        setTimeout(function () {stopRecording(name);}, duration * 1300); // 1000 /// // / / /// / / / / / / / / / / /  / /              /////
     }
 
     function stopRecording(name) {
@@ -155,7 +211,7 @@ if (window.DeviceMotionEvent && window.DeviceOrientationEvent) {
             outputString += `, ${MyRound10(x)}, ${MyRound10(y)}, ${MyRound10(z)}, ${MyRound10(alpha)}, ${MyRound10(beta)}, ${MyRound10(gamma)}`;
             pointCount += 6;
         }
-        for (pointCount; pointCount < 1146; pointCount++) {
+        for (pointCount; pointCount < 1146; pointCount++){
             outputString += ', 0.0000';
         }
         sensorData = [];

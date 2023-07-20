@@ -1,7 +1,7 @@
 let isBtnClicked = false;
-let scoreGood = 50;
-let scoreOk = 20;
-let scorePerfect = 90;
+let scoreGood = 25;
+let scoreOk = 13;
+let scorePerfect = 33;
 
 const danceVideo = document.getElementById("video-dance");
 const modalElem = document.getElementById("pop-up");
@@ -24,10 +24,6 @@ function getUsersByCookie() {
     }
 }
 
-function removeUser() {
-
-}
-
 function showStats() {
     addStats();
     modalElem.classList.remove("hidden");
@@ -48,37 +44,6 @@ danceVideo.addEventListener('ended', showStats);
 btnContinue.addEventListener("click", function () {
     window.location.href = "/room";
 })
-
-//(async () => {
-    //var classifier = new EdgeImpulseClassifier();
-   // /*await*/ classifier.init();
-
-    //let project = classifier.getProjectInfo();
-    //document.querySelector('h1').textContent = project.owner + ' / ' + project.name + ' (version ' + project.deploy_version + ')';
-
-
-
-
-
-    /*document.querySelector('#run-inference').onclick = () => {
-        try {
-            let features = document.querySelector('#features').value.split(',').map(x => Number(x.trim()));
-            let res = classifier.classify(features);
-            document.querySelector('#results').textContent = JSON.stringify(res, null, 4);
-        }
-        catch (ex) {
-            alert('Failed to classify: ' + (ex.message || ex.toString()));
-        }
-    };*/
-//})();
-
-
-
-// function openModalElem() {
-//     modalElem.classList.add("open");
-// }
-
-// x
 
 function AddScore(userID, Score){
     let user = document.getElementById(userID);
