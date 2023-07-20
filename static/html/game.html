@@ -1,36 +1,103 @@
 <html lang="en">
-<body class="main">
-<link rel="stylesheet" href="/static/css/gameField.css"/>
-  <div class="rank">
-    <div class="rank__hero" id="hero1">
-      <img class="hero__avatar" id="heroImg1">
-      <span class="hero__name" id="heroName1">Name 1</span>
-      <span class="hero__score">0</span>
-    </div>
-    <div class="rank__hero hidden" id="hero2">
-      <img class="hero__avatar" id="heroImg2">
-      <span class="hero__name" id="heroName2">Name 2</span>
-      <span class="hero__score">0</span>
-    </div>
-    <div class="rank__hero hidden" id="hero3">
-      <img class="hero__avatar" id="heroImg3">
-      <span class="hero__name" id="heroName3">Name 3</span>
-      <span class="hero__score">0</span>
-    </div>
-    <div class="rank__hero hidden" id="hero4">
-      <img class="hero__avatar" id="heroImg4">
-      <span class="hero__name" id="heroName4">Name 4</span>
-      <span class="hero__score">0</span>
-    </div>
-  </div>
-  <a class="btn-exit" href="/room">
-    <img src="/static/img/log_out.svg">
-  </a>
-  <video id="video-dance" class="video-dance" type="video/mp4" width="100%" autoplay="autoplay">
-    <source id="video-src" src="../video/americanGirl.mp4">
-  </video>
-</body>
-<scripts>
+<head>
+  <title>Dance Fusion</title>
+  <link rel="stylesheet" href="/static/css/gameField.css"/>
   <script src="/static/script/gameField.js" defer></script>
-</scripts>
+</head>
+<body class="main">
+<div class="rank">
+  <div class="rank__hero" id="hero1">
+    <img class="hero__rating-good hidden" src="/static/img/good.gif" alt="">
+    <img class="hero__rating-perfect hidden" src="/static/img/perfect.gif" alt="">
+    <img class="hero__rating-ok hidden" src="/static/img/OK.gif" alt="">
+    <img class="hero__rating-x hidden" src="/static/img/X.png" alt="">
+    <img class="hero__avatar" id="heroImg1" src=""  alt="">
+    <span class="hero__name" id="heroName1">Name 1</span>
+    <span class="hero__score">0</span>
+  </div>
+  <div class="rank__hero hidden" id="hero2">
+    <img class="hero__avatar" id="heroImg2" src=""  alt="">
+    <img class="hero__rating-good hidden" src="/static/img/good.gif" alt="">
+    <img class="hero__rating-perfect hidden" src="/static/img/perfect.gif" alt="">
+    <img class="hero__rating-ok hidden" src="/static/img/OK.gif" alt="">
+    <img class="hero__rating-x hidden" src="/static/img/X.png" alt="">
+    <span class="hero__name" id="heroName2">Name 2</span>
+    <span class="hero__score">0</span>
+  </div>
+  <div class="rank__hero hidden" id="hero3">
+    <img class="hero__avatar" id="heroImg3" src=""  alt="">
+    <img class="hero__rating-good hidden" src="/static/img/good.gif" alt="">
+    <img class="hero__rating-perfect hidden" src="/static/img/perfect.gif" alt="">
+    <img class="hero__rating-ok hidden" src="/static/img/OK.gif" alt="">
+    <img class="hero__rating-x hidden" src="/static/img/X.png" alt="">
+    <span class="hero__name" id="heroName3">Name 3</span>
+    <span class="hero__score">0</span>
+  </div>
+  <div class="rank__hero hidden" id="hero4">
+    <img class="hero__avatar" id="heroImg4" src=""  alt="">
+    <img class="hero__rating-good hidden" src="/static/img/good.gif" alt="">
+    <img class="hero__rating-perfect hidden" src="/static/img/perfect.gif" alt="">
+    <img class="hero__rating-ok hidden" src="/static/img/OK.gif" alt="">
+    <img class="hero__rating-x hidden" src="/static/img/X.png" alt="">
+    <span class="hero__name" id="heroName4">Name 4</span>
+    <span class="hero__score">0</span>
+  </div>
+</div>
+<a class="btn-exit" href="/room">
+  <img src="/static/img/log_out.svg" alt="">
+</a>
+<video id="video-dance" class="video-dance" type="video/mp4" width="100%" autoplay="autoplay">
+  <source id="video-src" src="../video/previews/americanGirl.mp4">
+</video>
+<div class="pop-up hidden" id="pop-up">
+  <div class="pop-up__pop-up-box">
+    <span class="pop-up-box__question">Total score</span>
+    <span id="user-score1" class="pop-up-box__user-score hidden">User 1: 0</span>
+    <span id="user-score2" class="pop-up-box__user-score hidden">User 2: 0</span>
+    <span id="user-score3" class="pop-up-box__user-score hidden">User 3: 0</span>
+    <span id="user-score4" class="pop-up-box__user-score hidden">User 4: 0</span>
+    <button id="btn-continue" class="pop-up-box__start-btn" type="button">Continue</button>
+  </div>
+</div>
+<script>
+  (async () => {
+    let classifier = new EdgeImpulseClassifier();
+    await classifier.init();
+    let project = classifier.getProjectInfo();
+    console.log(project.owner + ' / ' + project.name + ' (version ' + project.deploy_version + ')');
+
+    let socket = new WebSocket("wss://" + window.location.hostname + "/neuralWS/" + WssURL.split("/").pop().trim());
+
+    socket.onopen = function (event) {
+      console.log("WebSocket connection established.");
+    };
+
+    socket.onmessage = function (event) {
+      try {
+        let jsonData = JSON.parse(event.data);
+        //console.log(jsonData);
+        let songName = jsonData.name;
+        //let userID = mesData["userID"];
+        let motionString = jsonData.motionString;
+        let userID = jsonData.userID;
+        //console.log(motionString);
+        let features = motionString.split(',').map(x => Number(x.trim()));
+        let res = classifier.classify(features);
+        for (let motionDict of res["results"]) {
+          if (motionDict["label"] === songName) {
+            console.log(userID, songName, motionDict["value"]);
+            AddScore(userID.toString(), Math.round(motionDict["value"] * 100));
+          }
+        }
+      } catch (ex) {
+        //alert('Failed to classify: ' + (ex.message || ex.toString()));
+      }
+    };
+
+    socket.onclose = function (event) {
+      console.log("WebSocket connection closed.");
+    };
+  })();
+</script>
+</body>
 </html>

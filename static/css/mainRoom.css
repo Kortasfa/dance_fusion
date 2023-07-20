@@ -6,7 +6,7 @@
 }
 
 .page{
-    background-color: #0DF2BF;
+    background-color: #FFE973;
     position: relative;
 }
 
@@ -35,7 +35,7 @@
       }
 }
 
-.unplay {
+.unPlay {
     animation-duration: 1s;
     animation-name: unslidein;
     margin-left: calc(-96% + 590px);
@@ -102,10 +102,14 @@
 }
 
 .dance-style__button{
+
     margin: 24px;
 }
 
 .button__text{
+    border-style: dashed;
+    border-width: 5px;
+    border-color: #BD63D4;
     display: block;
     font: normal 400 47px/1.54 'Roboto';
     border-radius: 10px;
@@ -120,11 +124,14 @@
 }
 
 .button__text:hover{
-    background: #DBFF00;
+    background: #AEF26D;
 }
 
 .play-button
 {
+    border-style: dashed;
+    border-width: 5px;
+    border-color: #FFE973;
     display: block;
     font: normal 400 47px/1.54 'Roboto';
     border-radius: 10px;
@@ -146,10 +153,11 @@
 .game-menu{
     width: 642px;
     min-height: 600px;
-    background-color: #F20D40;
+    background-color: #BD63D4;
     display: flex;
     flex-direction: column;
     border-radius: 10px;
+    box-shadow: 0 6px 4px -4px rgba(0, 0, 0, .2);
 }
 
 .game-menu__party{
@@ -157,14 +165,6 @@
     height: 164px;
     flex-direction: row;
     justify-content: center;
-}
-
-.active{
-    background-color: yellow;
-}
-
-.actived{
-    background-color: yellow;
 }
 
 .party__user{
@@ -199,6 +199,10 @@
 }
 
 .song__section{
+    border-style: dashed;
+    border-width: 5px;
+    border-color: #BD63D4;
+    width: 290px;
     border-radius: 10px;
     position: relative;
     width: 352px;
@@ -208,7 +212,7 @@
     box-shadow: 0 6px 4px -4px rgba(0, 0, 0, .2);
 }
 .song__section:hover{
-    background: #DBFF00;
+    background: #AEF26D;
 }
 
 .name__title{
@@ -240,18 +244,20 @@
 .info__title{
     text-align: center;
     margin: 35px;
-    font: normal 400 48px 'Roboto';
+    font: normal 400 28px 'Roboto';
+    color: #1E1C1C;
 }
 
-.info__rmation{
-    font: normal 400 40px 'Roboto';
+.information{
+    font: normal 400 24px 'Roboto';
+    color: #1E1C1C;
 }
 
-.info__rmation p{
+.information p{
     margin: 35px;
 }
 
-.section__name{
+.section__name {
     margin: 24px 24px 24px 134px;
 }
 
@@ -259,7 +265,7 @@
     margin-bottom: 500px;
 }
 
-.party__messege{
+.party__message{
     font: normal 400 46px/1.54 'Roboto';
     text-align: center;
     margin: auto;
@@ -276,7 +282,12 @@
 }
 
 .button_yellow{
-    background: #DBFF00;
+    background: #AEF26D;
+}
+
+.button_ready{
+    background: #AEF26D;
+    color: #111111;
 }
 
 .songs::-webkit-scrollbar {
@@ -314,6 +325,7 @@
         animation-name: slidein;
         margin-left: 0;
     }
+
     @keyframes slidein {
         from {
             margin-left: -200%;
@@ -323,7 +335,7 @@
             margin-left: 0;
           }
     }
-    .unplay {
+    .unPlay {
         animation-duration: 1s;
         animation-name: unslidein;
         margin-left: -200%;
@@ -361,7 +373,7 @@
         min-height: 420px;
     }
 
-    .party__messege {
+    .party__message {
         font: normal 400 32px/1.54 'Roboto';
     }
 
