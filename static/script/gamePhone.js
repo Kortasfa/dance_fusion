@@ -106,10 +106,8 @@ function joinRoom(userID) {
 window.onbeforeunload = logout;
 
 async function logout() {
-    const response = await fetch("/clear");
-    if (response.ok) {
-        window.location.href = "/logIn";
-    }
+    fetch("/api/exit");
+    window.location.href = "/join";
 }
 
 btnLogOut.addEventListener("click", logout)
@@ -162,7 +160,7 @@ if (window.DeviceMotionEvent && window.DeviceOrientationEvent) {
         sensorData = [];
         //document.write(outputString);
 
-        let data = JSON.stringify({"name": name, "motionString": outputString, "selectedRoomID": selectedRoomID, "userID": userID});
+        let data = JSON.stringify({"name": name, "motionString": outputString, "userID": userID});
         //document.writeln(data);
         sendDataToServer(data);
     }

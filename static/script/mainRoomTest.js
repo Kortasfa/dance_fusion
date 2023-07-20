@@ -8,6 +8,7 @@ const PlayBtn = document.getElementById('play');
 let readyGame = false;
 let numberOfUser = 0;
 let readyPlayer = false;
+let connectedUsers = [];
 
 btnOpenInfo.addEventListener('click', openGuide);
 
@@ -132,34 +133,74 @@ socket.onopen = function (event) {
 };
 
 socket.onmessage = function (event) {
-    const userMessage = document.getElementById('needUser');
-    const message = event.data;
-    const parts = message.split('|');
-    const userID = parts[0];
-    const userName = parts[1];
-    const imgSrc = parts[2];
+    let message = event.data;
+    let parts = message.split('|');
+    let action = parts[0];
+    let userID = parts[1];
+    if (action === "add") {
+        let userName = parts[2];
+        let imgSrc = parts[3];
+        addUser(userID, userName, imgSrc);
+    } else if (action === "remove") {
+        removeUser(userID)
+    }
 
-    numberOfUser = numberOfUser + 1;
-    document.cookie = `User${numberOfUser}=${parts};path=/`;
-
-    userMessage.classList.add('none');
-    const indexUser = document.getElementById(`user${numberOfUser}`);
-    const indexUserName = document.getElementById(`userName${numberOfUser}`);
-    const indexUserImg = indexUser.querySelector(".user__avatar");
-    indexUser.classList.remove('none');
-    indexUserImg.src = `../${imgSrc}`;
-
-    readyPlayer = true;
-    changeButton();
-
-    indexUserName.innerText = userName;
-
-    console.log(`Пользователь присоединился: ${userID}`);
-    console.log(`Его имя: ${userName}`);
-    console.log(`Его фотка: ${imgSrc}`);
 };
-
 
 socket.onclose = function (event) {
     console.log("WebSocket connection closed.");
 };
+
+function addUser(userID, userName, imgSrc) {
+    console.log('Пользователь присоединился: ' + userID);
+    connectedUsers.push({"userID": userID, "userName": userName, "imgSrc": imgSrc});
+
+    let userMessage = document.getElementById('needUser');
+    userMessage.classList.add('none');
+    let indexUser = document.getElementById('user' + connectedUsers.length);
+    let indexUserName = document.getElementById('userName' + connectedUsers.length);
+    let indexUserImg = indexUser.querySelector(".user__avatar");
+    indexUser.classList.remove('none');
+    indexUserImg.src = '../' + imgSrc;
+    indexUserName.innerText = userName;
+
+    readyPlayer = true;
+    changeButton();
+}
+
+
+function removeUser(userID) {
+    console.log('Пользователь вышел: ' + userID);
+
+    let removedUserIndex = 0;
+    for (let i = 0; i < connectedUsers.length; i++) {
+        if (connectedUsers[i]["userID"] === userID) {
+            connectedUsers.splice(i, 1);
+            removedUserIndex = i;
+            break;
+        }
+    }
+
+    if (connectedUsers.length === 0) {
+        let userMessage = document.getElementById('needUser');
+        userMessage.classList.remove('none');
+        readyPlayer = false;
+        changeButton();
+    }
+
+    let indexUser = document.getElementById('user' + (removedUserIndex + 1));
+    let indexUserName = document.getElementById('userName' + (removedUserIndex + 1));
+    indexUser.classList.add('none');
+    indexUser.id = 'user4';
+    indexUserName.id = 'userName4';
+    const parent = indexUser.parentElement;
+    parent.removeChild(indexUser);
+    parent.appendChild(indexUser);
+
+    for (let i = removedUserIndex + 2; i <= 4; i++) {
+        let indexUser = document.getElementById('user' + i);
+        let indexUserName = document.getElementById('userName' + i);
+        indexUser.id = 'user' + (i - 1);
+        indexUserName.id = 'userName' + (i - 1);
+    }
+}

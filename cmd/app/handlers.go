@@ -69,10 +69,9 @@ func getMotion(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	var data struct {
-		Name           string
-		MotionString   string
-		SelectedRoomID string
-		UserID         int
+		Name         string
+		MotionString string
+		UserID       int
 	}
 	err = json.Unmarshal(reqData, &data)
 	if err != nil {
@@ -80,8 +79,13 @@ func getMotion(w http.ResponseWriter, r *http.Request) {
 		log.Println(err.Error())
 		return
 	}
+	selectedRoomID, found := retrieveUserRoom(strconv.Itoa(data.UserID))
+	if !found {
+		http.Error(w, "User not found", 500)
+		return
+	}
 	for conn, gameFieldID := range gameFieldWSDict {
-		if gameFieldID == data.SelectedRoomID {
+		if gameFieldID == selectedRoomID {
 			//fmt.Println("отправляем", gameFieldID, data.SelectedRoomID)
 			err := conn.WriteMessage(websocket.TextMessage, reqData)
 			if err != nil {
@@ -827,7 +831,7 @@ func clearCookie(w http.ResponseWriter, r *http.Request) {
 	var user userInfo
 	err := getJsonCookie(r, "userInfoCookie", &user)
 	if err != nil {
-		http.Error(w, "Internal Server Error", 500)
+		http.Error(w, "You have log out", 418)
 		log.Println(err.Error())
 		return
 	}
@@ -842,5 +846,21 @@ func clearCookie(w http.ResponseWriter, r *http.Request) {
 		Expires: time.Now().AddDate(0, 0, -1),
 	})
 	fmt.Println("Cookie is deleted")
+	w.WriteHeader(200)
+}
+
+func exit(w http.ResponseWriter, r *http.Request) {
+	var user userInfo
+	err := getJsonCookie(r, "userInfoCookie", &user)
+	if err != nil {
+		http.Error(w, "You have log out", 418)
+		log.Println(err.Error())
+		return
+	}
+	roomID, found := retrieveUserRoom(strconv.Itoa(user.UserID))
+	if found {
+		roomIDDict[roomID] = removeValueFromSlice(roomIDDict[roomID], strconv.Itoa(user.UserID))
+		broadcastJoiningUserID <- []string{"remove", roomID, strconv.Itoa(user.UserID)}
+	}
 	w.WriteHeader(200)
 }

@@ -35,7 +35,7 @@ function logIn() {
         warningMessage.forEach(element => element.classList.add("hidden"));
     }
     else {
-        XHR.open("POST", "/api/login");
+        XHR.open("POST", "/api/logIn");
         XHR.onload = function () {
             if (XHR.status === 200) {
                 console.log("Successfully logged in!");

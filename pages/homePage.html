@@ -19,43 +19,5 @@
     <div class="logo">Dance Fusion</div>
     <button class="button">Play Now</button>
 </div>
-<script src="../static/test/edge-impulse-standalone.js"></script>
-<script src="../static/test/run-impulse.js"></script>
-<script>
-    (async () => {
-        let classifier = new EdgeImpulseClassifier();
-        await classifier.init();
-        let project = classifier.getProjectInfo();
-        console.log(project.owner + ' / ' + project.name + ' (version ' + project.deploy_version + ')');
-
-        let socket = new WebSocket("wss://" + window.location.hostname + "/neuralWS");
-
-        socket.onopen = function (event) {
-            console.log("WebSocket connection established.");
-        };
-
-        socket.onmessage = function (event) {
-            try {
-                let songName = 'gold-turn';
-                let mesData = JSON.parse(event.data);
-                let userID = mesData["userID"];
-                let motionString = mesData["motion"];
-                let features = motionString.split(',').map(x => Number(x.trim()));
-                let res = classifier.classify(features);
-                for (let motionDict of res["results"]) {
-                    if (motionDict["label"] === songName) {
-                        console.log(userID, motionDict["value"]);
-                    }
-                }
-            } catch (ex) {
-                alert('Failed to classify: ' + (ex.message || ex.toString()));
-            }
-        };
-
-        socket.onclose = function (event) {
-            console.log("WebSocket connection closed.");
-        };
-    })();
-</script>
 </body>
 </html>
