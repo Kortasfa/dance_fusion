@@ -24,7 +24,7 @@ function getExpirationDate(expirationDays) {
 function getJsonCookie(name) {
     const cookies = document.cookie.split(';');
     for (let i = 0; i < cookies.length; i++) {
-        const cookie     = cookies[i].trim();
+        const cookie = cookies[i].trim();
         if (cookie.startsWith(name + '=')) {
             const encodedValue = cookie.substring(name.length + 1);
             const decodedValue = decodeURIComponent(encodedValue);
@@ -106,16 +106,50 @@ function joinRoom(userID) {
 }
 
 
-async function logout() {
-    const response = await fetch("/clear");
-    if (response.ok) {
-        window.location.href = "/logIn";
+async function exitFromGame() {
+    const response = await fetch("/api/exitFromGame", {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({"userID": userID}),
+    });
+    if (!response.ok) {
+        console.log('Не удалось выйти из игры');
+    } else {
+        console.log('Вышел из игры');
     }
 }
 
-// function ratingScale() {
-//     const
-// }
+async function exitFromRoom() {
+    const response = await fetch("/api/exitFromRoom", {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({"userID": userID}),
+    });
+    if (!response.ok) {
+        console.log('Не удалось выйти из комнаты');
+    } else {
+        console.log('Вышел из комнаты');
+    }
+}
+
+async function exitFromAccount() {
+    const response = await fetch("/api/exitFromAccount", {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({"userID": userID}),
+    });
+    if (!response.ok) {
+        console.log('Не удалось выйти из аккаунта');
+    } else {
+        console.log('Вышел из аккаунта');
+    }
+}
 
 let isOpen = false;
 function userMenu() {
@@ -132,7 +166,7 @@ function userMenu() {
 }
 
 
-btnLogOut.addEventListener("click", logout)
+btnLogOut.addEventListener("click", exitFromAccount)
 btnGo.addEventListener("click", sendMessage);
 user.addEventListener("click", userMenu);
 
@@ -183,7 +217,7 @@ if (window.DeviceMotionEvent && window.DeviceOrientationEvent) {
         sensorData = [];
         //document.write(outputString);
 
-        let data = JSON.stringify({"name": name, "motionString": outputString, "selectedRoomID": selectedRoomID, "userID": userID});
+        let data = JSON.stringify({"name": name, "motionString": outputString, "userID": userID});
         //document.writeln(data);
         sendDataToServer(data);
     }
