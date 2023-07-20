@@ -844,3 +844,19 @@ func clearCookie(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("Cookie is deleted")
 	w.WriteHeader(200)
 }
+
+func test(w http.ResponseWriter, r *http.Request) {
+	ts, err := template.ParseFiles("pages/myTest.html")
+	if err != nil {
+		http.Error(w, "Internal Server Error", 500)
+		log.Println(err.Error())
+		return
+	}
+
+	err = ts.Execute(w, nil)
+	if err != nil {
+		http.Error(w, "Internal Server Error", 500)
+		log.Println(err.Error())
+		return
+	}
+}

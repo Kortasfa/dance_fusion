@@ -1,11 +1,13 @@
 const btnGo = document.getElementById("btn-join");
 const enterInRoom = document.querySelector(".entrance-id-room__field");
-const connectionText = document.querySelector(".connection");
+const danceField = document.querySelector(".dance-block");
 const entranceField = document.querySelector(".entrance");
 const warningID = document.getElementById("id-warning");
 const emptyID = document.getElementById("id-empty");
 const fullID = document.getElementById("id-full");
-const btnLogOut = document.querySelector(".btn-log-out");
+const btnLogOut = document.getElementById("logout");
+const user = document.querySelector(".users");
+const menu = document.querySelector(".menu")
 
 function setJsonCookie(name, value, expirationDays) {
     const jsonValue = JSON.stringify(value);
@@ -22,7 +24,7 @@ function getExpirationDate(expirationDays) {
 function getJsonCookie(name) {
     const cookies = document.cookie.split(';');
     for (let i = 0; i < cookies.length; i++) {
-        const cookie = cookies[i].trim();
+        const cookie     = cookies[i].trim();
         if (cookie.startsWith(name + '=')) {
             const encodedValue = cookie.substring(name.length + 1);
             const decodedValue = decodeURIComponent(encodedValue);
@@ -60,7 +62,7 @@ function sendMessage() {
         XHR.onload = function () {
             if (XHR.status === 200) {
                 entranceField.classList.add("hidden");
-                connectionText.classList.remove("hidden");
+                danceField.classList.remove("hidden");
                 emptyID.classList.add("hidden");
                 fullID.classList.add("hidden");
                 warningID.classList.add("hidden");
@@ -111,8 +113,28 @@ async function logout() {
     }
 }
 
+// function ratingScale() {
+//     const
+// }
+
+let isOpen = false;
+function userMenu() {
+    if (!isOpen) {
+        menu.classList.remove("menu-hidden");
+        menu.classList.add("menu-open");
+        isOpen = true;
+    }
+    else {
+        menu.classList.add("menu-hidden");
+        menu.classList.remove("menu-open");
+        isOpen = false;
+    }
+}
+
+
 btnLogOut.addEventListener("click", logout)
 btnGo.addEventListener("click", sendMessage);
+user.addEventListener("click", userMenu);
 
 
 if (window.DeviceMotionEvent && window.DeviceOrientationEvent) {

@@ -45,6 +45,8 @@ func main() {
 	r.HandleFunc("/api/motion", getMotion).Methods("POST")
 	r.HandleFunc("/clear", clearCookie)
 
+	r.HandleFunc("/test", test)
+
 	go handleRoomWSMessages()
 	go handleJoinPageWSMessages()
 
