@@ -5,14 +5,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="30989664-2e9f-4ec9-a6da-1439fae47ca4" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/dataSources.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmd/app/handlers.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/app/handlers.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmd/app/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/app/main.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pages/homePage.html" beforeDir="false" afterPath="$PROJECT_DIR$/pages/homePage.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pages/mainRoom.html" beforeDir="false" afterPath="$PROJECT_DIR$/pages/mainRoom.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/static/script/gamePhone.js" beforeDir="false" afterPath="$PROJECT_DIR$/static/script/gamePhone.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/static/script/logIn.js" beforeDir="false" afterPath="$PROJECT_DIR$/static/script/logIn.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/static/script/mainRoomTest.js" beforeDir="false" afterPath="$PROJECT_DIR$/static/script/mainRoomTest.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/static/script/homePage.js" beforeDir="false" afterPath="$PROJECT_DIR$/static/script/homePage.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -53,6 +49,11 @@
     "last_opened_file_path": "/home/korta",
     "node.js.detected.package.eslint": "true",
     "node.js.selected.package.eslint": "(autodetect)"
+  },
+  "keyToStringList": {
+    "DatabaseDriversLRU": [
+      "mysql"
+    ]
   }
 }]]></component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />

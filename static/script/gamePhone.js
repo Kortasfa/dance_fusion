@@ -44,8 +44,7 @@ function sendMessage() {
         fullID.classList.add("hidden");
         emptyID.classList.remove("hidden");
         enterInRoom.classList.add("entrance-id-room__field_warning");
-    }
-    else {
+    } else {
         if (userInfo === null) {
             console.log("Login to your account!");
             return
@@ -88,17 +87,17 @@ function sendMessage() {
 
 function joinRoom(userID) {
     let socket = new WebSocket("wss://" + window.location.hostname + "/ws/joinToRoom/" + userID);
-    socket.onopen = function(event) {
+    socket.onopen = function (event) {
         console.log("WebSocket connection established.");
     };
 
-    socket.onmessage = function(event) {
+    socket.onmessage = function (event) {
         let receivedData = event.data;
         document.querySelector('.connection').innerText = 'Работаем';
         handleDanceData(JSON.parse(receivedData))
     };
 
-    socket.onclose = function(event) {
+    socket.onclose = function (event) {
         console.log("WebSocket connection closed.");
     };
 }
@@ -106,7 +105,7 @@ function joinRoom(userID) {
 window.onbeforeunload = logout;
 
 async function logout() {
-    fetch("/api/exit");
+    fetch("/api/exit").then(r => 'log out');
     window.location.href = "/join";
 }
 
@@ -122,8 +121,8 @@ if (window.DeviceMotionEvent && window.DeviceOrientationEvent) {
 
     function handleSensorData(event) {
         try {
-            const { alpha, beta, gamma } = event.rotationRate;
-            const { x, y, z } = event.accelerationIncludingGravity;
+            const {alpha, beta, gamma} = event.rotationRate;
+            const {x, y, z} = event.accelerationIncludingGravity;
             sensorData.push({
                 alpha,
                 beta,
@@ -140,7 +139,9 @@ if (window.DeviceMotionEvent && window.DeviceOrientationEvent) {
     function startRecording(name, duration) {
         window.addEventListener('devicemotion', handleSensorData, true);
         window.addEventListener('deviceorientation', handleSensorData, true);
-        setTimeout(function () {stopRecording(name);}, duration * 1300); // 1000 /// // / / /// / / / / / / / / / / /  / /              /////
+        setTimeout(function () {
+            stopRecording(name);
+        }, duration * 1300); // 1000 /// // / / /// / / / / / / / / / / /  / /              /////
     }
 
     function stopRecording(name) {
@@ -154,7 +155,7 @@ if (window.DeviceMotionEvent && window.DeviceOrientationEvent) {
             outputString += `, ${MyRound10(x)}, ${MyRound10(y)}, ${MyRound10(z)}, ${MyRound10(alpha)}, ${MyRound10(beta)}, ${MyRound10(gamma)}`;
             pointCount += 6;
         }
-        for (pointCount; pointCount < 1146; pointCount++){
+        for (pointCount; pointCount < 1146; pointCount++) {
             outputString += ', 0.0000';
         }
         sensorData = [];
@@ -174,33 +175,48 @@ function MyRound10(val) {
     return formattedVal.padStart(6, '0');
 }
 
+let stop = 0;
+
 function sendDataToServer(data) {
     // Replace the URL with the appropriate endpoint to handle the data on your server
     let url = '/api/motion';
-
-    fetch(url, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: data
-    })
-        .then(function (response) {
-            if (response.ok) {
-                console.log('Данные успешно отправлены.');
-            } else {
-                console.log('Ошибка при отправке данных. Статус:', response.status);
-            }
+    if (stop !== 1) {
+        fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: data
         })
-        .catch(function (error) {
-            console.log('Ошибка при отправке данных:', error);
-        });
+            .then(function (response) {
+                if (response.ok) {
+                    console.log('Данные успешно отправлены.');
+                } else {
+                    console.log('Ошибка при отправке данных. Статус:', response.status);
+                    if (response.status === 409) {
+                        document.querySelector('.connection').innerText = 'Комната была закрыта';
+                        //window.location.replace("/join")
+                        stop = 1;
+                        return;
+                    }
+                }
+            })
+            .catch(function (error) {
+                console.log('Ошибка при отправке данных:', error);
+            });
+    } else {
+        console.log('123');
+    }
 }
 
 function handleDanceData(danceDataJson) {
     //let oldStartTime = 0;
     for (let danceData of danceDataJson) {
-        setTimeout(function () {startRecording(danceData['name'], danceData['duration']);},
+        setTimeout(function () {
+                if (stop !== 1) {
+                    startRecording(danceData['name'], danceData['duration']);
+                }
+            },
             (danceData['start_time']) * 1000);
         //oldStartTime += danceData['start_time'];
     }
