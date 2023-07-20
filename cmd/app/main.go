@@ -47,8 +47,6 @@ func main() {
 	r.HandleFunc("/api/exitFromRoom", exitFromRoomAPI)
 	r.HandleFunc("/api/exitFromAccount", exitFromAccount)
 
-	r.HandleFunc("/test", test)
-
 	go handleRoomWSMessages()
 	go handleJoinPageWSMessages()
 

@@ -96,8 +96,9 @@ function joinRoom(userID) {
 
     socket.onmessage = function(event) {
         let receivedData = event.data;
-        document.querySelector('.connection').innerText = 'Работаем';
-        handleDanceData(JSON.parse(receivedData))
+        handleDanceData(JSON.parse(receivedData));
+        document.querySelector('.dance-block__connection').innerText = 'Dance!';
+3
     };
 
     socket.onclose = function(event) {
@@ -148,6 +149,7 @@ async function exitFromAccount() {
         console.log('Не удалось выйти из аккаунта');
     } else {
         console.log('Вышел из аккаунта');
+        window.location.href = '/logIn';
     }
 }
 
