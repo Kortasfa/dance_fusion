@@ -47,6 +47,9 @@ func main() {
 	r.HandleFunc("/api/exitFromRoom", exitFromRoomAPI)
 	r.HandleFunc("/api/exitFromAccount", exitFromAccount)
 
+	r.HandleFunc("/custom", custom(dbx))
+	r.HandleFunc("/api/custom", changeUserAvatar(dbx)).Methods("POST")
+
 	go handleRoomWSMessages()
 	go handleJoinPageWSMessages()
 
