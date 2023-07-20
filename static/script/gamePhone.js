@@ -120,6 +120,7 @@ async function exitFromGame() {
     } else {
         console.log('Вышел из игры');
     }
+    stop = 1;
 }
 
 async function exitFromRoom() {
@@ -233,33 +234,48 @@ function MyRound10(val) {
     return formattedVal.padStart(6, '0');
 }
 
+let stop = 0;
+
 function sendDataToServer(data) {
     // Replace the URL with the appropriate endpoint to handle the data on your server
     let url = '/api/motion';
-
-    fetch(url, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: data
-    })
-        .then(function (response) {
-            if (response.ok) {
-                console.log('Данные успешно отправлены.');
-            } else {
-                console.log('Ошибка при отправке данных. Статус:', response.status);
-            }
+    if (stop !== 1) {
+        fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: data
         })
-        .catch(function (error) {
-            console.log('Ошибка при отправке данных:', error);
-        });
+            .then(function (response) {
+                if (response.ok) {
+                    console.log('Данные успешно отправлены.');
+                } else {
+                    console.log('Ошибка при отправке данных. Статус:', response.status);
+                    if (response.status === 409) {
+                        stop = 1;
+                        document.querySelector('.dance-block__connection').innerText = 'Комната была закрыта';
+                        //window.location.replace("/join")
+                        return;
+                    }
+                }
+            })
+            .catch(function (error) {
+                console.log('Ошибка при отправке данных:', error);
+            });
+    } else {
+        console.log('123');
+    }
 }
 
 function handleDanceData(danceDataJson) {
     //let oldStartTime = 0;
     for (let danceData of danceDataJson) {
-        setTimeout(function () {startRecording(danceData['name'], danceData['duration']);},
+        setTimeout(function () {
+                if (stop !== 1) {
+                    startRecording(danceData['name'], danceData['duration']);
+                }
+            },
             (danceData['start_time']) * 1000);
         //oldStartTime += danceData['start_time'];
     }
