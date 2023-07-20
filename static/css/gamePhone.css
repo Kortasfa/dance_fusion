@@ -48,6 +48,46 @@
     color: #1E1C1C;
 }
 
+.menu {
+    position: absolute;
+    top: 25px;
+    left: 129px;
+    width: 140px;
+    background: #d9a0e7;
+    border-radius: 10px;
+    border-style: dashed;
+    border-color: #BD63D4;
+    border-width: 3px;
+    opacity: 0;
+}
+
+.menu__point {
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.menu__point_border {
+    border-bottom: dashed #BD63D4;
+    border-width: 3px;
+}
+
+.point__text {
+    font: 400 16px Roboto, sans-serif;
+    color: #1E1C1C;
+}
+
+.menu-open {
+    animation: 1s show ease;
+    opacity: 1;
+}
+
+.menu-hidden {
+    animation: 1s closeMenu ease;
+    opacity: 0;
+}
+
 .btn-log-out {
     position: absolute;
     top: 20px;
@@ -153,4 +193,14 @@
     20% {
         transform: translateY(-20px)
     }
+}
+
+@keyframes show {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes closeMenu {
+    from { opacity: 1; }
+    to { opacity: 0; }
 }
