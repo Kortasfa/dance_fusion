@@ -274,6 +274,7 @@ func exitFromRoom(r *http.Request) (int, string, error) {
 }
 
 func exitFromRoomAPI(w http.ResponseWriter, r *http.Request) {
+	exitFromGame(w, r)
 	userID, roomID, err := exitFromRoom(r)
 	if err != nil {
 		http.Error(w, "Internal Server Error", 500)
