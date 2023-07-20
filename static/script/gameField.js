@@ -24,10 +24,6 @@ function getUsersByCookie() {
     }
 }
 
-function removeUser() {
-
-}
-
 function showStats() {
     addStats();
     modalElem.classList.remove("hidden");
@@ -48,37 +44,6 @@ danceVideo.addEventListener('ended', showStats);
 btnContinue.addEventListener("click", function () {
     window.location.href = "/room";
 })
-
-//(async () => {
-    //var classifier = new EdgeImpulseClassifier();
-   // /*await*/ classifier.init();
-
-    //let project = classifier.getProjectInfo();
-    //document.querySelector('h1').textContent = project.owner + ' / ' + project.name + ' (version ' + project.deploy_version + ')';
-
-
-
-
-
-    /*document.querySelector('#run-inference').onclick = () => {
-        try {
-            let features = document.querySelector('#features').value.split(',').map(x => Number(x.trim()));
-            let res = classifier.classify(features);
-            document.querySelector('#results').textContent = JSON.stringify(res, null, 4);
-        }
-        catch (ex) {
-            alert('Failed to classify: ' + (ex.message || ex.toString()));
-        }
-    };*/
-//})();
-
-
-
-// function openModalElem() {
-//     modalElem.classList.add("open");
-// }
-
-// x
 
 function AddScore(userID, Score){
     let user = document.getElementById(userID);
@@ -118,42 +83,3 @@ function AddScore(userID, Score){
         }, 1000);
     }
 }
-// function emulateClick(btn) {
-//     let click = new CustomEvent("mousemove");
-//     btn.dispatchEvent(click);
-//     console.log("click!")
-// }
-
-// function playVideo() {
-//     modalElem.classList.remove("open");
-//     setTimeout(() => {
-//         danceVideo.play();
-//     }, 500);
-// }
-/*window.onload = emulateClick(btnGo);
-
-/*function test() {
-    console.log("test click")
-}
-
-btnGo.addEventListener("mousemove", test());*/
-
-/*let socket = new WebSocket(WssURL);
-
-socket.onopen = function(event) {
-    console.log("WebSocket connection established.");
-}
-
-socket.onmessage = function() {
-    //let message = event.data;
-    /*x.removeAttribute('disabled');
-    btnGo.click();*/
-/*  playVideo();
-
-}
-
-socket.onclose = function(event) {
-  console.log("WebSocket connection closed.");
-}*/
-
-// btnGo.addEventListener("click", playVideo);

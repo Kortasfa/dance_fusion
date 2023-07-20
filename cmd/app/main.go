@@ -43,7 +43,9 @@ func main() {
 	r.HandleFunc("/api/signUp", getRegisteredUserData(dbx)).Methods("POST")
 	r.HandleFunc("/api/logIn", getLoginUserData(dbx)).Methods("POST")
 	r.HandleFunc("/api/motion", getMotion).Methods("POST")
-	r.HandleFunc("/clear", clearCookie)
+	r.HandleFunc("/api/exitFromGame", exitFromGame)
+	r.HandleFunc("/api/exitFromRoom", exitFromRoomAPI)
+	r.HandleFunc("/api/exitFromAccount", exitFromAccount)
 
 	go handleRoomWSMessages()
 	go handleJoinPageWSMessages()

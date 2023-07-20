@@ -86,6 +86,7 @@ function sendMessage() {
     }
 }
 
+
 function joinRoom(userID) {
     let socket = new WebSocket("wss://" + window.location.hostname + "/ws/joinToRoom/" + userID);
     socket.onopen = function(event) {
@@ -103,17 +104,55 @@ function joinRoom(userID) {
     };
 }
 
-window.onbeforeunload = logout;
 
-async function logout() {
-    const response = await fetch("/clear");
-    if (response.ok) {
-        window.location.href = "/logIn";
+async function exitFromGame() {
+    const response = await fetch("/api/exitFromGame", {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({"userID": userID}),
+    });
+    if (!response.ok) {
+        console.log('Не удалось выйти из игры');
+    } else {
+        console.log('Вышел из игры');
     }
 }
 
-btnLogOut.addEventListener("click", logout)
+async function exitFromRoom() {
+    const response = await fetch("/api/exitFromRoom", {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({"userID": userID}),
+    });
+    if (!response.ok) {
+        console.log('Не удалось выйти из комнаты');
+    } else {
+        console.log('Вышел из комнаты');
+    }
+}
+
+async function exitFromAccount() {
+    const response = await fetch("/api/exitFromAccount", {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({"userID": userID}),
+    });
+    if (!response.ok) {
+        console.log('Не удалось выйти из аккаунта');
+    } else {
+        console.log('Вышел из аккаунта');
+    }
+}
+
+btnLogOut.addEventListener("click", exitFromGame)
 btnGo.addEventListener("click", sendMessage);
+//window.onbeforeunload = logout;
 
 
 if (window.DeviceMotionEvent && window.DeviceOrientationEvent) {

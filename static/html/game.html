@@ -60,6 +60,22 @@
     </div>
   </div>
   <script>
+    function removeUser(userID) {
+      console.log('Пользователь вышел: ' + userID);
+      const usersBlock = document.querySelector(".rank");
+      let index = 0;
+      for (const userBlock of usersBlock.children) {
+        index += 1;
+        if (userBlock.id === userID.toString()) {
+          userBlock.id = "0";
+          let userScore = document.getElementById('user-score' + index);
+          userScore.classList.add('hidden');
+          userBlock.classList.add('hidden');
+          break
+        }
+      }
+    }
+
     (async () => {
       let classifier = new EdgeImpulseClassifier();
       await classifier.init();
@@ -75,12 +91,14 @@
       socket.onmessage = function (event) {
         try {
           let jsonData = JSON.parse(event.data);
-          //console.log(jsonData);
+          if ("ExitingUser" in jsonData) {
+            console.log("Удаляем пользователя на чёрт");
+            removeUser(jsonData.ExitingUser);
+            return;
+          }
           let songName = jsonData.name;
-          //let userID = mesData["userID"];
           let motionString = jsonData.motionString;
           let userID = jsonData.userID;
-          //console.log(motionString);
           let features = motionString.split(',').map(x => Number(x.trim()));
 
           let deviationCount = 0;
@@ -121,7 +139,7 @@
 
 
         } catch (ex) {
-          //alert('Failed to classify: ' + (ex.message || ex.toString()));
+          console.log(ex);
         }
       };
 
