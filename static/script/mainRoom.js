@@ -6,40 +6,12 @@ const returnBtn = document.getElementById('return-button');
 const PlayBtn = document.getElementById('Play');
 
 let readyGame = false;
-let numberOfUser = 0;
 let readyPlayer = false;
 let readySong = false;
 
+let connectedUsers = [];
+
 btnOpenInfo.addEventListener('click', openGuide);
-
-document.addEventListener("DOMContentLoaded", getUsersByCookie);
-
-function getUsersByCookie() {
-    let allCookies = document.cookie;
-    let cookiesArray = allCookies.split(';');
-    for (let i = 0; i < cookiesArray.length; i++) {
-        let name = cookiesArray[i].split('=');
-        let mane = name[0];
-        let n = mane.indexOf('User');
-        if (n === 1) {
-            let parts = name[1].split(',');
-            let userID = parts[0];
-            let userName = parts[1];
-            let imgSrc = parts[2];
-            numberOfUser = numberOfUser + 1;
-            let userMSG = document.getElementById('needUser');
-            userMSG.classList.add('none');
-            let indexUser = document.getElementById('user' + numberOfUser);
-            let indexUserName = document.getElementById('userName' + numberOfUser);
-            let indexUserImg = indexUser.querySelector(".user__avatar");
-            indexUser.classList.remove('none');
-            indexUserImg.src = '../' + imgSrc;
-            indexUserName.innerText = userName;
-            readyPlayer = true;
-            changeButton();
-        }
-    }
-}
 
 function changeButton() {
     if (readyPlayer && readySong) {
@@ -95,6 +67,11 @@ Array.from(test).forEach(function (element) {
         let fullVideo = document.getElementById('full' + videoSrcID);
         let videoPlayer = document.getElementById('videoPlayer');
         songName = document.querySelector('.song' + element.id).innerHTML;
+        // let menuItem = parent.querySelectorAll('.button_yellow');
+        // // Отлавливаем элемент в родители на который мы нажали
+        // for(let i = 0; i < menuItem.length; i++) {
+        //   menuItem[i].classList.remove('button_yellow');
+        // }
         readySong = true;
         changeButton();
         videoPlayer.src = video.innerText;
@@ -107,10 +84,11 @@ $(document).ready(function () {
     let container = $('#content');
 
     // Fire on click
-    trigger.on('click', function () {
+    trigger.on('click', function() {
         if (readyGame) {
 
             socket.send(songName);
+            socket.close();
             console.log(songName)// Можно отправить pause или resume
 
 
@@ -136,39 +114,6 @@ function showVideo(videoID) {
     videoPlayer.src = video.innerText;
 }
 
-let socket = new WebSocket(WssURL);
-
-socket.onopen = function (event) {
-    console.log("WebSocket connection established.");
-};
-
-socket.onmessage = function (event) {
-    let userMessage = document.getElementById('needUser');
-    let message = event.data;
-    let parts = message.split('|');
-    let userID = parts[0];
-    let userName = parts[1];
-    let imgSrc = parts[2];
-    numberOfUser = numberOfUser + 1;
-    document.cookie = "User" + numberOfUser + '=' + parts + ';path=/';
-    userMessage.classList.add('none');
-    let indexUser = document.getElementById('user' + numberOfUser);
-    let indexUserName = document.getElementById('userName' + numberOfUser);
-    let indexUserImg = indexUser.querySelector(".user__avatar");
-    indexUser.classList.remove('none');
-    indexUserImg.src = '../' + imgSrc;
-    readyPlayer = true;
-    changeButton();
-    indexUserName.innerText = userName;
-    console.log('Пользователь присоединился: ' + userID);
-    console.log('Его имя: ' + userName);
-    console.log('Его фотка: ' + imgSrc);
-};
-
-socket.onclose = function (event) {
-    console.log("WebSocket connection closed.");
-};
-
 let parent = document.querySelector('.songs');
 
 function addColor(song) {
@@ -182,4 +127,82 @@ function addColor(song) {
 
 function changeColor(song) {
     song.classList.add('button_yellow');
+}
+
+let socket = new WebSocket(WssURL);
+
+socket.onopen = function (event) {
+    console.log("WebSocket connection established.");
+};
+
+socket.onmessage = function (event) {
+    let message = event.data;
+    let parts = message.split('|');
+    let action = parts[0];
+    let userID = parts[1];
+    if (action === "add") {
+        let userName = parts[2];
+        let imgSrc = parts[3];
+        addUser(userID, userName, imgSrc);
+    } else if (action === "remove") {
+        removeUser(userID)
+    }
+
+};
+
+socket.onclose = function (event) {
+    console.log("WebSocket connection closed.");
+};
+
+function addUser(userID, userName, imgSrc) {
+    console.log('Пользователь присоединился: ' + userID);
+    connectedUsers.push({"userID": userID, "userName": userName, "imgSrc": imgSrc});
+
+    let userMessage = document.getElementById('needUser');
+    userMessage.classList.add('none');
+    let indexUser = document.getElementById('user' + connectedUsers.length);
+    let indexUserName = document.getElementById('userName' + connectedUsers.length);
+    let indexUserImg = indexUser.querySelector(".user__avatar");
+    indexUser.classList.remove('none');
+    indexUserImg.src = '../' + imgSrc;
+    indexUserName.innerText = userName;
+
+    readyPlayer = true;
+    changeButton();
+}
+
+function removeUser(userID) {
+    console.log('Пользователь вышел: ' + userID);
+
+    let removedUserIndex = 0;
+    for (let i = 0; i < connectedUsers.length; i++) {
+        if (connectedUsers[i]["userID"] === userID) {
+            connectedUsers.splice(i, 1);
+            removedUserIndex = i;
+            break;
+        }
+    }
+
+    if (connectedUsers.length === 0) {
+        let userMessage = document.getElementById('needUser');
+        userMessage.classList.remove('none');
+        readyPlayer = false;
+        changeButton();
+    }
+
+    let indexUser = document.getElementById('user' + (removedUserIndex + 1));
+    let indexUserName = document.getElementById('userName' + (removedUserIndex + 1));
+    indexUser.classList.add('none');
+    indexUser.id = 'user4';
+    indexUserName.id = 'userName4';
+    const parent = indexUser.parentElement;
+    parent.removeChild(indexUser);
+    parent.appendChild(indexUser);
+
+    for (let i = removedUserIndex + 2; i <= 4; i++) {
+        let indexUser = document.getElementById('user' + i);
+        let indexUserName = document.getElementById('userName' + i);
+        indexUser.id = 'user' + (i - 1);
+        indexUserName.id = 'userName' + (i - 1);
+    }
 }

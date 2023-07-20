@@ -13,6 +13,12 @@ function setJsonCookie(name, value, expirationDays) {
     document.cookie = `${name}=${encodedValue}; path=/; expires=${getExpirationDate(expirationDays)}`;
 }
 
+function getExpirationDate(expirationDays) {
+    const date = new Date();
+    date.setDate(date.getDate() + expirationDays);
+    return date.toUTCString();
+}
+
 function getJsonCookie(name) {
     const cookies = document.cookie.split(';');
     for (let i = 0; i < cookies.length; i++) {
@@ -26,15 +32,8 @@ function getJsonCookie(name) {
     return null;
 }
 
-function getExpirationDate(expirationDays) {
-    const date = new Date();
-    date.setDate(date.getDate() + expirationDays);
-    return date.toUTCString();
-}
-
 const userInfo = getJsonCookie("userInfoCookie");
 let userID = userInfo.UserID;
-let selectedRoomID = userInfo.SelectedRoom;
 
 document.querySelector('.user__name').textContent = userInfo.UserName;
 document.querySelector('.user__avatar').src = userInfo.ImgSrc;
@@ -51,16 +50,6 @@ function sendMessage() {
             console.log("Login to your account!");
             return
         }
-        if (userInfo.SelectedRoom !== "") {
-            if (enterInRoom.value !== userInfo.SelectedRoom) {
-                console.log("You are already connected to another room!");
-            }
-            else {
-                console.log("You are already connected to this room!");
-            }
-            return
-        }
-        let IDField = document.getElementById("id-field");
         let postInfo = {
             "userID": userInfo.UserID,
             "roomID": enterInRoom.value
@@ -76,37 +65,7 @@ function sendMessage() {
                 fullID.classList.add("hidden");
                 warningID.classList.add("hidden");
                 console.log("Connected to the room!");
-
-                const userInfo = getJsonCookie("userInfoCookie");
-                selectedRoomID = userInfo.SelectedRoom;
-
-                let socket = new WebSocket("wss://" + window.location.hostname + "/ws/joinToRoom/" + userInfo.UserID);
-
-                socket.onopen = function(event) {
-                    console.log("WebSocket connection established.");
-                };
-
-                socket.onmessage = function(event) {
-                    let receivedData = event.data;
-                    if (receivedData === 'pause') {
-                        console.log('pause');
-                    }
-                    else if (receivedData === 'resume') {
-                        console.log('resume');
-                    }
-                    else {
-                        //console.log('Motions:');
-                        //console.log(JSON.parse(receivedData))//////////////////////////////
-                        document.querySelector('.connection').innerText = 'Работаем';
-                        handleDanceData(JSON.parse(receivedData))
-
-                    }
-                };
-
-                socket.onclose = function(event) {
-                    console.log("WebSocket connection closed.");
-                };
-
+                joinRoom(userInfo.UserID)
             } else if (XHR.status === 404) {
                 emptyID.classList.add("hidden");
                 warningID.classList.remove("hidden");
@@ -127,10 +86,29 @@ function sendMessage() {
     }
 }
 
+function joinRoom(userID) {
+    let socket = new WebSocket("wss://" + window.location.hostname + "/ws/joinToRoom/" + userID);
+    socket.onopen = function(event) {
+        console.log("WebSocket connection established.");
+    };
+
+    socket.onmessage = function(event) {
+        let receivedData = event.data;
+        document.querySelector('.connection').innerText = 'Работаем';
+        handleDanceData(JSON.parse(receivedData))
+    };
+
+    socket.onclose = function(event) {
+        console.log("WebSocket connection closed.");
+    };
+}
+
+window.onbeforeunload = logout;
+
 async function logout() {
     const response = await fetch("/clear");
     if (response.ok) {
-        window.location.href = "/login";
+        window.location.href = "/logIn";
     }
 }
 
@@ -164,7 +142,7 @@ if (window.DeviceMotionEvent && window.DeviceOrientationEvent) {
     function startRecording(name, duration) {
         window.addEventListener('devicemotion', handleSensorData, true);
         window.addEventListener('deviceorientation', handleSensorData, true);
-        setTimeout(function () {stopRecording(name);}, duration * 1500); // 1000 /// // / / /// / / / / / / / / / / /  / /              /////
+        setTimeout(function () {stopRecording(name);}, duration * 1300); // 1000 /// // / / /// / / / / / / / / / / /  / /              /////
     }
 
     function stopRecording(name) {
@@ -199,7 +177,7 @@ function MyRound10(val) {
 }
 
 function sendDataToServer(data) {
-    // Replace the URL wPlayith the appropriate endpoint to handle the data on your server
+    // Replace the URL with the appropriate endpoint to handle the data on your server
     let url = '/api/motion';
 
     fetch(url, {
@@ -229,4 +207,3 @@ function handleDanceData(danceDataJson) {
         //oldStartTime += danceData['start_time'];
     }
 }
-
