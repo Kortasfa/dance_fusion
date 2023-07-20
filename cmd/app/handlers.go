@@ -43,6 +43,13 @@ type songsData struct {
 	StyleID         int    `db:"style_id"`
 }
 
+type UserAvatar struct {
+	Id		        int    `json:"id"`
+	HatSrc          string `json:"hatSrc"`
+	FaceSrc         string `json:"faceSrc"`
+	BodySrc         string `json:"bodySrc"`
+}
+
 type userInfo struct {
 	UserID       int
 	UserName     string
@@ -141,6 +148,50 @@ func getSongsData(db *sqlx.DB) ([]songsData, error) {
 	}
 
 	return data, nil
+}
+
+    func changeUserAvatarData(db *sqlx.DB, field UserAvatar) error {
+	const query = `
+	UPDATE
+		users
+	SET
+		img_hat = ?,
+        img_face = ?,
+        img_body = ?
+	WHERE id = ?
+	`
+
+	_, err := db.Exec(query, field.HatSrc, field.FaceSrc, field.BodySrc, field.Id)
+	return err
+}
+
+func changeUserAvatar(db *sqlx.DB) func(w http.ResponseWriter, r *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
+
+		avatarData, err := io.ReadAll(r.Body)
+		if err != nil {
+			http.Error(w, "Internal Server Error", 500)
+			log.Println(err)
+			return
+		}
+
+		var field UserAvatar
+		err = json.Unmarshal(avatarData, &field)
+		if err != nil {
+			http.Error(w, "Internal Server Error Unmarshall", 500)
+			log.Println(err.Error())
+			return
+		}
+
+		err = changeUserAvatarData(db, field)
+		if err != nil {
+			http.Error(w, "Internal Server Error", 500)
+			log.Println(err.Error())
+			return
+		}
+
+		return
+	}
 }
 
 func handleRoom(db *sqlx.DB) func(w http.ResponseWriter, r *http.Request) {

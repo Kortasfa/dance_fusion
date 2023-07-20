@@ -44,6 +44,7 @@ func main() {
 	r.HandleFunc("/clear", clearCookie(dbx))
 
 	r.HandleFunc("/custom", custom(dbx))
+	r.HandleFunc("/api/custom", changeUserAvatar(dbx)).Methods("POST")
 
 	go handleRoomWSMessages()
 	go handleJoinPageWSMessages()
