@@ -103,6 +103,7 @@ function joinRoom(userID) {
     };
 }
 
+window.onbeforeunload = logout;
 
 async function logout() {
     const response = await fetch("/clear");
