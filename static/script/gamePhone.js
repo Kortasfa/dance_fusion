@@ -162,7 +162,7 @@ if (window.DeviceMotionEvent && window.DeviceOrientationEvent) {
         sensorData = [];
         //document.write(outputString);
 
-        let data = JSON.stringify({"name": name, "motionString": outputString, "selectedRoomID": selectedRoomID, "userID": userID});
+        let data = JSON.stringify({"name": name, "motionString": outputString, "userID": userID});
         //document.writeln(data);
         sendDataToServer(data);
     }
