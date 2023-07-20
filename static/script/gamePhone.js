@@ -120,6 +120,7 @@ async function exitFromGame() {
     } else {
         console.log('Вышел из игры');
     }
+    stop = 1;
 }
 
 async function exitFromRoom() {
@@ -252,9 +253,9 @@ function sendDataToServer(data) {
                 } else {
                     console.log('Ошибка при отправке данных. Статус:', response.status);
                     if (response.status === 409) {
-                        document.querySelector('.connection').innerText = 'Комната была закрыта';
-                        //window.location.replace("/join")
                         stop = 1;
+                        document.querySelector('.dance-block__connection').innerText = 'Комната была закрыта';
+                        //window.location.replace("/join")
                         return;
                     }
                 }
