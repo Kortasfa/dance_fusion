@@ -1,45 +1,44 @@
-const listSong = document.getElementById('list-song');
-const listGenre = document.getElementById('list-genre');
+const listSong = document.getElementById('listSong');
+const listGenre = document.getElementById('listGenre');
 const btnOpenInfo = document.getElementById('openGuide');
 const guide = document.getElementById('guide');
-const returnBtn = document.getElementById('return-button');
-const PlayBtn = document.getElementById('Play');
+const returnBtn = document.getElementById('returnButton');
+const PlayBtn = document.getElementById('play');
 
 let readyGame = false;
+let numberOfUser = 0;
 let readyPlayer = false;
-let readySong = false;
-
 let connectedUsers = [];
 
 btnOpenInfo.addEventListener('click', openGuide);
 
 function changeButton() {
-    if (readyPlayer && readySong) {
-        readyGame = true;
-    }
+    readyGame = readyPlayer && readySong;
     if (readyGame) {
         PlayBtn.classList.add('button_ready');
     }
 }
 
 function openSong(styleButtonBlock) {
-    returnBtn.classList.toggle('hide')
+    returnBtn.classList.toggle('hide');
     listGenre.classList.add('none');
     document.querySelector('.songs').classList.remove('none');
-    const songBlock = document.getElementsByClassName('song__section');
-    for (let i = 0; i < songBlock.length; i++) {
-        if ((songBlock[i].id === styleButtonBlock.id) && songBlock[i].classList.contains('none')) {
-            songBlock[i].classList.remove('none');
+    const songBlocks = document.getElementsByClassName('song__section');
+    for (let i = 0; i < songBlocks.length; i++) {
+        if (songBlocks[i].id === styleButtonBlock.id && songBlocks[i].classList.contains('none')) {
+            songBlocks[i].classList.remove('none');
         }
     }
 }
 
+returnBtn.addEventListener('click', closeSong);
+
 function closeSong() {
-    returnBtn.classList.toggle('hide')
-    const songBlock = document.getElementsByClassName('song__section');
-    for (let i = 0; i < songBlock.length; i++) {
-        if (!songBlock[i].classList.contains('none')) {
-            songBlock[i].classList.add('none');
+    returnBtn.classList.toggle('hide');
+    const songBlocks = document.getElementsByClassName('song__section');
+    for (let i = 0; i < songBlocks.length; i++) {
+        if (!songBlocks[i].classList.contains('none')) {
+            songBlocks[i].classList.add('none');
         }
     }
     listSong.classList.add('none');
@@ -57,50 +56,50 @@ function closeGuide() {
 }
 
 let songName = '';
-let test = document.getElementsByClassName("section__img");
-let testing = '';
-// Iterate over each element in the collection
+let fullSongName = '';
+let readySong = false;
+
+function onImageClick(element) {
+    const videoSrcID = 'song' + element.id;
+    const video = document.getElementById(videoSrcID);
+    const fullVideo = document.getElementById('full' + videoSrcID);
+    const videoPlayer = document.getElementById('videoPlayer');
+
+    songName = document.querySelector('.song' + element.id).innerHTML;
+    readySong = true;
+    changeButton();
+
+    videoPlayer.src = video.innerText;
+    fullSongName = fullVideo.innerText;
+}
+
+const test = document.getElementsByClassName('section__img');
+
 Array.from(test).forEach(function (element) {
     element.addEventListener('click', function () {
-        let videoSrcID = '9' + element.id;
-        let video = document.getElementById(videoSrcID);
-        let fullVideo = document.getElementById('full' + videoSrcID);
-        let videoPlayer = document.getElementById('videoPlayer');
-        songName = document.querySelector('.song' + element.id).innerHTML;
-        // let menuItem = parent.querySelectorAll('.button_yellow');
-        // // Отлавливаем элемент в родители на который мы нажали
-        // for(let i = 0; i < menuItem.length; i++) {
-        //   menuItem[i].classList.remove('button_yellow');
-        // }
-        readySong = true;
-        changeButton();
-        videoPlayer.src = video.innerText;
-        testing = fullVideo.innerText;
+        onImageClick(element);
     });
 });
 
 $(document).ready(function () {
-    let trigger = $('#Play');
-    let container = $('#content');
+    const playButton = $('#play');
+    const contentContainer = $('#content');
 
-    // Fire on click
-    trigger.on('click', function() {
+    playButton.on('click', function () {
         if (readyGame) {
-
             socket.send(songName);
-            socket.close();
-            console.log(songName)// Можно отправить pause или resume
+            socket.close() // Закрываем вебсокет mainRoom
 
-
-            container.load("/static/html/game.html", function () {
-                let video = $('#video-dance').get(0);
-                let src = $('#video-src').get(0);
-                src.setAttribute('src', testing);
+            contentContainer.load("/static/html/game.html", function () {
+                const video = $('#video-dance')[0];
+                const src = $('#video-src')[0];
+                src.setAttribute('src', fullSongName);
 
                 video.addEventListener('loadeddata', function () {
                     video.play();
                 });
             });
+
             return false;
         }
     });
@@ -108,31 +107,30 @@ $(document).ready(function () {
 
 
 function showVideo(videoID) {
-    let videoSrcID = '9' + videoID.id;
+    let videoSrcID = 'song' + videoID.id;
     let video = document.getElementById(videoSrcID);
     let videoPlayer = document.getElementById('videoPlayer');
     videoPlayer.src = video.innerText;
 }
 
-let parent = document.querySelector('.songs');
-
-function addColor(song) {
-    let menuItem = parent.querySelectorAll('.button_yellow');
-    for (let i = 0; i < menuItem.length; i++) {
-        // Убираем у других
-        menuItem[i].classList.remove('button_yellow');
-    }
-    setTimeout(changeColor(song), 1000);
-}
+const parent = document.querySelector('.songs');
 
 function changeColor(song) {
     song.classList.add('button_yellow');
 }
 
+function addColor(song) {
+    const menuItem = parent.querySelectorAll('.button_yellow');
+    for (let i = 0; i < menuItem.length; i++) {
+        menuItem[i].classList.remove('button_yellow');
+    }
+    changeColor(song);
+}
+
 let socket = new WebSocket(WssURL);
 
 socket.onopen = function (event) {
-    console.log("WebSocket connection established.");
+    console.log("WebSocket mainRoom connection established.");
 };
 
 socket.onmessage = function (event) {
@@ -151,7 +149,7 @@ socket.onmessage = function (event) {
 };
 
 socket.onclose = function (event) {
-    console.log("WebSocket connection closed.");
+    console.log("WebSocket mainRoom connection closed.");
 };
 
 function addUser(userID, userName, imgSrc) {
@@ -170,6 +168,7 @@ function addUser(userID, userName, imgSrc) {
     readyPlayer = true;
     changeButton();
 }
+
 
 function removeUser(userID) {
     console.log('Пользователь вышел: ' + userID);
