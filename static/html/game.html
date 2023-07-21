@@ -76,6 +76,24 @@
         }
     }
 
+    async function sendPoint(userID, point) {
+      const response = await fetch("/api/sendPoint", {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          "UserID": userID,
+          "point": point,
+        }),
+      });
+      if (response.ok) {
+        console.log('Балл отправлен');
+      } else {
+        console.log('Не удалось отправить балл');
+      }
+    }
+
     (async () => {
         let classifier = new EdgeImpulseClassifier();
         await classifier.init();
@@ -249,40 +267,48 @@
                             if (moveName === "gold-circle") {
                                 let sameMoveOne = res["results"].find(item => item.label === "up-down-click");
                                 score = Math.max(motionDict["value"], sameMoveOne.value);
-                                if (score > 0.01 && score < 0.1) {
-                                    score = 0.1;
+                                if (score > 0.01 && score <= 1) {
+                                    score = 2;
                                 }
                             }
                             if (moveName === "gold-turn") {
                                 let sameMoveOne = res["results"].find(item => item.label === "down-from-the-middle-in-arc");
                                 let sameMoveTwo = res["results"].find(item => item.label === "gold-circle");
                                 score = Math.max(motionDict["value"], sameMoveOne.value, sameMoveTwo.value);
-                                if (score > 0.01 && score < 0.1) {
-                                    score = 0.1;
+                                if (score > 0.01 && score <= 1) {
+                                    score = 2;
                                 }
                             }
                         }
                     }
                     console.log(moveName);
                     console.log(score);
-                    if (score >= 0.4) {
-                        AddScore(userID.toString(), 40);
+                    let point = 0;
+                    if (score >= 0.4 && score <= 1) {
+                        point = 40;
                     }
                     if (score >= 0.3 && score < 0.4) {
-                        AddScore(userID.toString(), Math.round(score * 400 / 4));
+                        point =Math.round(score * 400 / 4);
+
                     }
                     if (score >= 0.2 && score < 0.3) {
-                        AddScore(userID.toString(), Math.round(score * 100) + 5);
+                        point = Math.round(score * 100) + 5;
+
                     }
                     if (score > 0.1 && score < 0.2) {
-                        AddScore(userID.toString(), Math.round(score * 100) + 7);
+                        point = Math.round(score * 100) + 7;
                     }
                     if (score <= 0.1 && score > 0) {
-                        AddScore(userID.toString(), Math.round(score * 100) + 9);
+                        point = Math.round(score * 100) + 9;
                     }
+                    if (score === 2) {
+                      point = 100;
+                    }
+                    addScore(userID.toString(), point);
+                    sendPoint(userID, point).then(() => {})
                 } else {
                     console.log('Лежит', deviationCount);
-                    AddScore(userID.toString(), 0);
+                    addScore(userID.toString(), 0);
                 }
             } catch (ex) {
                 console.log(ex);

@@ -45,7 +45,7 @@ btnContinue.addEventListener("click", function () {
     window.location.href = "/room";
 })
 
-function AddScore(userID, Score){
+function addScore(userID, Score){
     let user = document.getElementById(userID);
     let userScore = user.querySelector(".hero__score");
     userScore.innerText = parseInt(userScore.innerText) + Score;
