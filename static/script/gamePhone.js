@@ -96,10 +96,27 @@ function joinRoom(userID) {
     };
 
     socket.onmessage = function(event) {
+        let maxTheory = 5600;
+        let maxPractice = maxTheory - maxTheory * 0.2; //4480
+        let value = 0
         let receivedData = event.data;
-        handleDanceData(JSON.parse(receivedData));
-        document.querySelector('.dance-block__connection').innerText = 'Dance!';
-3
+        let receivedJSON = JSON.parse(receivedData);
+        if ("point" in receivedJSON) {
+            let score = receivedJSON["point"];
+            console.log("score: " + score);
+            if (value > 5600) return
+            value += score;
+            console.log("value: " + value);
+            const percentage = (value / maxPractice);
+            console.log("percentage: " + percentage);
+            let pix = 250 * percentage;
+            console.log("pix: " + pix);
+            scale.style.height = pix + 'px';
+        }
+        else {
+            handleDanceData(receivedJSON);
+            document.querySelector('.dance-block__connection').innerText = 'Dance!';
+        }
     };
 
     socket.onclose = function(event) {
@@ -108,7 +125,7 @@ function joinRoom(userID) {
 }
 
 
-window.onbeforeunload = exitFromGame;
+// window.onbeforeunload = exitFromGame;
 async function exitFromGame() {
     const response = await fetch("/api/exitFromGame", {
         method: 'POST',
@@ -125,6 +142,8 @@ async function exitFromGame() {
             socket = undefined
         }
         console.log('Вышел из игры');
+        entranceField.classList.remove("hidden");
+        danceField.classList.add("hidden");
     }
     stop = 1;
 }
@@ -274,4 +293,24 @@ function handleDanceData(danceDataJson) {
             (danceData['start_time']) * 1000);
         //oldStartTime += danceData['start_time'];
     }
+}
+
+const scale = document.querySelector('.dance-block__ratingScale');
+
+function getRatingScale() {
+    let maxTheory = 5600;
+    let maxPractice = maxTheory - maxTheory * 0.2; //4480
+    let value = 0;
+}
+
+function anim(score) {
+    console.log("score: " + score);
+    if (value > 5600) return
+    value += score;
+    console.log("value: " + value);
+    const percentage = (value / maxPractice);
+    console.log("percentage: " + percentage);
+    let pix = 250 * percentage;
+    console.log("pix: " + pix);
+    scale.style.height = pix + 'px';// Рекурсивно вызываем функцию для создания плавной анимации
 }

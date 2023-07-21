@@ -310,3 +310,41 @@ func getUserAvatar(db *sqlx.DB) func(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 }
+
+func sendPointToJoin(w http.ResponseWriter, r *http.Request) {
+	reqData, err := io.ReadAll(r.Body)
+	if err != nil {
+		http.Error(w, "Internal Server Error", 500)
+		log.Println(err)
+		return
+	}
+
+	var data struct {
+		UserID int
+		Point  int
+	}
+
+	err = json.Unmarshal(reqData, &data)
+	if err != nil {
+		http.Error(w, "Internal Server Error Unmarshall", 500)
+		log.Println(err.Error())
+		return
+	}
+	for conn, userID := range joinPageWSDict {
+		if strconv.Itoa(data.UserID) == userID {
+			err := conn.WriteMessage(websocket.TextMessage, reqData)
+			if err != nil {
+				err := conn.Close()
+				if err != nil {
+					w.WriteHeader(409)
+					log.Println(err.Error())
+					return
+				}
+				delete(joinPageWSDict, conn)
+			}
+			break
+		}
+	}
+	w.WriteHeader(200)
+
+}
