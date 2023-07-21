@@ -3,7 +3,10 @@ CREATE TABLE users(
     `id` INTEGER AUTO_INCREMENT PRIMARY KEY, 
     `name` VARCHAR(255) NOT NULL,
     `password` VARCHAR(255) NOT NULL,
-    `img_src` VARCHAR(255) NOT NULL
+    `img_src` VARCHAR(255) NOT NULL,
+    `img_hat` VARCHAR(255) NOT NULL  DEFAULT '../static/img/hat/bigHat.png',
+    `img_body` VARCHAR(255) NOT NULL  DEFAULT '../static/img/body/fff76e.png',
+    `img_face` VARCHAR(255) NOT NULL  DEFAULT '../static/img/face/7.png'
 ) ENGINE = InnoDB
 CHARACTER SET = utf8mb4
 COLLATE utf8mb4_unicode_ci;

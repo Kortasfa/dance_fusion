@@ -8,37 +8,45 @@
 	<link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
 	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 	<link href="../static/css/userAccount.css " type="text/css" rel="stylesheet"/>
+	<script src="../static/script/userAccount.js" defer></script>
 </head>
 <body>
 <div class="customization">
 	<div class="customization__character">
 		<div class="character__avatar">
-			<div class="character__level"><a class="level" >99</a></div>
+			<div class="character__level"><a class="level" id="level">1</a></div>
 			<div  class="avatar">
 				<div  class="avatar__head">
-					<div class="head__circle"></div>
-					<div class="head__face"></div>
-					<div class="head__hat"></div>
+					<div class="head__body"><img class="user-body" alt=""></div>
+					<div class="head__face"><img class="user-face" alt=""></div>
+					<div class="head__hat"><img class="user-hat" alt=""></div>
 				</div>
 				<div class="avatar__name"><a>Kirill</a></div>
 			</div>
+			<img class="avatar-save" id="saveButton" src="../static/img/check-circle.svg" alt=""/>
 		</div>
 	</div>
 	<div class="customization__option">
 		<div class="option__type">
-			<div class="type" id="hat"><a class="type__text">hat</a></div>
-			<div class="type" id="face"><a class="type__text">face</a></div>
-			<div class="type" id="circle"><a class="type__text">body</a></div>
+			<div class="type type-selected" id="hat" onclick="openElement(this)"><a class="type__text">hat</a></div>
+			<div class="type" id="face" onclick="openElement(this)"><a class="type__text">face</a></div>
+			<div class="type" id="body" onclick="openElement(this)"><a class="type__text">body</a></div>
 		</div>
 		<div class="option__element">
 			{{ range .Hats }}
-			<div class="element">{{ .hatSrc }}{{ .recommendedLevel }}</div>
-			{{ end }}
-			{{ range .Bodies }}
-			<div class="element">{{ .bodySrc }}</div>
+			<div class="element hat" lvl="{{ .HatLevel }}" onclick="changeHat(this)">
+				<img class="element__hat" src="{{ .HatSrc }}" alt=""/>
+			</div>
 			{{ end }}
 			{{ range .Faces }}
-			<div class="element">{{ .faceSrc }}</div>
+			<div class="element face none" lvl="{{ .FaceLevel }}" onclick="changeFace(this)">
+				<img class="element__face" src="{{ .FaceSrc }}" alt=""/>
+			</div>
+			{{ end }}
+			{{ range .Bodies }}
+			<div class="element body none" lvl="{{ .BodyLevel }}"  onclick="changeBody(this)">
+			  <img  class="element__body" src="{{ .BodySrc }}"  alt=""/>
+		  </div>
 			{{ end }}
 		</div>
 	</div>
