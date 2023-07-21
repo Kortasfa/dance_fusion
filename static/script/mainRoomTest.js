@@ -88,6 +88,7 @@ $(document).ready(function () {
     playButton.on('click', function () {
         if (readyGame) {
             socket.send(songName);
+            socket.close() // Закрываем вебсокет mainRoom
 
             contentContainer.load("/static/html/game.html", function () {
                 const video = $('#video-dance')[0];
@@ -129,7 +130,7 @@ function addColor(song) {
 let socket = new WebSocket(WssURL);
 
 socket.onopen = function (event) {
-    console.log("WebSocket connection established.");
+    console.log("WebSocket mainRoom connection established.");
 };
 
 socket.onmessage = function (event) {
@@ -148,7 +149,7 @@ socket.onmessage = function (event) {
 };
 
 socket.onclose = function (event) {
-    console.log("WebSocket connection closed.");
+    console.log("WebSocket mainRoom connection closed.");
 };
 
 function addUser(userID, userName, imgSrc) {

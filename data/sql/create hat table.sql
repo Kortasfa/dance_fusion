@@ -20,5 +20,5 @@ VALUES
     ("9","2","../static/img/hat/sherlokHat.png"),
     ("10","2","../static/img/hat/vatsonHat.png"),
     ("11","3","../static/img/hat/herHat.png"),
-    ("12","3","../static/img/hat/beretHat.png")
+    ("12","3","../static/img/hat/beretHat.png"),
     ("13","5","../static/img/hat/bigHat.png");

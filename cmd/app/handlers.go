@@ -44,13 +44,6 @@ type songsData struct {
 	StyleID         int    `db:"style_id"`
 }
 
-type UserAvatar struct {
-	Id      int    `json:"id"`
-	HatSrc  string `json:"hatSrc"`
-	FaceSrc string `json:"faceSrc"`
-	BodySrc string `json:"bodySrc"`
-}
-
 type userInfo struct {
 	UserID   int
 	UserName string
@@ -62,6 +55,36 @@ type menuPageData struct {
 	Songs   []songsData
 	RoomKey string
 	WssURL  string
+}
+
+type userAvatarData struct {
+	HatSrc  string
+	FaceSrc string
+	BodySrc string
+}
+
+type hatData struct {
+	HatID    int    `db:"id"`
+	HatLevel int    `db:"recommended_level"`
+	HatSrc   string `db:"hat_src"`
+}
+
+type facesData struct {
+	FaceID    int    `db:"id"`
+	FaceLevel int    `db:"recommended_level"`
+	FaceSrc   string `db:"face_src"`
+}
+
+type bodyData struct {
+	BodyID    int    `db:"id"`
+	BodyLevel int    `db:"recommended_level"`
+	BodySrc   string `db:"body_src"`
+}
+
+type customPageData struct {
+	Faces  []facesData
+	Bodies []bodyData
+	Hats   []hatData
 }
 
 func homePageHandler(w http.ResponseWriter, r *http.Request) {
@@ -111,50 +134,6 @@ func sendConnectedUserInfo(db *sqlx.DB, roomID string) error {
 		broadcastJoiningUserID <- []string{"add", roomID, userID, data.UserName, data.ImgSrc}
 	}
 	return nil
-}
-
-func changeUserAvatarData(db *sqlx.DB, field UserAvatar) error {
-	const query = `
-	UPDATE
-		users
-	SET
-		img_hat = ?,
-        img_face = ?,
-        img_body = ?
-	WHERE id = ?
-	`
-
-	_, err := db.Exec(query, field.HatSrc, field.FaceSrc, field.BodySrc, field.Id)
-	return err
-}
-
-func changeUserAvatar(db *sqlx.DB) func(w http.ResponseWriter, r *http.Request) {
-	return func(w http.ResponseWriter, r *http.Request) {
-
-		avatarData, err := io.ReadAll(r.Body)
-		if err != nil {
-			http.Error(w, "Internal Server Error", 500)
-			log.Println(err)
-			return
-		}
-
-		var field UserAvatar
-		err = json.Unmarshal(avatarData, &field)
-		if err != nil {
-			http.Error(w, "Internal Server Error Unmarshall", 500)
-			log.Println(err.Error())
-			return
-		}
-
-		err = changeUserAvatarData(db, field)
-		if err != nil {
-			http.Error(w, "Internal Server Error", 500)
-			log.Println(err.Error())
-			return
-		}
-
-		return
-	}
 }
 
 func handleRoom(db *sqlx.DB) func(w http.ResponseWriter, r *http.Request) {
@@ -305,68 +284,14 @@ func logIn(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 }
-func getHatData(db *sqlx.DB) ([]hatData, error) {
-	const query = `
-		SELECT
-			id,
-			recommended_level,
-			hat_src
-		FROM
-			hats
-	`
-	var data []hatData
 
-	err := db.Select(&data, query)
-
-	if err != nil {
-		return nil, err
-	}
-
-	return data, nil
-}
-
-func getFaceData(db *sqlx.DB) ([]facesData, error) {
-	const query = `
-		SELECT
-			id,
-			recommended_level,
-			face_src
-		FROM
-			faces
-	`
-	var data []facesData
-
-	err := db.Select(&data, query)
-
-	if err != nil {
-		return nil, err
-	}
-
-	return data, nil
-}
-
-func getBodyData(db *sqlx.DB) ([]bodyData, error) {
-	const query = `
-		SELECT
-			id,
-			recommended_level,
-			body_src
-		FROM
-			bodies
-	`
-	var data []bodyData
-
-	err := db.Select(&data, query)
-
-	if err != nil {
-		return nil, err
-	}
-
-	return data, nil
-}
-
-func custom(db *sqlx.DB) func(w http.ResponseWriter, r *http.Request) {
+func customPageHandler(db *sqlx.DB) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
+		_, err := r.Cookie("userInfoCookie")
+		if err != nil {
+			http.Redirect(w, r, "/logIn", http.StatusFound)
+			return
+		}
 		tmpl, err := template.ParseFiles("pages/userAccount.html")
 		if err != nil {
 			http.Error(w, "Internal Server Error", 500)
