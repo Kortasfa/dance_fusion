@@ -201,7 +201,7 @@ func getMotion(w http.ResponseWriter, r *http.Request) {
 					w.WriteHeader(409)
 					return
 				}
-				delete(roomWSDict, conn)
+				delete(gameFieldWSDict, conn)
 			}
 			w.WriteHeader(200)
 			return
@@ -255,7 +255,7 @@ func exitFromGame(r *http.Request) (int, string, error) {
 				if err != nil {
 					return 0, "", err
 				}
-				delete(roomWSDict, conn)
+				delete(gameFieldWSDict, conn)
 			}
 			break
 		}
