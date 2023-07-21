@@ -15,10 +15,16 @@ function setJsonCookie(name, value, expirationDays) {
     document.cookie = `${name}=${encodedValue}; path=/; expires=${getExpirationDate(expirationDays)}`;
 }
 
+function getExpirationDate(expirationDays) {
+    const date = new Date();
+    date.setDate(date.getDate() + expirationDays);
+    return date.toUTCString();
+}
+
 function getJsonCookie(name) {
     const cookies = document.cookie.split(';');
     for (let i = 0; i < cookies.length; i++) {
-        const cookie     = cookies[i].trim();
+        const cookie = cookies[i].trim();
         if (cookie.startsWith(name + '=')) {
             const encodedValue = cookie.substring(name.length + 1);
             const decodedValue = decodeURIComponent(encodedValue);
@@ -28,15 +34,8 @@ function getJsonCookie(name) {
     return null;
 }
 
-function getExpirationDate(expirationDays) {
-    const date = new Date();
-    date.setDate(date.getDate() + expirationDays);
-    return date.toUTCString();
-}
-
 const userInfo = getJsonCookie("userInfoCookie");
 let userID = userInfo.UserID;
-let selectedRoomID = userInfo.SelectedRoom;
 
 document.querySelector('.user__name').textContent = userInfo.UserName;
 document.querySelector('.user__avatar').src = userInfo.ImgSrc;
@@ -53,16 +52,6 @@ function sendMessage() {
             console.log("Login to your account!");
             return
         }
-        if (userInfo.SelectedRoom !== "") {
-            if (enterInRoom.value !== userInfo.SelectedRoom) {
-                console.log("You are already connected to another room!");
-            }
-            else {
-                console.log("You are already connected to this room!");
-            }
-            return
-        }
-        let IDField = document.getElementById("id-field");
         let postInfo = {
             "userID": userInfo.UserID,
             "roomID": enterInRoom.value
@@ -78,38 +67,7 @@ function sendMessage() {
                 fullID.classList.add("hidden");
                 warningID.classList.add("hidden");
                 console.log("Connected to the room!");
-
-                const userInfo = getJsonCookie("userInfoCookie");
-                selectedRoomID = userInfo.SelectedRoom;
-
-                let socket = new WebSocket("wss://" + window.location.hostname + "/ws/joinToRoom/" + userInfo.UserID);
-
-                socket.onopen = function(event) {
-                    console.log("WebSocket connection established.");
-                };
-
-                socket.onmessage = function(event) {
-                    let receivedData = event.data;
-                    if (receivedData === 'pause') {
-                        console.log('pause');
-                    }
-                    else if (receivedData === 'resume') {
-                        console.log('resume');
-                    }
-                    else {
-                        //console.log('Motions:');
-                        //console.log(JSON.parse(receivedData))//////////////////////////////
-                        document.querySelector('.dance-block__connection').innerText = 'Работаем';
-
-                        handleDanceData(JSON.parse(receivedData))
-
-                    }
-                };
-
-                socket.onclose = function(event) {
-                    console.log("WebSocket connection closed.");
-                };
-
+                joinRoom(userInfo.UserID)
             } else if (XHR.status === 404) {
                 emptyID.classList.add("hidden");
                 warningID.classList.remove("hidden");
@@ -130,16 +88,66 @@ function sendMessage() {
     }
 }
 
-async function logout() {
-    const response = await fetch("/clear");
-    if (response.ok) {
-        window.location.href = "/logIn";
-    }
+let socket;
+function joinRoom(userID) {
+    socket = new WebSocket("wss://" + window.location.hostname + "/ws/joinToRoom/" + userID);
+    socket.onopen = function(event) {
+        console.log("WebSocket connection established.");
+    };
+
+    socket.onmessage = function(event) {
+        let receivedData = event.data;
+        handleDanceData(JSON.parse(receivedData));
+        document.querySelector('.dance-block__connection').innerText = 'Dance!';
+3
+    };
+
+    socket.onclose = function(event) {
+        console.log("WebSocket connection closed.");
+    };
 }
 
-// function ratingScale() {
-//     const
-// }
+
+window.onbeforeunload = exitFromGame;
+async function exitFromGame() {
+    const response = await fetch("/api/exitFromGame", {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({"userID": userID}),
+    });
+    if (!response.ok) {
+        console.log('Не удалось выйти из игры');
+    } else {
+        if (socket !== undefined) {
+            socket.close();
+            socket = undefined
+        }
+        console.log('Вышел из игры');
+    }
+    stop = 1;
+}
+
+async function exitFromAccount() {
+    const response = await fetch("/api/exitFromAccount", {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({"userID": userID}),
+    });
+    if (!response.ok) {
+        if (socket !== undefined) {
+            socket.close();
+            socket = undefined
+        }
+        console.log('Не удалось выйти из аккаунта');
+    } else {
+        console.log('Вышел из аккаунта');
+        window.location.href = '/logIn';
+    }
+}
 
 let isOpen = false;
 function userMenu() {
@@ -156,7 +164,7 @@ function userMenu() {
 }
 
 
-btnLogOut.addEventListener("click", logout)
+btnLogOut.addEventListener("click", exitFromAccount)
 btnGo.addEventListener("click", sendMessage);
 user.addEventListener("click", userMenu);
 
@@ -207,7 +215,7 @@ if (window.DeviceMotionEvent && window.DeviceOrientationEvent) {
         sensorData = [];
         //document.write(outputString);
 
-        let data = JSON.stringify({"name": name, "motionString": outputString, "selectedRoomID": selectedRoomID, "userID": userID});
+        let data = JSON.stringify({"name": name, "motionString": outputString, "userID": userID});
         //document.writeln(data);
         sendDataToServer(data);
     }
@@ -221,33 +229,48 @@ function MyRound10(val) {
     return formattedVal.padStart(6, '0');
 }
 
+let stop = 0;
+
 function sendDataToServer(data) {
     // Replace the URL with the appropriate endpoint to handle the data on your server
     let url = '/api/motion';
-
-    fetch(url, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: data
-    })
-        .then(function (response) {
-            if (response.ok) {
-                console.log('Данные успешно отправлены.');
-            } else {
-                console.log('Ошибка при отправке данных. Статус:', response.status);
-            }
+    if (stop !== 1) {
+        fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: data
         })
-        .catch(function (error) {
-            console.log('Ошибка при отправке данных:', error);
-        });
+            .then(function (response) {
+                if (response.ok) {
+                    console.log('Данные успешно отправлены.');
+                } else {
+                    console.log('Ошибка при отправке данных. Статус:', response.status);
+                    if (response.status === 409) {
+                        stop = 1;
+                        document.querySelector('.dance-block__connection').innerText = 'Комната была закрыта';
+                        //window.location.replace("/join")
+                        return;
+                    }
+                }
+            })
+            .catch(function (error) {
+                console.log('Ошибка при отправке данных:', error);
+            });
+    } else {
+        console.log('123');
+    }
 }
 
 function handleDanceData(danceDataJson) {
     //let oldStartTime = 0;
     for (let danceData of danceDataJson) {
-        setTimeout(function () {startRecording(danceData['name'], danceData['duration']);},
+        setTimeout(function () {
+                if (stop !== 1) {
+                    startRecording(danceData['name'], danceData['duration']);
+                }
+            },
             (danceData['start_time']) * 1000);
         //oldStartTime += danceData['start_time'];
     }
