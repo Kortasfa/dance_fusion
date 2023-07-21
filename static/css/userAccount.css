@@ -1,4 +1,7 @@
-*
+* {
+    user-select: none;
+}
+
 {
     font-weight: normal;
     background-repeat: no-repeat;

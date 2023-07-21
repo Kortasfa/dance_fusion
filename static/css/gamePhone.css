@@ -1,3 +1,7 @@
+* {
+    user-select: none;
+}
+
 .page {
     background-color: #FFE973;
     display: flex;
@@ -9,6 +13,7 @@
 
 .logo {
     display: flex;
+    /*user-select: none;*/
 }
 
 .logo__item {
@@ -179,6 +184,7 @@
 .dance-block__ratingScale {
     width: 30px;
     height: 250px;
+    margin: 40px 0 0 0;
     background-color: #0DF2BF;
 }
 
