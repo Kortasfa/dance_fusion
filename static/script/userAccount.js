@@ -4,7 +4,6 @@ const userHat = document.querySelector('.user-hat');
 const element = document.querySelectorAll('.element');
 const item = document.querySelectorAll('.type');
 const userLvl = parseInt(document.getElementById('level').innerText);
-let userID = 4;
 const saveButton = document.getElementById('saveButton');
 
 function openElement(type){
@@ -48,15 +47,23 @@ verificationLvl()
 
 async function changeAvatar() {
     if ((userHat.getAttribute("src") !== null) && (userFace.getAttribute("src") !== null) && (userBody.getAttribute("src") !== null)){
-        const [response] = await Promise.all([fetch("/api/custom", {
-            method: "POST",
-            body: JSON.stringify({
-                id: userID,
-                hatSrc: userHat.getAttribute("src"),
-                faceSrc: userFace.getAttribute("src"),
-                bodySrc: userBody.getAttribute("src"),
-            })
-        })])
+        const dataToSend = {
+            hatSrc: userHat.getAttribute("src"),
+            faceSrc: userFace.getAttribute("src"),
+            bodySrc: userBody.getAttribute("src"),
+        };
+        const response = await fetch("/api/custom", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(dataToSend),
+        });
+        if (response.ok) {
+            console.log('Кастомизация принята');
+        } else {
+            console.log('Не удалось применить кастомизацию');
+        }
     }
 }
 

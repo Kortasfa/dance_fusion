@@ -88,8 +88,9 @@ function sendMessage() {
     }
 }
 
+let socket;
 function joinRoom(userID) {
-    let socket = new WebSocket("wss://" + window.location.hostname + "/ws/joinToRoom/" + userID);
+    socket = new WebSocket("wss://" + window.location.hostname + "/ws/joinToRoom/" + userID);
     socket.onopen = function(event) {
         console.log("WebSocket connection established.");
     };
@@ -107,6 +108,7 @@ function joinRoom(userID) {
 }
 
 
+window.onbeforeunload = exitFromGame;
 async function exitFromGame() {
     const response = await fetch("/api/exitFromGame", {
         method: 'POST',
@@ -118,24 +120,13 @@ async function exitFromGame() {
     if (!response.ok) {
         console.log('Не удалось выйти из игры');
     } else {
+        if (socket !== undefined) {
+            socket.close();
+            socket = undefined
+        }
         console.log('Вышел из игры');
     }
     stop = 1;
-}
-
-async function exitFromRoom() {
-    const response = await fetch("/api/exitFromRoom", {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({"userID": userID}),
-    });
-    if (!response.ok) {
-        console.log('Не удалось выйти из комнаты');
-    } else {
-        console.log('Вышел из комнаты');
-    }
 }
 
 async function exitFromAccount() {
@@ -147,6 +138,10 @@ async function exitFromAccount() {
         body: JSON.stringify({"userID": userID}),
     });
     if (!response.ok) {
+        if (socket !== undefined) {
+            socket.close();
+            socket = undefined
+        }
         console.log('Не удалось выйти из аккаунта');
     } else {
         console.log('Вышел из аккаунта');

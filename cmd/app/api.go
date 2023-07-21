@@ -210,37 +210,42 @@ func getMotion(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(409)
 }
 
-func exitFromGame(w http.ResponseWriter, r *http.Request) {
-	reqData, err := io.ReadAll(r.Body)
+func exitFromGameAPI(w http.ResponseWriter, r *http.Request) {
+	userID, roomID, err := exitFromGame(r)
 	if err != nil {
-		http.Error(w, "Parsing error", 500)
+		http.Error(w, "Internal Server Error", 500)
 		log.Println(err.Error())
 		return
 	}
-	var data struct {
-		UserID int
-	}
-	err = json.Unmarshal(reqData, &data)
+	fmt.Println("User", userID, "left the room", roomID)
+	w.WriteHeader(200)
+}
+
+func exitFromGame(r *http.Request) (int, string, error) {
+	var user userInfo
+	err := getJsonCookie(r, "userInfoCookie", &user)
 	if err != nil {
-		http.Error(w, "JSON parsing error", 500)
 		log.Println(err.Error())
-		return
+		return 0, "", err
 	}
-	selectedRoomID, found := retrieveUserRoom(strconv.Itoa(data.UserID))
+
+	selectedRoomID, found := retrieveUserRoom(strconv.Itoa(user.UserID))
 	if !found {
-		http.Error(w, "User not found", 500)
-		return
+		return user.UserID, "хз, он уже давно вышел", nil
 	}
+	//Выход из команты
+	roomIDDict[selectedRoomID] = removeValueFromSlice(roomIDDict[selectedRoomID], strconv.Itoa(user.UserID))
+	broadcastJoiningUserID <- []string{"remove", selectedRoomID, strconv.Itoa(user.UserID)}
+
+	//Выход из игры
 	message := struct {
 		ExitingUser string
 	}{
-		ExitingUser: fmt.Sprintf("%d", data.UserID),
+		ExitingUser: fmt.Sprintf("%d", user.UserID),
 	}
 	messageData, err := json.Marshal(message)
 	if err != nil {
-		http.Error(w, "JSON marshal error", 500)
-		log.Println("JSON marshal error:", err)
-		return
+		return 0, "", err
 	}
 	for conn, gameFieldID := range gameFieldWSDict {
 		if gameFieldID == selectedRoomID {
@@ -248,45 +253,18 @@ func exitFromGame(w http.ResponseWriter, r *http.Request) {
 			if err != nil {
 				err := conn.Close()
 				if err != nil {
-					w.WriteHeader(409)
-					return
+					return 0, "", err
 				}
 				delete(roomWSDict, conn)
 			}
-			w.WriteHeader(200)
-			return
+			break
 		}
 	}
-}
-
-func exitFromRoom(r *http.Request) (int, string, error) {
-	var user userInfo
-	err := getJsonCookie(r, "userInfoCookie", &user)
-	if err != nil {
-		return 0, "", err
-	}
-	roomID, found := retrieveUserRoom(strconv.Itoa(user.UserID))
-	if found {
-		roomIDDict[roomID] = removeValueFromSlice(roomIDDict[roomID], strconv.Itoa(user.UserID))
-		broadcastJoiningUserID <- []string{"remove", roomID, strconv.Itoa(user.UserID)}
-	}
-	return user.UserID, roomID, nil
-}
-
-func exitFromRoomAPI(w http.ResponseWriter, r *http.Request) {
-	exitFromGame(w, r)
-	userID, roomID, err := exitFromRoom(r)
-	if err != nil {
-		http.Error(w, "Internal Server Error", 500)
-		log.Println(err.Error())
-		return
-	}
-	fmt.Println(userID, "left room", roomID)
-	w.WriteHeader(200)
+	return user.UserID, selectedRoomID, nil
 }
 
 func exitFromAccount(w http.ResponseWriter, r *http.Request) {
-	userID, _, err := exitFromRoom(r)
+	userID, _, err := exitFromGame(r)
 	if err != nil {
 		http.Error(w, "Internal Server Error", 500)
 		log.Println(err.Error())
@@ -298,4 +276,37 @@ func exitFromAccount(w http.ResponseWriter, r *http.Request) {
 		Expires: time.Now().AddDate(0, 0, -1),
 	})
 	fmt.Println(userID, "logged out")
+}
+
+func getUserAvatar(db *sqlx.DB) func(w http.ResponseWriter, r *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
+		reqData, err := io.ReadAll(r.Body)
+		if err != nil {
+			http.Error(w, "Internal Server Error", 500)
+			log.Println(err)
+			return
+		}
+
+		var userAvatar userAvatarData
+		err = json.Unmarshal(reqData, &userAvatar)
+		if err != nil {
+			http.Error(w, "Internal Server Error Unmarshall", 500)
+			log.Println(err.Error())
+			return
+		}
+		var user userInfo
+		err = getJsonCookie(r, "userInfoCookie", &user)
+		if err != nil {
+			http.Error(w, "Internal Server Error", 500)
+			log.Println(err.Error())
+			return
+		}
+
+		err = changeUserAvatar(db, userAvatar, user.UserID)
+		if err != nil {
+			http.Error(w, "Internal Server Error", 500)
+			log.Println(err.Error())
+			return
+		}
+	}
 }

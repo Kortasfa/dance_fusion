@@ -147,3 +147,78 @@ func getUserInfo(db *sqlx.DB, userID string) (string, string, error) {
 	}
 	return data.UserName, data.ImgSrc, nil
 }
+
+func getHatData(db *sqlx.DB) ([]hatData, error) {
+	const query = `
+		SELECT
+			id,
+			recommended_level,
+			hat_src
+		FROM
+			hats
+	`
+	var data []hatData
+
+	err := db.Select(&data, query)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return data, nil
+}
+
+func getFaceData(db *sqlx.DB) ([]facesData, error) {
+	const query = `
+		SELECT
+			id,
+			recommended_level,
+			face_src
+		FROM
+			faces
+	`
+	var data []facesData
+
+	err := db.Select(&data, query)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return data, nil
+}
+
+func getBodyData(db *sqlx.DB) ([]bodyData, error) {
+	const query = `
+		SELECT
+			id,
+			recommended_level,
+			body_src
+		FROM
+			bodies
+	`
+	var data []bodyData
+
+	err := db.Select(&data, query)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return data, nil
+}
+
+func changeUserAvatar(db *sqlx.DB, field userAvatarData, userID int) error {
+	const query = `
+	UPDATE
+		users
+	SET
+		img_hat = ?,
+        img_face = ?,
+        img_body = ?
+	WHERE id = ?
+	`
+
+	_, err := db.Exec(query, field.HatSrc, field.FaceSrc, field.BodySrc, userID)
+	return err
+}
