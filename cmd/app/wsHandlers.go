@@ -34,6 +34,7 @@ func roomWSHandler(db *sqlx.DB) func(w http.ResponseWriter, r *http.Request) {
 			delete(roomWSDict, conn)
 			return
 		}
+		fmt.Println("Надо отправить название: ", string(message))
 
 		motionListPath, err := getMotionListPath(db, string(message))
 		if err != nil {
@@ -46,16 +47,16 @@ func roomWSHandler(db *sqlx.DB) func(w http.ResponseWriter, r *http.Request) {
 		fileContent, err := ioutil.ReadFile(motionListPath)
 		if err != nil {
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-			fmt.Println("Ошибка при открытии файла:", err)
+			log.Println("Ошибка при открытии файла:", err)
 			delete(roomWSDict, conn)
 			return
 		}
-		//log.Println(string(fileContent))
 		for roomID, userSlice := range roomIDDict {
 			if roomID == websocketID {
 				for _, userID := range userSlice {
+					fmt.Println("Надо отправить JSON этому", userID)
 					broadcastJoinPageWSMessage <- []string{userID, string(fileContent)}
-					//fmt.Println(userID, "Пишем")
+					err = conn.Close() // Пока закрываем вебсокет, потому что дальше он не испоьлзуется
 				}
 				break
 			}
@@ -99,7 +100,7 @@ func joinPageWSHandler(w http.ResponseWriter, r *http.Request) {
 	for {
 		_, _, err := conn.ReadMessage()
 		if err != nil {
-			delete(roomWSDict, conn)
+			delete(joinPageWSDict, conn)
 			break
 		}
 	}
@@ -167,16 +168,14 @@ func handleJoinPageWSMessages() { // broadcastJoinPageWSMessage <- []string{User
 		for wsConnect := range joinPageWSDict {
 			userID := mesArr[0]
 			data := mesArr[1]
-
 			if joinPageWSDict[wsConnect] == userID {
-				//log.Println("ОТПРАВИЛ", userID, data)
 				err := wsConnect.WriteMessage(websocket.TextMessage, []byte(data))
 				if err != nil {
 					err := wsConnect.Close()
 					if err != nil {
 						return
 					}
-					delete(roomWSDict, wsConnect)
+					delete(joinPageWSDict, wsConnect)
 				}
 			}
 		}

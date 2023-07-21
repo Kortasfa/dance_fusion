@@ -45,7 +45,6 @@ func main() {
 	r.HandleFunc("/api/logIn", getLoginUserData(dbx)).Methods("POST")
 	r.HandleFunc("/api/motion", getMotion).Methods("POST")
 	r.HandleFunc("/api/exitFromGame", exitFromGameAPI)
-	//r.HandleFunc("/api/exitFromRoom", exitFromRoomAPI)
 	r.HandleFunc("/api/exitFromAccount", exitFromAccount)
 	r.HandleFunc("/api/custom", getUserAvatar(dbx)).Methods("POST")
 
