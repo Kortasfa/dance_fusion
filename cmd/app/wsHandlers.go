@@ -148,15 +148,14 @@ func handleRoomWSMessages() {
 			} else {
 				message = action + "|" + userID
 			}
-
 			if roomWSDict[wsConnect] == roomID {
 				err := wsConnect.WriteMessage(websocket.TextMessage, []byte(message))
 				if err != nil {
 					err := wsConnect.Close()
+					delete(roomWSDict, wsConnect)
 					if err != nil {
 						return
 					}
-					delete(roomWSDict, wsConnect)
 				}
 			}
 		}
@@ -172,10 +171,10 @@ func handleJoinPageWSMessages() { // broadcastJoinPageWSMessage <- []string{User
 				err := wsConnect.WriteMessage(websocket.TextMessage, []byte(data))
 				if err != nil {
 					err := wsConnect.Close()
+					delete(joinPageWSDict, wsConnect)
 					if err != nil {
 						return
 					}
-					delete(joinPageWSDict, wsConnect)
 				}
 			}
 		}

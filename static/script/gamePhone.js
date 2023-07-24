@@ -99,8 +99,7 @@ function joinRoom(userID) {
         let maxTheory = 5600;
         let maxPractice = maxTheory - maxTheory * 0.2; //4480
         let value = 0
-        let receivedData = event.data;
-        let receivedJSON = JSON.parse(receivedData);
+        let receivedJSON = JSON.parse(event.data);
         if ("point" in receivedJSON) {
             let score = receivedJSON["point"];
             console.log("score: " + score);
@@ -115,6 +114,7 @@ function joinRoom(userID) {
         }
         else {
             handleDanceData(receivedJSON);
+            console.log("Получил JSON", receivedJSON);
             document.querySelector('.dance-block__connection').innerText = 'Dance!';
         }
     };
@@ -138,6 +138,7 @@ async function exitFromGame() {
         console.log('Не удалось выйти из игры');
     } else {
         if (socket !== undefined) {
+            console.log("Закрываем бобанный WS");
             socket.close();
             socket = undefined
         }
@@ -268,14 +269,14 @@ function sendDataToServer(data) {
                     console.log('Ошибка при отправке данных. Статус:', response.status);
                     if (response.status === 409) {
                         stop = 1;
-                        //exitFromGame().then(r => {}) При закрытии игры не надо выходить из комнаты. Надо оставлять пользователя в комнате. Просто пишем "подключитесь к комнате"
+                        exitFromGame().then(r => {})// При закрытии игры не надо выходить из комнаты. Надо оставлять пользователя в комнате. Просто пишем ""
                         document.querySelector('.dance-block__connection').innerText = 'Комната была закрыта';
-                        //window.location.replace("/join")
+                        window.location.replace("/join")
                     }
                 }
             })
             .catch(function (error) {
-                console.log('Ошибка при отправке данных:', error);
+                console.log('Ошибка при отправке данных: ', error);
             });
     } else {
         console.log('123');

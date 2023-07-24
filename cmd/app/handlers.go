@@ -9,7 +9,6 @@ import (
 	"log"
 	"math/rand"
 	"net/http"
-	"strconv"
 	"time"
 )
 
@@ -55,10 +54,11 @@ type userInfo struct {
 }
 
 type menuPageData struct {
-	Styles  []stylesData
-	Songs   []songsData
-	RoomKey string
-	WssURL  string
+	Styles         []stylesData
+	Songs          []songsData
+	RoomKey        string
+	ConnectedUsers []userInfo
+	WssURL         string
 }
 
 type userAvatarData struct {
@@ -111,35 +111,6 @@ func homePageHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func sendConnectedUserInfo(db *sqlx.DB, roomID string) error {
-	userIDs := roomIDDict[roomID]
-	for _, userID := range userIDs {
-		const query = `
-			SELECT
-				name,
-				img_src
-			FROM
-				users
-			WHERE id = ?`
-
-		var data struct {
-			UserName string `db:"name"`
-			ImgSrc   string `db:"img_src"`
-		}
-
-		id, err := strconv.Atoi(userID)
-		if err != nil {
-			return err
-		}
-		err = db.Get(&data, query, id)
-		if err != nil {
-			return err
-		}
-		broadcastJoiningUserID <- []string{"add", roomID, userID, data.UserName, data.ImgSrc}
-	}
-	return nil
-}
-
 func handleRoom(db *sqlx.DB) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
@@ -179,11 +150,19 @@ func handleRoom(db *sqlx.DB) func(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
+		users, err := getConnectedUsers(roomID, db)
+		if err != nil {
+			http.Error(w, "Internal Server Error", 500)
+			log.Println(err)
+			return
+		}
+
 		data := menuPageData{
-			Styles:  styles,
-			Songs:   songs,
-			RoomKey: roomID,
-			WssURL:  "wss://" + r.Host + "/roomWS/" + roomID,
+			Styles:         styles,
+			Songs:          songs,
+			RoomKey:        roomID,
+			ConnectedUsers: users,
+			WssURL:         "wss://" + r.Host + "/roomWS/" + roomID,
 		}
 
 		err = tmpl.Execute(w, data)
@@ -192,16 +171,6 @@ func handleRoom(db *sqlx.DB) func(w http.ResponseWriter, r *http.Request) {
 			log.Println(err.Error())
 			return
 		}
-
-		go func() {
-			time.Sleep(1000 * time.Millisecond)
-			err = sendConnectedUserInfo(db, roomID)
-			if err != nil {
-				http.Error(w, "Internal Server Error", 500)
-				log.Println(err.Error())
-				return
-			}
-		}()
 	}
 }
 
