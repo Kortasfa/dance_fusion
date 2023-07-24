@@ -7,42 +7,43 @@
 <body class="main">
   <div class="rank">
       <div class="rank__hero" id="hero1">
-          <img class="hero__rating-good hidden" src="/static/img/good.gif" alt="">
-          <img class="hero__rating-perfect hidden" src="/static/img/perfect.gif" alt="">
-          <img class="hero__rating-ok hidden" src="/static/img/OK.gif" alt="">
-          <img class="hero__rating-x hidden" src="/static/img/X.png" alt="">
-          <img class="hero__avatar" id="heroImg1" src="" alt="">
-          <span class="hero__name" id="heroName1">Name 1</span>
-          <span class="hero__score">0</span>
+        <img class="hero__rating-good hidden" src="/static/img/good.gif" alt="">
+        <img class="hero__rating-perfect hidden" src="/static/img/perfect.gif" alt="">
+        <img class="hero__rating-ok hidden" src="/static/img/OK.gif" alt="">
+        <img class="hero__rating-x hidden" src="/static/img/X.png" alt="">
+        <img class="hero__avatar" id="heroImg1" src="" alt="">
+        <span class="hero__name" id="heroName1">Name 1</span>
+        <span class="hero__score">0</span>
       </div>
       <div class="rank__hero hidden" id="hero2">
-          <img class="hero__avatar" id="heroImg2" src="" alt="">
-          <img class="hero__rating-good hidden" src="/static/img/good.gif" alt="">
-          <img class="hero__rating-perfect hidden" src="/static/img/perfect.gif" alt="">
-          <img class="hero__rating-ok hidden" src="/static/img/OK.gif" alt="">
-          <img class="hero__rating-x hidden" src="/static/img/X.png" alt="">
-          <span class="hero__name" id="heroName2">Name 2</span>
-          <span class="hero__score">0</span>
+        <img class="hero__avatar" id="heroImg2" src="" alt="">
+        <img class="hero__rating-good hidden" src="/static/img/good.gif" alt="">
+        <img class="hero__rating-perfect hidden" src="/static/img/perfect.gif" alt="">
+        <img class="hero__rating-ok hidden" src="/static/img/OK.gif" alt="">
+        <img class="hero__rating-x hidden" src="/static/img/X.png" alt="">
+        <span class="hero__name" id="heroName2">Name 2</span>
+        <span class="hero__score">0</span>
       </div>
       <div class="rank__hero hidden" id="hero3">
-          <img class="hero__avatar" id="heroImg3" src="" alt="">
-          <img class="hero__rating-good hidden" src="/static/img/good.gif" alt="">
-          <img class="hero__rating-perfect hidden" src="/static/img/perfect.gif" alt="">
-          <img class="hero__rating-ok hidden" src="/static/img/OK.gif" alt="">
-          <img class="hero__rating-x hidden" src="/static/img/X.png" alt="">
-          <span class="hero__name" id="heroName3">Name 3</span>
-          <span class="hero__score">0</span>
+        <img class="hero__avatar" id="heroImg3" src="" alt="">
+        <img class="hero__rating-good hidden" src="/static/img/good.gif" alt="">
+        <img class="hero__rating-perfect hidden" src="/static/img/perfect.gif" alt="">
+        <img class="hero__rating-ok hidden" src="/static/img/OK.gif" alt="">
+        <img class="hero__rating-x hidden" src="/static/img/X.png" alt="">
+        <span class="hero__name" id="heroName3">Name 3</span>
+        <span class="hero__score">0</span>
       </div>
       <div class="rank__hero hidden" id="hero4">
-          <img class="hero__avatar" id="heroImg4" src="" alt="">
-          <img class="hero__rating-good hidden" src="/static/img/good.gif" alt="">
-          <img class="hero__rating-perfect hidden" src="/static/img/perfect.gif" alt="">
-          <img class="hero__rating-ok hidden" src="/static/img/OK.gif" alt="">
-          <img class="hero__rating-x hidden" src="/static/img/X.png" alt="">
-          <span class="hero__name" id="heroName4">Name 4</span>
-          <span class="hero__score">0</span>
+        <img class="hero__avatar" id="heroImg4" src="" alt="">
+        <img class="hero__rating-good hidden" src="/static/img/good.gif" alt="">
+        <img class="hero__rating-perfect hidden" src="/static/img/perfect.gif" alt="">
+        <img class="hero__rating-ok hidden" src="/static/img/OK.gif" alt="">
+        <img class="hero__rating-x hidden" src="/static/img/X.png" alt="">
+        <span class="hero__name" id="heroName4">Name 4</span>
+        <span class="hero__score">0</span>
       </div>
   </div>
+  <div class="dance-block__ratingScale"></div>
   <a class="btn-exit" href="/room">
       <img src="/static/img/log_out.svg" alt="">
   </a>
@@ -61,6 +62,9 @@
       </div>
   </div>
   <script>
+      const scale = document.querySelector('.dance-block__ratingScale');
+      let val = 0;
+      let scaleHeight = 0;
       function removeUser(userID) {
           console.log('Пользователь вышел: ' + userID);
           const usersBlock = document.querySelector(".rank");
@@ -306,16 +310,18 @@
                       if (score === 2) {
                         point = 100;
                       }
+                      console.log('Кол-во баллов', point);
                       addScore(userID.toString(), point);
-                      console.log("score: " + point);
-                      val += point;
-                      console.log("value: " + val);
-                      let percentage = (val / (5600 - 5600 * 0.2));
-                      console.log("percentage: " + percentage);
-                      let pix = 250 * percentage;
-                      console.log("pix: " + pix);
-                      // scale.style.height = pix + 'px';
-                        sendPoint(userID, point).then(() => {})
+                    // console.log("score: " + score);
+                    // val += score;
+                    // console.log("value: " + val);
+                    // let percentage = (val / maxPractice);
+                    // console.log("percentage: " + percentage);
+                    // let pix = 250 * percentage;
+                    // console.log("pix: " + pix);
+                    // scaleHeight += pix;
+                    // console.log("scaleHeight: " + scaleHeight);
+                      sendPoint(userID, point).then(() => {})
                   } else {
                       console.log('Лежит', deviationCount);
                       addScore(userID.toString(), 0);

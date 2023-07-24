@@ -89,16 +89,17 @@ function sendMessage() {
 }
 
 let socket;
+let value;
+let scaleHeight;
+let scale = document.querySelector(".dance-block__ratingScale");
 function joinRoom(userID) {
     socket = new WebSocket("wss://" + window.location.hostname + "/ws/joinToRoom/" + userID);
     socket.onopen = function(event) {
         console.log("WebSocket connection established.");
     };
-
     socket.onmessage = function(event) {
         let maxTheory = 5600;
         let maxPractice = maxTheory - maxTheory * 0.2; //4480
-        let value = 0
         let receivedData = event.data;
         let receivedJSON = JSON.parse(receivedData);
         if ("point" in receivedJSON) {
@@ -110,9 +111,13 @@ function joinRoom(userID) {
             console.log("percentage: " + percentage);
             let pix = 250 * percentage;
             console.log("pix: " + pix);
+            scaleHeight += pix;
+            console.log("scaleHeight: " + scaleHeight);
             scale.style.height = pix + 'px';
         }
         else {
+            value = 0;
+            scaleHeight = 0;
             handleDanceData(receivedJSON);
             document.querySelector('.dance-block__connection').innerText = 'Dance!';
         }
@@ -294,7 +299,7 @@ function handleDanceData(danceDataJson) {
     }
 }
 
-const scale = document.querySelector('.dance-block__ratingScale');
+
 
 function getRatingScale() {
     let maxTheory = 5600;
@@ -311,5 +316,6 @@ function anim(score) {
     console.log("percentage: " + percentage);
     let pix = 250 * percentage;
     console.log("pix: " + pix);
+    console.log("scaleHeight: " + scaleHeight);
     scale.style.height = pix + 'px';// Рекурсивно вызываем функцию для создания плавной анимации
 }
