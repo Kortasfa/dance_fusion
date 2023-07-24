@@ -89,6 +89,17 @@ function sendMessage() {
 }
 
 let socket;
+let value;
+let pix;
+let percentage;
+let scale = document.querySelector(".dance-block__rating-scale");
+const starOne = document.getElementById("star-1");
+const starTwo = document.getElementById("star-2");
+const starThree = document.getElementById("star-3");
+const starFour = document.getElementById("star-4");
+const starFive = document.getElementById("star-5");
+const megaStar = document.getElementById("mega-star");
+const stars = document.querySelectorAll(".rating-stars__star")
 function joinRoom(userID) {
     socket = new WebSocket("wss://" + window.location.hostname + "/ws/joinToRoom/" + userID);
     socket.onopen = function(event) {
@@ -98,21 +109,56 @@ function joinRoom(userID) {
     socket.onmessage = function(event) {
         let maxTheory = 5600;
         let maxPractice = maxTheory - maxTheory * 0.2; //4480
-        let value = 0
-        let receivedJSON = JSON.parse(event.data);
+        let receivedData = event.data;
+        let receivedJSON = JSON.parse(receivedData);
         if ("point" in receivedJSON) {
             let score = receivedJSON["point"];
             console.log("score: " + score);
             if (value > 5600) return
             value += score;
             console.log("value: " + value);
-            const percentage = (value / maxPractice);
-            console.log("percentage: " + percentage);
-            let pix = 250 * percentage;
-            console.log("pix: " + pix);
+            if (value <= maxTheory) {
+                console.log("value: " + value);
+                percentage = (value / maxPractice);
+                console.log("percentage: " + percentage);
+                pix = 250 * percentage;
+                console.log("pix: " + pix);
+            }
+            if (value > maxTheory) {
+                percentage = (value / maxTheory);
+                console.log("percentage: " + percentage);
+                pix = 50 * percentage;
+                console.log("pix: " + pix);
+            }
             scale.style.height = pix + 'px';
+            if (value >= 0.2 * maxPractice) {
+                starOne.src = "/static/img/star_blue.svg"
+            }
+            if (value >= 0.4 * maxPractice) {
+                starTwo.src = "/static/img/star_blue.svg"
+            }
+            if (value >= 0.6 * maxPractice) {
+                starThree.src = "/static/img/star_blue.svg"
+            }
+            if (value >= 0.8 * maxPractice) {
+                starFour.src = "/static/img/star_blue.svg"
+            }
+            if (value >= maxPractice) {
+                starFive.src = "/static/img/star_blue.svg"
+            }
+            if (value >= 0.9 * maxTheory) {
+                megaStar.src = "/static/img/mega-star.svg"
+                megaStar.classList.remove("hidden");
+            }
         }
         else {
+            value = 0;
+            stop = 0;
+            pix = 0;
+            percentage = 0;
+            scale.style.height = 0 + 'px';
+            megaStar.classList.add("hidden");
+            stars.forEach(element => element.src = "/static/img/star_white.svg");
             handleDanceData(receivedJSON);
             console.log("Получил JSON", receivedJSON);
             stop = 0;
@@ -126,7 +172,7 @@ function joinRoom(userID) {
 }
 
 
-// window.onbeforeunload = exitFromGame;
+window.onbeforeunload = exitFromGame;
 async function exitFromGame() {
     const response = await fetch("/api/exitFromGame", {
         method: 'POST',
@@ -295,24 +341,4 @@ function handleDanceData(danceDataJson) {
             (danceData['start_time']) * 1000);
         //oldStartTime += danceData['start_time'];
     }
-}
-
-const scale = document.querySelector('.dance-block__ratingScale');
-
-function getRatingScale() {
-    let maxTheory = 5600;
-    let maxPractice = maxTheory - maxTheory * 0.2; //4480
-    let value = 0;
-}
-
-function anim(score) {
-    console.log("score: " + score);
-    if (value > 5600) return
-    value += score;
-    console.log("value: " + value);
-    const percentage = (value / maxPractice);
-    console.log("percentage: " + percentage);
-    let pix = 250 * percentage;
-    console.log("pix: " + pix);
-    scale.style.height = pix + 'px';// Рекурсивно вызываем функцию для создания плавной анимации
 }
