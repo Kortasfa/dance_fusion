@@ -90,13 +90,13 @@ function sendMessage() {
 
 let socket;
 let value;
-let scaleHeight;
 let scale = document.querySelector(".dance-block__ratingScale");
 function joinRoom(userID) {
     socket = new WebSocket("wss://" + window.location.hostname + "/ws/joinToRoom/" + userID);
     socket.onopen = function(event) {
         console.log("WebSocket connection established.");
     };
+
     socket.onmessage = function(event) {
         let maxTheory = 5600;
         let maxPractice = maxTheory - maxTheory * 0.2; //4480
@@ -105,20 +105,19 @@ function joinRoom(userID) {
         if ("point" in receivedJSON) {
             let score = receivedJSON["point"];
             console.log("score: " + score);
+            if (value > 5600) return
             value += score;
             console.log("value: " + value);
             let percentage = (value / maxPractice);
             console.log("percentage: " + percentage);
             let pix = 250 * percentage;
             console.log("pix: " + pix);
-            scaleHeight += pix;
-            console.log("scaleHeight: " + scaleHeight);
             scale.style.height = pix + 'px';
         }
         else {
             value = 0;
-            scaleHeight = 0;
             handleDanceData(receivedJSON);
+            console.log("Получил JSON", receivedJSON);
             document.querySelector('.dance-block__connection').innerText = 'Dance!';
         }
     };
@@ -142,6 +141,7 @@ async function exitFromGame() {
         console.log('Не удалось выйти из игры');
     } else {
         if (socket !== undefined) {
+            console.log("Закрываем бобанный WS");
             socket.close();
             socket = undefined
         }
@@ -272,14 +272,14 @@ function sendDataToServer(data) {
                     console.log('Ошибка при отправке данных. Статус:', response.status);
                     if (response.status === 409) {
                         stop = 1;
-                        //exitFromGame().then(r => {}) При закрытии игры не надо выходить из комнаты. Надо оставлять пользователя в комнате. Просто пишем "подключитесь к комнате"
+                        exitFromGame().then(r => {})// При закрытии игры не надо выходить из комнаты. Надо оставлять пользователя в комнате. Просто пишем ""
                         document.querySelector('.dance-block__connection').innerText = 'Комната была закрыта';
-                        //window.location.replace("/join")
+                        window.location.replace("/join")
                     }
                 }
             })
             .catch(function (error) {
-                console.log('Ошибка при отправке данных:', error);
+                console.log('Ошибка при отправке данных: ', error);
             });
     } else {
         console.log('123');
@@ -316,6 +316,5 @@ function anim(score) {
     console.log("percentage: " + percentage);
     let pix = 250 * percentage;
     console.log("pix: " + pix);
-    console.log("scaleHeight: " + scaleHeight);
     scale.style.height = pix + 'px';// Рекурсивно вызываем функцию для создания плавной анимации
 }
