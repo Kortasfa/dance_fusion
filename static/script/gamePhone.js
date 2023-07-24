@@ -1,16 +1,24 @@
 const btnGo = document.getElementById("btn-join");
 const enterInRoom = document.querySelector(".entrance-id-room__field");
-const connectionText = document.querySelector(".connection");
+const danceField = document.querySelector(".dance-block");
 const entranceField = document.querySelector(".entrance");
 const warningID = document.getElementById("id-warning");
 const emptyID = document.getElementById("id-empty");
 const fullID = document.getElementById("id-full");
-const btnLogOut = document.querySelector(".btn-log-out");
+const btnLogOut = document.getElementById("logout");
+const user = document.querySelector(".users");
+const menu = document.querySelector(".menu")
 
 function setJsonCookie(name, value, expirationDays) {
     const jsonValue = JSON.stringify(value);
     const encodedValue = encodeURIComponent(jsonValue);
     document.cookie = `${name}=${encodedValue}; path=/; expires=${getExpirationDate(expirationDays)}`;
+}
+
+function getExpirationDate(expirationDays) {
+    const date = new Date();
+    date.setDate(date.getDate() + expirationDays);
+    return date.toUTCString();
 }
 
 function getJsonCookie(name) {
@@ -26,13 +34,9 @@ function getJsonCookie(name) {
     return null;
 }
 
-function getExpirationDate(expirationDays) {
-    const date = new Date();
-    date.setDate(date.getDate() + expirationDays);
-    return date.toUTCString();
-}
-
 const userInfo = getJsonCookie("userInfoCookie");
+let userID = userInfo.UserID;
+
 document.querySelector('.user__name').textContent = userInfo.UserName;
 document.querySelector('.user__avatar').src = userInfo.ImgSrc;
 
@@ -48,16 +52,6 @@ function sendMessage() {
             console.log("Login to your account!");
             return
         }
-        if (userInfo.SelectedRoom !== "") {
-            if (enterInRoom.value !== userInfo.SelectedRoom) {
-                console.log("You are already connected to another room!");
-            }
-            else {
-                console.log("You are already connected to this room!");
-            }
-            return
-        }
-        let IDField = document.getElementById("id-field");
         let postInfo = {
             "userID": userInfo.UserID,
             "roomID": enterInRoom.value
@@ -68,36 +62,12 @@ function sendMessage() {
         XHR.onload = function () {
             if (XHR.status === 200) {
                 entranceField.classList.add("hidden");
-                connectionText.classList.remove("hidden");
+                danceField.classList.remove("hidden");
                 emptyID.classList.add("hidden");
                 fullID.classList.add("hidden");
                 warningID.classList.add("hidden");
                 console.log("Connected to the room!");
-
-                let socket = new WebSocket("wss://" + window.location.hostname + "/ws/joinToRoom/" + userInfo.UserID);
-
-                socket.onopen = function(event) {
-                    console.log("WebSocket connection established.");
-                };
-
-                socket.onmessage = function(event) {
-                    let receivedData = event.data;
-                    if (receivedData === 'pause') {
-                        console.log('pause');
-                    }
-                    else if (receivedData === 'resume') {
-                        console.log('resume');
-                    }
-                    else {
-                        console.log('Motions:');
-                        console.log(JSON.parse(receivedData))
-                    }
-                };
-
-                socket.onclose = function(event) {
-                    console.log("WebSocket connection closed.");
-                };
-
+                joinRoom(userInfo.UserID)
             } else if (XHR.status === 404) {
                 emptyID.classList.add("hidden");
                 warningID.classList.remove("hidden");
@@ -118,12 +88,190 @@ function sendMessage() {
     }
 }
 
-async function logout() {
-    const response = await fetch("/clear");
-    if (response.ok) {
-        window.location.href = "/logIn";
+let socket;
+function joinRoom(userID) {
+    socket = new WebSocket("wss://" + window.location.hostname + "/ws/joinToRoom/" + userID);
+    socket.onopen = function(event) {
+        console.log("WebSocket connection established.");
+    };
+
+    socket.onmessage = function(event) {
+        let receivedData = event.data;
+        handleDanceData(JSON.parse(receivedData));
+        document.querySelector('.dance-block__connection').innerText = 'Dance!';
+3
+    };
+
+    socket.onclose = function(event) {
+        console.log("WebSocket connection closed.");
+    };
+}
+
+
+window.onbeforeunload = exitFromGame;
+async function exitFromGame() {
+    const response = await fetch("/api/exitFromGame", {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({"userID": userID}),
+    });
+    if (!response.ok) {
+        console.log('Не удалось выйти из игры');
+    } else {
+        if (socket !== undefined) {
+            socket.close();
+            socket = undefined
+        }
+        console.log('Вышел из игры');
+    }
+    stop = 1;
+}
+
+async function exitFromAccount() {
+    const response = await fetch("/api/exitFromAccount", {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({"userID": userID}),
+    });
+    if (!response.ok) {
+        if (socket !== undefined) {
+            socket.close();
+            socket = undefined
+        }
+        console.log('Не удалось выйти из аккаунта');
+    } else {
+        console.log('Вышел из аккаунта');
+        window.location.href = '/logIn';
     }
 }
 
-btnLogOut.addEventListener("click", logout)
+let isOpen = false;
+function userMenu() {
+    if (!isOpen) {
+        menu.classList.remove("menu-hidden");
+        menu.classList.add("menu-open");
+        isOpen = true;
+    }
+    else {
+        menu.classList.add("menu-hidden");
+        menu.classList.remove("menu-open");
+        isOpen = false;
+    }
+}
+
+
+btnLogOut.addEventListener("click", exitFromAccount)
 btnGo.addEventListener("click", sendMessage);
+user.addEventListener("click", userMenu);
+
+
+if (window.DeviceMotionEvent && window.DeviceOrientationEvent) {
+    const sensorFrequency = 62.5;
+    const interval = 1000 / sensorFrequency;
+
+    let sensorData = [];
+
+    function handleSensorData(event) {
+        try {
+            const { alpha, beta, gamma } = event.rotationRate;
+            const { x, y, z } = event.accelerationIncludingGravity;
+            sensorData.push({
+                alpha,
+                beta,
+                gamma,
+                x,
+                y,
+                z,
+            });
+        } catch (error) {
+            //document.writeln('Ошибка при обработке данных сенсора:', error);
+        }
+    }
+
+    function startRecording(name, duration) {
+        window.addEventListener('devicemotion', handleSensorData, true);
+        window.addEventListener('deviceorientation', handleSensorData, true);
+        setTimeout(function () {stopRecording(name);}, duration * 1300); // 1000 /// // / / /// / / / / / / / / / / /  / /              /////
+    }
+
+    function stopRecording(name) {
+        window.removeEventListener('devicemotion', handleSensorData, true);
+        window.removeEventListener('deviceorientation', handleSensorData, true);
+        let pointCount = 12; // 1146
+        let outputString = '0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000';
+
+        for (let i = 0; i < sensorData.length; i++) {
+            const {x, y, z, alpha, beta, gamma} = sensorData[i];
+            outputString += `, ${MyRound10(x)}, ${MyRound10(y)}, ${MyRound10(z)}, ${MyRound10(alpha)}, ${MyRound10(beta)}, ${MyRound10(gamma)}`;
+            pointCount += 6;
+        }
+        for (pointCount; pointCount < 1146; pointCount++){
+            outputString += ', 0.0000';
+        }
+        sensorData = [];
+        //document.write(outputString);
+
+        let data = JSON.stringify({"name": name, "motionString": outputString, "userID": userID});
+        //document.writeln(data);
+        sendDataToServer(data);
+    }
+} else {
+    console.log('The device does not support required sensors.');
+}
+
+function MyRound10(val) {
+    const roundedVal = Math.round(val * 10) / 10;
+    const formattedVal = roundedVal.toFixed(4);
+    return formattedVal.padStart(6, '0');
+}
+
+let stop = 0;
+
+function sendDataToServer(data) {
+    // Replace the URL with the appropriate endpoint to handle the data on your server
+    let url = '/api/motion';
+    if (stop !== 1) {
+        fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: data
+        })
+            .then(function (response) {
+                if (response.ok) {
+                    console.log('Данные успешно отправлены.');
+                } else {
+                    console.log('Ошибка при отправке данных. Статус:', response.status);
+                    if (response.status === 409) {
+                        stop = 1;
+                        exitFromGame().then(r => {})
+                        document.querySelector('.dance-block__connection').innerText = 'Комната была закрыта';
+                        //window.location.replace("/join")
+                    }
+                }
+            })
+            .catch(function (error) {
+                console.log('Ошибка при отправке данных:', error);
+            });
+    } else {
+        console.log('123');
+    }
+}
+
+function handleDanceData(danceDataJson) {
+    //let oldStartTime = 0;
+    for (let danceData of danceDataJson) {
+        setTimeout(function () {
+                if (stop !== 1) {
+                    startRecording(danceData['name'], danceData['duration']);
+                }
+            },
+            (danceData['start_time']) * 1000);
+        //oldStartTime += danceData['start_time'];
+    }
+}

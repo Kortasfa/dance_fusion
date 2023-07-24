@@ -1,18 +1,15 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
 	"github.com/gorilla/mux"
 	"github.com/gorilla/websocket"
 	"github.com/jmoiron/sqlx"
 	"html/template"
-	"io"
-	"io/ioutil"
 	"log"
 	"math/rand"
 	"net/http"
-	"net/url"
+	"strconv"
 	"time"
 )
 
@@ -29,6 +26,9 @@ var maxUsers int = 4
 var joinPageWSDict = make(map[*websocket.Conn]string) // {WSConnection: UserID, WSConnection: UserID, WSConnection: UserID, ...}
 var broadcastJoinPageWSMessage = make(chan []string)  // [UserID, Data]
 
+var gameFieldWSDict = make(map[*websocket.Conn]string) // {WSConnection: gameFieldID, WSConnection: gameFieldID, WSConnection: gameFieldID, ...}
+//var broadcastGameFieldWSMessage = make(chan []string)
+
 type stylesData struct {
 	StyleID   int    `db:"id"`
 	StyleName string `db:"name"`
@@ -39,22 +39,15 @@ type songsData struct {
 	SongName        string `db:"song_name"`
 	SongAuthor      string `db:"author_name"`
 	PreviewVideoSrc string `db:"preview_video_src"`
+	VideoSrc        string `db:"video_src"`
 	ImageSrc        string `db:"image_src"`
 	StyleID         int    `db:"style_id"`
 }
 
-type UserAvatar struct {
-	Id		        int    `json:"id"`
-	HatSrc          string `json:"hatSrc"`
-	FaceSrc         string `json:"faceSrc"`
-	BodySrc         string `json:"bodySrc"`
-}
-
 type userInfo struct {
-	UserID       int
-	UserName     string
-	ImgSrc       string
-	SelectedRoom string
+	UserID   int
+	UserName string
+	ImgSrc   string
 }
 
 type menuPageData struct {
@@ -64,22 +57,28 @@ type menuPageData struct {
 	WssURL  string
 }
 
-type facesData struct {
-	FaceID    int     `db:"id"`
-	FaceLevel int     `db:"recommended_level"`
-	FaceSrc   string  `db:"face_src"`
-}
-
-type bodyData struct {
-	BodyID    int     `db:"id"`
-	BodyLevel int     `db:"recommended_level"`
-	BodySrc   string  `db:"body_src"`
+type userAvatarData struct {
+	HatSrc  string
+	FaceSrc string
+	BodySrc string
 }
 
 type hatData struct {
-	HatID    int     `db:"id"`
-	HatLevel int     `db:"recommended_level"`
-	HatSrc   string  `db:"hat_src"`
+	HatID    int    `db:"id"`
+	HatLevel int    `db:"recommended_level"`
+	HatSrc   string `db:"hat_src"`
+}
+
+type facesData struct {
+	FaceID    int    `db:"id"`
+	FaceLevel int    `db:"recommended_level"`
+	FaceSrc   string `db:"face_src"`
+}
+
+type bodyData struct {
+	BodyID    int    `db:"id"`
+	BodyLevel int    `db:"recommended_level"`
+	BodySrc   string `db:"body_src"`
 }
 
 type customPageData struct {
@@ -108,90 +107,33 @@ func homePageHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func getStylesData(db *sqlx.DB) ([]stylesData, error) {
-	const query = `
-		SELECT
-			id,
-			name
-		FROM
-			styles
-	`
-	var data []stylesData
+func sendConnectedUserInfo(db *sqlx.DB, roomID string) error {
+	userIDs := roomIDDict[roomID]
+	for _, userID := range userIDs {
+		const query = `
+			SELECT
+				name,
+				img_src
+			FROM
+				users
+			WHERE id = ?`
 
-	err := db.Select(&data, query)
-
-	if err != nil {
-		return nil, err
-	}
-
-	return data, nil
-}
-
-func getSongsData(db *sqlx.DB) ([]songsData, error) {
-	const query = `
-		SELECT
-			id,
-			song_name,
-			author_name,
-			preview_video_src,
-			image_src,
-			style_id
-		FROM
-			songs
-	`
-	var data []songsData
-
-	err := db.Select(&data, query)
-
-	if err != nil {
-		return nil, err
-	}
-
-	return data, nil
-}
-
-    func changeUserAvatarData(db *sqlx.DB, field UserAvatar) error {
-	const query = `
-	UPDATE
-		users
-	SET
-		img_hat = ?,
-        img_face = ?,
-        img_body = ?
-	WHERE id = ?
-	`
-
-	_, err := db.Exec(query, field.HatSrc, field.FaceSrc, field.BodySrc, field.Id)
-	return err
-}
-
-func changeUserAvatar(db *sqlx.DB) func(w http.ResponseWriter, r *http.Request) {
-	return func(w http.ResponseWriter, r *http.Request) {
-
-		avatarData, err := io.ReadAll(r.Body)
-		if err != nil {
-			http.Error(w, "Internal Server Error", 500)
-			log.Println(err)
-			return
+		var data struct {
+			UserName string `db:"name"`
+			ImgSrc   string `db:"img_src"`
 		}
 
-		var field UserAvatar
-		err = json.Unmarshal(avatarData, &field)
+		id, err := strconv.Atoi(userID)
 		if err != nil {
-			http.Error(w, "Internal Server Error Unmarshall", 500)
-			log.Println(err.Error())
-			return
+			return err
 		}
-
-		err = changeUserAvatarData(db, field)
+		err = db.Get(&data, query, id)
 		if err != nil {
-			http.Error(w, "Internal Server Error", 500)
-			log.Println(err.Error())
-			return
+			return err
 		}
-
-		return
+		broadcastJoiningUserID <- []string{"add", roomID, userID, data.UserName, data.ImgSrc}
 	}
+	return nil
 }
 
 func handleRoom(db *sqlx.DB) func(w http.ResponseWriter, r *http.Request) {
@@ -222,6 +164,7 @@ func handleRoom(db *sqlx.DB) func(w http.ResponseWriter, r *http.Request) {
 			log.Println(err)
 			return
 		}
+
 		data := menuPageData{
 			Styles:  styles,
 			Songs:   songs,
@@ -235,6 +178,16 @@ func handleRoom(db *sqlx.DB) func(w http.ResponseWriter, r *http.Request) {
 			log.Println(err.Error())
 			return
 		}
+
+		go func() {
+			time.Sleep(1000 * time.Millisecond)
+			err = sendConnectedUserInfo(db, roomID)
+			if err != nil {
+				http.Error(w, "Internal Server Error", 500)
+				log.Println(err.Error())
+				return
+			}
+		}()
 	}
 }
 
@@ -269,242 +222,6 @@ func joinPageHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Internal Server Error", 500)
 		log.Println(err.Error())
 		return
-	}
-}
-
-func getUserInfo(db *sqlx.DB, userID string) (string, string, error) {
-	const query = `
-		SELECT
-			name,
-			img_src
-		FROM
-			users
-		WHERE
-		   id=?
-	`
-	row := db.QueryRow(query, userID)
-	//data := new(userData)
-	data := new(struct {
-		UserID   int    `db:"id"`
-		UserName string `db:"name"`
-		ImgSrc   string `db:"img_src"`
-	})
-	err := row.Scan(&data.UserName, &data.ImgSrc)
-	if err != nil {
-		return "", "", err
-	}
-	return data.UserName, data.ImgSrc, nil
-}
-
-func joinPageWSHandler(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	websocketID := vars["id"]
-	conn, err := upgrader.Upgrade(w, r, nil)
-	if err != nil {
-		log.Println("Failed to upgrade websocket connection:", err)
-		return
-	}
-	defer func(conn *websocket.Conn) {
-		err := conn.Close()
-		if err != nil {
-		}
-	}(conn)
-
-	joinPageWSDict[conn] = websocketID
-
-	for {
-		_, _, err := conn.ReadMessage()
-		if err != nil {
-			delete(roomWSDict, conn)
-			break
-		}
-	}
-}
-
-func handleJoinPageWSMessages() { // broadcastJoinPageWSMessage <- []string{UserID, Data}
-	for mesArr := range broadcastJoinPageWSMessage {
-		for wsConnect := range joinPageWSDict {
-			userID := mesArr[0]
-			data := mesArr[1]
-
-			if joinPageWSDict[wsConnect] == userID {
-				//log.Println("ОТПРАВИЛ", userID, data)
-				err := wsConnect.WriteMessage(websocket.TextMessage, []byte(data))
-				if err != nil {
-					err := wsConnect.Close()
-					if err != nil {
-						return
-					}
-					delete(roomWSDict, wsConnect)
-				}
-			}
-		}
-	}
-}
-
-func getJoinedUserData(db *sqlx.DB) func(w http.ResponseWriter, r *http.Request) {
-	return func(w http.ResponseWriter, r *http.Request) {
-		reqData, err := io.ReadAll(r.Body)
-		if err != nil {
-			http.Error(w, "Parsing error", 500)
-			log.Println(err.Error())
-			return
-		}
-		var data struct {
-			UserID int
-			RoomID string
-		}
-		err = json.Unmarshal(reqData, &data)
-		if err != nil {
-			http.Error(w, "JSON parsing error", 500)
-			log.Println(err.Error())
-			return
-		}
-		_, exists := roomIDDict[data.RoomID]
-		if !exists {
-			w.WriteHeader(404)
-			return
-		}
-		if len(roomIDDict[data.RoomID]) >= maxUsers {
-			w.WriteHeader(409)
-			return
-		}
-		slice := roomIDDict[data.RoomID]
-		roomIDDict[data.RoomID] = append(slice, fmt.Sprintf("%d", data.UserID))
-		userName, imgSrc, err := getUserInfo(db, fmt.Sprintf("%d", data.UserID))
-		if err != nil {
-			http.Error(w, "Internal server error", 500)
-			log.Println(err.Error())
-			return
-		}
-		broadcastJoiningUserID <- []string{data.RoomID, fmt.Sprintf("%d", data.UserID), userName, imgSrc}
-
-		var user userInfo
-		err = getJsonCookie(r, "userInfoCookie", &user)
-		if err != nil {
-			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-			log.Println(err.Error())
-			return
-		}
-		user.SelectedRoom = data.RoomID
-		err = setJsonCookie(w, "userInfoCookie", user, 24*time.Hour)
-		if err != nil {
-			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-			log.Println(err.Error())
-			return
-		}
-		w.WriteHeader(200)
-	}
-}
-
-func handleRoomWSMessages() {
-	for mesArr := range broadcastJoiningUserID {
-		for wsConnect := range roomWSDict {
-			roomID := mesArr[0]
-			userID := mesArr[1]
-			userName := mesArr[2]
-			imgSrc := mesArr[3]
-			if roomWSDict[wsConnect] == roomID {
-				message := userID + "|" + userName + "|" + imgSrc
-				err := wsConnect.WriteMessage(websocket.TextMessage, []byte(message))
-				if err != nil {
-					err := wsConnect.Close()
-					if err != nil {
-						return
-					}
-					delete(roomWSDict, wsConnect)
-				}
-			}
-		}
-	}
-}
-
-func getMotionListPath(db *sqlx.DB, songName string) (string, error) {
-	const query = `
-		SELECT
-			motion_list_path
-		FROM
-			songs
-		WHERE
-		   song_name=?
-	`
-
-	var motionListPath string
-	err := db.QueryRow(query, songName).Scan(&motionListPath)
-	if err != nil {
-		return "", err
-	}
-
-	return motionListPath, nil
-}
-
-func roomWSHandler(db *sqlx.DB) func(w http.ResponseWriter, r *http.Request) {
-	return func(w http.ResponseWriter, r *http.Request) {
-		vars := mux.Vars(r)
-		websocketID := vars["id"]
-		conn, err := upgrader.Upgrade(w, r, nil)
-		if err != nil {
-			log.Println("Failed to upgrade websocket connection:", err)
-			return
-		}
-		defer func(conn *websocket.Conn) {
-			err := conn.Close()
-			if err != nil {
-			}
-		}(conn)
-
-		roomWSDict[conn] = websocketID
-
-		_, message, err := conn.ReadMessage() // Чтение названия песни
-		if err != nil {
-			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-			log.Println(err.Error())
-			delete(roomWSDict, conn)
-			return
-		}
-
-		motionListPath, err := getMotionListPath(db, string(message))
-		if err != nil {
-			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-			log.Println(err.Error())
-			delete(roomWSDict, conn)
-			return
-		}
-
-		fileContent, err := ioutil.ReadFile(motionListPath)
-		if err != nil {
-			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-			fmt.Println("Ошибка при открытии файла:", err)
-			delete(roomWSDict, conn)
-			return
-		}
-		//log.Println(string(fileContent))
-		for roomID, userSlice := range roomIDDict {
-			if roomID == websocketID {
-				for _, userID := range userSlice {
-					broadcastJoinPageWSMessage <- []string{userID, string(fileContent)}
-					//fmt.Println(userID, "Пишем")
-				}
-				break
-			}
-		}
-
-		for { // Чтение действия (pause / resume) + end game
-			_, message, err = conn.ReadMessage()
-			if err != nil {
-				delete(roomWSDict, conn)
-				break
-			}
-			for roomID, userSlice := range roomIDDict {
-				if roomID == websocketID {
-					for _, userID := range userSlice {
-						broadcastJoinPageWSMessage <- []string{userID, string(message)}
-					}
-					break
-				}
-			}
-		}
-
 	}
 }
 
@@ -548,105 +265,6 @@ func signUp(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func userExists(db *sqlx.DB, userName string) (bool, error) {
-	const query = `
-			SELECT COUNT(*)
-			FROM users
-			WHERE name = ?`
-	var count int
-	err := db.QueryRow(query, userName).Scan(&count)
-	if err != nil {
-		log.Println(err.Error())
-		return false, err
-	}
-	if count > 0 {
-		return true, nil
-	}
-	return false, nil
-}
-
-func insertNewUser(db *sqlx.DB, userName string, password string) (int, error) {
-	user := struct {
-		UserName     string
-		Password     string
-		UserImageSrc string
-	}{
-		UserName:     userName,
-		Password:     password,
-		UserImageSrc: "static/img/user_1.png",
-	}
-	query := `
-		INSERT INTO users(name, password, img_src)
-		VALUES (?, ?, ?)`
-	result, err := db.Exec(query, user.UserName, user.Password, user.UserImageSrc)
-	if err != nil {
-		return 0, err
-	}
-	userID, err := result.LastInsertId()
-	if err != nil {
-		return 0, err
-	}
-	return int(userID), nil
-}
-
-func getRegisteredUserData(db *sqlx.DB) func(w http.ResponseWriter, r *http.Request) {
-	return func(w http.ResponseWriter, r *http.Request) {
-		reqData, err := io.ReadAll(r.Body)
-		if err != nil {
-			http.Error(w, "Parsing error", 500)
-			log.Println(err.Error())
-			return
-		}
-		var data struct {
-			UserName string
-			Password string
-		}
-		err = json.Unmarshal(reqData, &data)
-		if err != nil {
-			http.Error(w, "JSON parsing error", 500)
-			log.Println(err.Error())
-			return
-		}
-		userName := data.UserName
-		exists, err := userExists(db, data.UserName)
-		if err != nil {
-			http.Error(w, "Internal Server Error", 500)
-			log.Println(err.Error())
-			return
-		}
-		if exists {
-			w.WriteHeader(409)
-			return
-		}
-		userID, err := insertNewUser(db, userName, data.Password)
-		if err != nil {
-			http.Error(w, "Internal Server Error", 500)
-			log.Println(err.Error())
-			return
-		}
-
-		_, imgSrc, err := getUserInfo(db, fmt.Sprintf("%d", userID))
-		if err != nil {
-			http.Error(w, "Internal Server Error", 500)
-			log.Println(err.Error())
-			return
-		}
-		user := userInfo{
-			UserID:       userID,
-			UserName:     userName,
-			ImgSrc:       imgSrc,
-			SelectedRoom: "",
-		}
-		err = setJsonCookie(w, "userInfoCookie", user, 24*time.Hour)
-		if err != nil {
-			http.Error(w, "Internal Server Error", 500)
-			log.Println(err.Error())
-			return
-		}
-		w.WriteHeader(200)
-	}
-}
-
 func logIn(w http.ResponseWriter, r *http.Request) {
 	_, err := r.Cookie("userInfoCookie")
 	if err == nil {
@@ -666,215 +284,52 @@ func logIn(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 }
-func getHatData(db *sqlx.DB) ([]hatData, error) {
-	const query = `
-		SELECT
-			id,
-			recommended_level,
-			hat_src
-		FROM
-			hats
-	`
-	var data []hatData
 
-	err := db.Select(&data, query)
-
-	if err != nil {
-		return nil, err
-	}
-
-	return data, nil
-}
-
-func getFaceData(db *sqlx.DB) ([]facesData, error) {
-	const query = `
-		SELECT
-			id,
-			recommended_level,
-			face_src
-		FROM
-			faces
-	`
-	var data []facesData
-
-	err := db.Select(&data, query)
-
-	if err != nil {
-		return nil, err
-	}
-
-	return data, nil
-}
-
-func getBodyData(db *sqlx.DB) ([]bodyData, error) {
-	const query = `
-		SELECT
-			id,
-			recommended_level,
-			body_src
-		FROM
-			bodies
-	`
-	var data []bodyData
-
-	err := db.Select(&data, query)
-
-	if err != nil {
-		return nil, err
-	}
-
-	return data, nil
-}
-
-func custom(db *sqlx.DB) func(w http.ResponseWriter, r *http.Request) {
+func customPageHandler(db *sqlx.DB) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
-        tmpl, err := template.ParseFiles("pages/userAccount.html")
-        if err != nil {
-            http.Error(w, "Internal Server Error", 500)
-            log.Println(err.Error())
-            return
-        }
-        faces, err := getFaceData(db)
-        if err != nil {
-            http.Error(w, "Internal Server Error", 500)
-            log.Println(err)
-            return
-        }
-
-        bodies, err := getBodyData(db)
-        if err != nil {
-            http.Error(w, "Internal Server Error", 500)
-            log.Println(err)
-            return
-        }
-
-        hats, err := getHatData(db)
-        if err != nil {
-            http.Error(w, "Internal Server Error", 500)
-            log.Println(err)
-            return
-        }
-
-        data := customPageData{
-            Faces:   faces,
-            Bodies:  bodies,
-            Hats:    hats,
-        }
-
-        err = tmpl.Execute(w, data)
-        if err != nil {
-            http.Error(w, "Internal Server Error", 500)
-            log.Println(err.Error())
-            return
-        }
-    }
-}
-
-func credentialExists(db *sqlx.DB, userName string, password string) (int, bool, error) {
-	const query = `
-		SELECT id
-		FROM users
-		WHERE name = ? and password = ?`
-	var userIDs []int
-	err := db.Select(&userIDs, query, userName, password)
-	if len(userIDs) == 0 {
-		return 0, false, nil
-	} else if err != nil {
-		log.Println(err.Error())
-		return 0, false, err
-	}
-	return userIDs[0], true, nil
-}
-
-func getLoginUserData(db *sqlx.DB) func(w http.ResponseWriter, r *http.Request) {
-	return func(w http.ResponseWriter, r *http.Request) {
-		reqData, err := io.ReadAll(r.Body)
+		_, err := r.Cookie("userInfoCookie")
 		if err != nil {
-			http.Error(w, "Parsing error", 500)
-			log.Println(err.Error())
+			http.Redirect(w, r, "/logIn", http.StatusFound)
 			return
 		}
-		var data struct {
-			UserName string
-			Password string
-		}
-		err = json.Unmarshal(reqData, &data)
-		if err != nil {
-			http.Error(w, "JSON parsing error", 500)
-			log.Println(err.Error())
-			return
-		}
-		userID, exists, err := credentialExists(db, data.UserName, data.Password)
+		tmpl, err := template.ParseFiles("pages/userAccount.html")
 		if err != nil {
 			http.Error(w, "Internal Server Error", 500)
 			log.Println(err.Error())
 			return
 		}
-		if exists {
-			_, imgSrc, err := getUserInfo(db, fmt.Sprintf("%d", userID))
-			if err != nil {
-				http.Error(w, "Internal Server Error", 500)
-				log.Println(err.Error())
-				return
-			}
-			user := userInfo{
-				UserID:       userID,
-				UserName:     data.UserName,
-				ImgSrc:       imgSrc,
-				SelectedRoom: "",
-			}
-			err = setJsonCookie(w, "userInfoCookie", user, 24*time.Hour)
-			if err != nil {
-				http.Error(w, "Internal Server Error", 500)
-				log.Println(err.Error())
-				return
-			}
-			w.WriteHeader(http.StatusOK)
-		} else {
-			w.WriteHeader(409)
+		faces, err := getFaceData(db)
+		if err != nil {
+			http.Error(w, "Internal Server Error", 500)
+			log.Println(err)
+			return
 		}
-	}
-}
 
-func setJsonCookie(w http.ResponseWriter, name string, value interface{}, expiration time.Duration) error {
-	cookieValue, err := json.Marshal(value)
-	if err != nil {
-		return err
-	}
-	escapedValue := url.QueryEscape(string(cookieValue))
-	http.SetCookie(w, &http.Cookie{
-		Name:    name,
-		Value:   escapedValue,
-		Path:    "/",
-		Expires: time.Now().AddDate(0, 0, 1),
-	})
-	return nil
-}
+		bodies, err := getBodyData(db)
+		if err != nil {
+			http.Error(w, "Internal Server Error", 500)
+			log.Println(err)
+			return
+		}
 
-func getJsonCookie(r *http.Request, name string, value interface{}) error {
-	cookie, err := r.Cookie(name)
-	if err != nil {
-		return err
-	}
-	decodedValue, err := url.PathUnescape(cookie.Value)
-	if err != nil {
-		return err
-	}
-	err = json.Unmarshal([]byte(decodedValue), value)
-	if err != nil {
-		return err
-	}
-	return nil
-}
+		hats, err := getHatData(db)
+		if err != nil {
+			http.Error(w, "Internal Server Error", 500)
+			log.Println(err)
+			return
+		}
 
-func clearCookie(db *sqlx.DB) func(w http.ResponseWriter, r *http.Request) {
-	return func(w http.ResponseWriter, r *http.Request) {
-		http.SetCookie(w, &http.Cookie{
-			Name:    "userInfoCookie",
-			Path:    "/",
-			Expires: time.Now().AddDate(0, 0, -1),
-		})
-		fmt.Println("Cookie is deleted")
-		w.WriteHeader(200)
+		data := customPageData{
+			Faces:  faces,
+			Bodies: bodies,
+			Hats:   hats,
+		}
+
+		err = tmpl.Execute(w, data)
+		if err != nil {
+			http.Error(w, "Internal Server Error", 500)
+			log.Println(err.Error())
+			return
+		}
 	}
 }

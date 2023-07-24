@@ -1,36 +1,26 @@
 let isBtnClicked = false;
-let scoreGood = 50;
-let scoreOk = 20;
-let scorePerfect = 90;
+let scoreGood = 25;
+let scoreOk = 13;
+let scorePerfect = 33;
 
 const danceVideo = document.getElementById("video-dance");
 const modalElem = document.getElementById("pop-up");
 const btnContinue = document.getElementById("btn-continue");
 function getUsersByCookie() {
-    let numberOfUser = 0;
-    let allCookies = document.cookie;
-    let cookiesArray = allCookies.split(';');
-    for (let i = 0; i < cookiesArray.length; i++) {
-        let cookie = cookiesArray[i].split('=')
-        let name = cookie[0];
-        let findUser = name.indexOf('User');
-        if (findUser === 1) {
-            let parts = cookie[1].split(',');
-            let userID = parts[0];
-            let userName = parts[1];
-            let imgSrc = parts[2];
-            numberOfUser = numberOfUser + 1;
-            let userScore = document.getElementById('user-score' + numberOfUser);
-            let indexUser = document.getElementById('hero' + numberOfUser);
-            let indexUserName = document.getElementById('heroName' + numberOfUser);
-            let indexUserImg = document.getElementById('heroImg' + numberOfUser);
-            userScore.innerText = userName + ":";
-            userScore.classList.remove('hidden');
-            indexUser.classList.remove('hidden');
-            indexUser.id = userID;
-            indexUserImg.src =  '../' + imgSrc;
-            indexUserName.innerText = userName;
-        }
+    for (let i = 0; i < connectedUsers.length; i++) {
+        let userID = connectedUsers[i]["userID"];
+        let userName = connectedUsers[i]["userName"];
+        let imgSrc = connectedUsers[i]["imgSrc"];
+        let userScore = document.getElementById('user-score' + (i + 1));
+        let indexUser = document.getElementById('hero' + (i + 1));
+        let indexUserName = document.getElementById('heroName' + (i + 1));
+        let indexUserImg = document.getElementById('heroImg' + (i + 1));
+        userScore.innerText = userName + ":";
+        userScore.classList.remove('hidden');
+        indexUser.classList.remove('hidden');
+        indexUser.id = userID;
+        indexUserImg.src =  '../' + imgSrc;
+        indexUserName.innerText = userName;
     }
 }
 
@@ -55,13 +45,6 @@ btnContinue.addEventListener("click", function () {
     window.location.href = "/room";
 })
 
-
-// function openModalElem() {
-//     modalElem.classList.add("open");
-// }
-
-// x
-
 function AddScore(userID, Score){
     let user = document.getElementById(userID);
     let userScore = user.querySelector(".hero__score");
@@ -82,7 +65,7 @@ function AddScore(userID, Score){
             effect.classList.remove("hero__rating_visible");
             effect.classList.add("hidden")
         }, 1000);
-    }else if (Score > scoreOk){
+    } else if (Score > scoreOk){
         let effect = user.querySelector(".hero__rating-ok");
         effect.classList.remove("hidden");
         effect.classList.add("hero__rating_visible");
@@ -90,7 +73,7 @@ function AddScore(userID, Score){
             effect.classList.remove("hero__rating_visible");
             effect.classList.add("hidden")
         }, 1000);
-    }else {
+    } else {
         let effect = user.querySelector(".hero__rating-x");
         effect.classList.remove("hidden");
         effect.classList.add("hero__rating_bad");
@@ -100,42 +83,3 @@ function AddScore(userID, Score){
         }, 1000);
     }
 }
-// function emulateClick(btn) {
-//     let click = new CustomEvent("mousemove");
-//     btn.dispatchEvent(click);
-//     console.log("click!")
-// }
-
-// function playVideo() {
-//     modalElem.classList.remove("open");
-//     setTimeout(() => {
-//         danceVideo.play();
-//     }, 500);
-// }
-/*window.onload = emulateClick(btnGo);
-
-/*function test() {
-    console.log("test click")
-}
-
-btnGo.addEventListener("mousemove", test());*/
-
-/*let socket = new WebSocket(WssURL);
-
-socket.onopen = function(event) {
-    console.log("WebSocket connection established.");
-}
-
-socket.onmessage = function() {
-    //let message = event.data;
-    /*x.removeAttribute('disabled');
-    btnGo.click();*/
-/*  playVideo();
-
-}
-
-socket.onclose = function(event) {
-  console.log("WebSocket connection closed.");
-}*/
-
-// btnGo.addEventListener("click", playVideo);
