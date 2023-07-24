@@ -196,8 +196,8 @@ func getMotion(w http.ResponseWriter, r *http.Request) {
 			//fmt.Println("отправляем", gameFieldID, data.SelectedRoomID)
 			err := conn.WriteMessage(websocket.TextMessage, reqData)
 			if err != nil {
-				delete(gameFieldWSDict, conn)
 				err := conn.Close()
+				delete(gameFieldWSDict, conn)
 				if err != nil {
 					w.WriteHeader(409)
 					return

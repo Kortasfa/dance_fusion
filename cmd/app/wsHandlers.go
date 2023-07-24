@@ -124,6 +124,7 @@ func neuralWSHandler(w http.ResponseWriter, r *http.Request) {
 		}
 	}(conn)
 	gameFieldWSDict[conn] = gameFieldID
+	fmt.Println(len(gameFieldWSDict))
 	for {
 		_, _, err := conn.ReadMessage()
 		if err != nil {

@@ -115,6 +115,7 @@ function joinRoom(userID) {
         else {
             handleDanceData(receivedJSON);
             console.log("Получил JSON", receivedJSON);
+            stop = 0;
             document.querySelector('.dance-block__connection').innerText = 'Dance!';
         }
     };
