@@ -267,9 +267,9 @@ function sendDataToServer(data) {
                     console.log('Ошибка при отправке данных. Статус:', response.status);
                     if (response.status === 409) {
                         stop = 1;
+                        //exitFromGame().then(r => {}) При закрытии игры не надо выходить из комнаты. Надо оставлять пользователя в комнате. Просто пишем "подключитесь к комнате"
                         document.querySelector('.dance-block__connection').innerText = 'Комната была закрыта';
                         //window.location.replace("/join")
-                        return;
                     }
                 }
             })
