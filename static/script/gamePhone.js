@@ -216,7 +216,7 @@ if (window.DeviceMotionEvent && window.DeviceOrientationEvent) {
     function startRecording(name, duration) {
         window.addEventListener('devicemotion', handleSensorData, true);
         window.addEventListener('deviceorientation', handleSensorData, true);
-        setTimeout(function () {stopRecording(name);}, duration * 1300); // 1000 /// // / / /// / / / / / / / / / / /  / /              /////
+        setTimeout(function () {stopRecording(name);}, duration * 1300);
     }
 
     function stopRecording(name) {
