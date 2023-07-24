@@ -4,15 +4,9 @@
     <option name="autoReloadType" value="ALL" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="ec2f077e-e8c5-407a-9336-0f39d6d727b9" name="Changes" comment="merge main in dasha-mvp1">
+    <list default="true" id="ec2f077e-e8c5-407a-9336-0f39d6d727b9" name="Changes" comment="merge dasha-mvp1 in main_test_2107">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmd/app/api.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/app/api.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmd/app/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/app/main.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/go.mod" beforeDir="false" afterPath="$PROJECT_DIR$/go.mod" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/static/css/gamePhone.css" beforeDir="false" afterPath="$PROJECT_DIR$/static/css/gamePhone.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/static/css/myTest.css" beforeDir="false" afterPath="$PROJECT_DIR$/static/css/myTest.css" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/static/html/game.html" beforeDir="false" afterPath="$PROJECT_DIR$/static/html/game.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/static/script/gameField.js" beforeDir="false" afterPath="$PROJECT_DIR$/static/script/gameField.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/static/script/gamePhone.js" beforeDir="false" afterPath="$PROJECT_DIR$/static/script/gamePhone.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -22,12 +16,18 @@
   </component>
   <component name="GOROOT" url="file://$PROJECT_DIR$/../../../Program Files/Go" />
   <component name="Git.Merge.Settings">
-    <option name="BRANCH" value="origin/main_test_2007" />
+    <option name="BRANCH" value="origin/dasha-mvp1" />
+    <option name="OPTIONS">
+      <set>
+        <option value="NO_FF" />
+        <option value="NO_COMMIT" />
+      </set>
+    </option>
   </component>
   <component name="Git.Settings">
     <option name="RECENT_BRANCH_BY_REPOSITORY">
       <map>
-        <entry key="$PROJECT_DIR$" value="main_test_2007" />
+        <entry key="$PROJECT_DIR$" value="main_test_2107" />
       </map>
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -95,7 +95,15 @@
       <option name="project" value="LOCAL" />
       <updated>1689943506613</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <task id="LOCAL-00003" summary="merge dasha-mvp1 in main_test_2107">
+      <option name="closed" value="true" />
+      <created>1689958899974</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1689958899974</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -104,7 +112,8 @@
   <component name="VcsManagerConfiguration">
     <MESSAGE value="dasha-mvp1 тест создание шкалы" />
     <MESSAGE value="merge main in dasha-mvp1" />
-    <option name="LAST_COMMIT_MESSAGE" value="merge main in dasha-mvp1" />
+    <MESSAGE value="merge dasha-mvp1 in main_test_2107" />
+    <option name="LAST_COMMIT_MESSAGE" value="merge dasha-mvp1 in main_test_2107" />
   </component>
   <component name="VgoProject">
     <settings-migrated>true</settings-migrated>

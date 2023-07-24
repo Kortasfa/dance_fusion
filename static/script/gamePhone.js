@@ -104,10 +104,9 @@ function joinRoom(userID) {
         if ("point" in receivedJSON) {
             let score = receivedJSON["point"];
             console.log("score: " + score);
-            if (value > 5600) return
             value += score;
             console.log("value: " + value);
-            const percentage = (value / maxPractice);
+            let percentage = (value / maxPractice);
             console.log("percentage: " + percentage);
             let pix = 250 * percentage;
             console.log("pix: " + pix);
