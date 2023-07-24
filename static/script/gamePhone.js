@@ -7,7 +7,8 @@ const emptyID = document.getElementById("id-empty");
 const fullID = document.getElementById("id-full");
 const btnLogOut = document.getElementById("logout");
 const user = document.querySelector(".users");
-const menu = document.querySelector(".menu")
+const menu = document.querySelector(".menu");
+const custom = document.getElementById("custom");
 
 function setJsonCookie(name, value, expirationDays) {
     const jsonValue = JSON.stringify(value);
@@ -38,7 +39,9 @@ const userInfo = getJsonCookie("userInfoCookie");
 let userID = userInfo.UserID;
 
 document.querySelector('.user__name').textContent = userInfo.UserName;
-document.querySelector('.user__avatar').src = userInfo.ImgSrc;
+document.querySelector('.body').src = userInfo.BodyImgSrc;
+document.querySelector('.face').src = userInfo.FaceImgSrc;
+document.querySelector('.hat').src = userInfo.HatImgSrc;
 
 function sendMessage() {
     if (enterInRoom.value === "") {
@@ -234,6 +237,7 @@ function userMenu() {
 btnLogOut.addEventListener("click", exitFromAccount)
 btnGo.addEventListener("click", sendMessage);
 user.addEventListener("click", userMenu);
+custom.addEventListener("click", function() {window.location.href = 'custom '});
 
 
 if (window.DeviceMotionEvent && window.DeviceOrientationEvent) {

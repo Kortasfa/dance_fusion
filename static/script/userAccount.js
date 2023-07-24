@@ -61,6 +61,7 @@ async function changeAvatar() {
         });
         if (response.ok) {
             console.log('Кастомизация принята');
+            window.location.href = 'join';
         } else {
             console.log('Не удалось применить кастомизацию');
         }
