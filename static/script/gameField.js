@@ -10,16 +10,22 @@ function getUsersByCookie() {
     for (let i = 0; i < connectedUsers.length; i++) {
         let userID = connectedUsers[i]["userID"];
         let userName = connectedUsers[i]["userName"];
-        let imgSrc = connectedUsers[i]["imgSrc"];
+        let bodyImgSrc = connectedUsers[i]["bodyImgSrc"];
+        let faceImgSrc = connectedUsers[i]["faceImgSrc"];
+        let hatImgSrc = connectedUsers[i]["hatImgSrc"];
         let userScore = document.getElementById('user-score' + (i + 1));
         let indexUser = document.getElementById('hero' + (i + 1));
-        let indexUserName = document.getElementById('heroName' + (i + 1));
-        let indexUserImg = document.getElementById('heroImg' + (i + 1));
+        let indexUserName = indexUser.querySelector(".hero__name");
+        let indexUserBodyImg = indexUser.querySelector(".body");
+        let indexUserFaceImg = indexUser.querySelector(".face");
+        let indexUserHatImg = indexUser.querySelector(".hat");
         userScore.innerText = userName + ":";
         userScore.classList.remove('hidden');
         indexUser.classList.remove('hidden');
         indexUser.id = userID;
-        indexUserImg.src =  '../' + imgSrc;
+        indexUserBodyImg.src = bodyImgSrc;
+        indexUserFaceImg.src = faceImgSrc;
+        indexUserHatImg.src = hatImgSrc;
         indexUserName.innerText = userName;
     }
 }
@@ -45,11 +51,11 @@ btnContinue.addEventListener("click", function () {
     window.location.href = "/room";
 })
 
-function AddScore(userID, Score){
+function AddScore(userID, score){
     let user = document.getElementById(userID);
     let userScore = user.querySelector(".hero__score");
-    userScore.innerText = parseInt(userScore.innerText) + Score;
-    if (Score > scorePerfect){
+    userScore.innerText = parseInt(userScore.innerText) + score;
+    if (score > scorePerfect){
         let effect = user.querySelector(".hero__rating-perfect");
         effect.classList.remove("hidden");
         effect.classList.add("hero__rating_visible");
@@ -57,7 +63,7 @@ function AddScore(userID, Score){
             effect.classList.remove("hero__rating_visible");
             effect.classList.add("hidden")
         }, 1000);
-    } else if (Score > scoreGood) {
+    } else if (score > scoreGood) {
         let effect = user.querySelector(".hero__rating-good");
         effect.classList.remove("hidden");
         effect.classList.add("hero__rating_visible");
@@ -65,7 +71,7 @@ function AddScore(userID, Score){
             effect.classList.remove("hero__rating_visible");
             effect.classList.add("hidden")
         }, 1000);
-    } else if (Score > scoreOk){
+    } else if (score > scoreOk){
         let effect = user.querySelector(".hero__rating-ok");
         effect.classList.remove("hidden");
         effect.classList.add("hero__rating_visible");

@@ -170,6 +170,7 @@
 
 .party__user{
     margin: 27px;
+    margin-top: 40px;
     width: 84px;
 }
 
@@ -292,7 +293,43 @@
 
 .songs::-webkit-scrollbar {
     width: 0;
-  }
+}
+
+.user__head{
+    position: relative;
+    margin: 0 auto;
+    height: 90px;
+    width: 90px;
+}
+
+.head__body{
+    position: absolute;
+}
+
+.body{
+    width: 90px;
+    height: 90px;
+}
+
+.head__face{
+    position: absolute;
+    margin: 8px 5px;
+}
+
+.face{
+    width: 80px;
+    height: 80px;
+}
+
+.head__hat{
+    position: absolute;
+    margin: -65px 3px;
+}
+
+.hat{
+    width: 86px;
+    height: 90px;
+}
 
 @media screen and (max-width: 1180px) {
     .content {
