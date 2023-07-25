@@ -1,6 +1,8 @@
 package main
 
 import (
+	"database/sql"
+	"fmt"
 	"github.com/jmoiron/sqlx"
 	"log"
 )
@@ -263,4 +265,26 @@ func changeUserAvatar(db *sqlx.DB, field userAvatarData, userID int) error {
 
 	_, err := db.Exec(query, field.HatSrc, field.FaceSrc, field.BodySrc, userID)
 	return err
+}
+
+func getScoreByUserID(db *sqlx.DB, userID int) (int, error) {
+	const query = `
+		SELECT
+			score
+		FROM
+			users
+		WHERE
+			id = ?
+	`
+
+	var score int
+	err := db.QueryRow(query, userID).Scan(&score)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return 0, fmt.Errorf("пользователь с ID %d не найден", userID)
+		}
+		return 0, err
+	}
+
+	return score, nil
 }
