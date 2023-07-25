@@ -148,6 +148,33 @@ func getUserInfo(db *sqlx.DB, userID string) (string, string, error) {
 	return data.UserName, data.ImgSrc, nil
 }
 
+func getConnectedUsers(roomID string, db *sqlx.DB) ([]userInfo, error) {
+	userIDs := roomIDDict[roomID]
+	var users []userInfo
+
+	for _, userID := range userIDs {
+		const query = `
+			SELECT
+				id,
+				name,
+				img_src
+			FROM
+				users
+			WHERE id = ?`
+
+		row := db.QueryRow(query, userID)
+		var user userInfo
+
+		err := row.Scan(&user.UserID, &user.UserName, &user.ImgSrc)
+		if err != nil {
+			return nil, err
+		}
+		users = append(users, user)
+	}
+
+	return users, nil
+}
+
 func getHatData(db *sqlx.DB) ([]hatData, error) {
 	const query = `
 		SELECT

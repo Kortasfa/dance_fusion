@@ -124,6 +124,7 @@ func neuralWSHandler(w http.ResponseWriter, r *http.Request) {
 		}
 	}(conn)
 	gameFieldWSDict[conn] = gameFieldID
+	fmt.Println(len(gameFieldWSDict))
 	for {
 		_, _, err := conn.ReadMessage()
 		if err != nil {
@@ -148,15 +149,14 @@ func handleRoomWSMessages() {
 			} else {
 				message = action + "|" + userID
 			}
-
 			if roomWSDict[wsConnect] == roomID {
 				err := wsConnect.WriteMessage(websocket.TextMessage, []byte(message))
 				if err != nil {
 					err := wsConnect.Close()
+					delete(roomWSDict, wsConnect)
 					if err != nil {
 						return
 					}
-					delete(roomWSDict, wsConnect)
 				}
 			}
 		}
@@ -172,10 +172,10 @@ func handleJoinPageWSMessages() { // broadcastJoinPageWSMessage <- []string{User
 				err := wsConnect.WriteMessage(websocket.TextMessage, []byte(data))
 				if err != nil {
 					err := wsConnect.Close()
+					delete(joinPageWSDict, wsConnect)
 					if err != nil {
 						return
 					}
-					delete(joinPageWSDict, wsConnect)
 				}
 			}
 		}

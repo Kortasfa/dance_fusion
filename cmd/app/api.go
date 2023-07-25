@@ -197,11 +197,11 @@ func getMotion(w http.ResponseWriter, r *http.Request) {
 			err := conn.WriteMessage(websocket.TextMessage, reqData)
 			if err != nil {
 				err := conn.Close()
+				delete(gameFieldWSDict, conn)
 				if err != nil {
 					w.WriteHeader(409)
 					return
 				}
-				delete(roomWSDict, conn)
 			}
 			w.WriteHeader(200)
 			return
@@ -252,10 +252,10 @@ func exitFromGame(r *http.Request) (int, string, error) {
 			err := conn.WriteMessage(websocket.TextMessage, messageData)
 			if err != nil {
 				err := conn.Close()
+				delete(gameFieldWSDict, conn)
 				if err != nil {
 					return 0, "", err
 				}
-				delete(roomWSDict, conn)
 			}
 			break
 		}
@@ -309,4 +309,42 @@ func getUserAvatar(db *sqlx.DB) func(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}
+}
+
+func sendPointToJoin(w http.ResponseWriter, r *http.Request) {
+	reqData, err := io.ReadAll(r.Body)
+	if err != nil {
+		http.Error(w, "Internal Server Error", 500)
+		log.Println(err)
+		return
+	}
+
+	var data struct {
+		UserID int
+		Point  int
+	}
+
+	err = json.Unmarshal(reqData, &data)
+	if err != nil {
+		http.Error(w, "Internal Server Error Unmarshall", 500)
+		log.Println(err.Error())
+		return
+	}
+	for conn, userID := range joinPageWSDict {
+		if strconv.Itoa(data.UserID) == userID {
+			err := conn.WriteMessage(websocket.TextMessage, reqData)
+			if err != nil {
+				err := conn.Close()
+				delete(joinPageWSDict, conn)
+				if err != nil {
+					w.WriteHeader(409)
+					log.Println(err.Error())
+					return
+				}
+			}
+			break
+		}
+	}
+	w.WriteHeader(200)
+
 }
