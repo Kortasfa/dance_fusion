@@ -34,8 +34,20 @@
 }
 
 .hero__score {
-    font: 400 48px Roboto, sans-serif;
-    color: #F20D40;
+    width: fit-content;
+    display: flex;
+    margin-top: 5px;
+
+}
+
+.score__star {
+    width: 25px;
+    height: 25px;
+}
+
+.score__star_mega {
+    width: 30px;
+    height: 30px;
 }
 
 .btn-exit {
