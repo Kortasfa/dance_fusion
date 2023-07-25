@@ -9,7 +9,6 @@ import (
 	"log"
 	"math/rand"
 	"net/http"
-	"strconv"
 	"time"
 )
 
@@ -29,6 +28,10 @@ var broadcastJoinPageWSMessage = make(chan []string)  // [UserID, Data]
 var gameFieldWSDict = make(map[*websocket.Conn]string) // {WSConnection: gameFieldID, WSConnection: gameFieldID, WSConnection: gameFieldID, ...}
 //var broadcastGameFieldWSMessage = make(chan []string)
 
+type activeRoomData struct {
+	ActiveRoomID string
+}
+
 type stylesData struct {
 	StyleID   int    `db:"id"`
 	StyleName string `db:"name"`
@@ -47,14 +50,17 @@ type songsData struct {
 type userInfo struct {
 	UserID   int
 	UserName string
-	ImgSrc   string
+	HatSrc   string
+	FaceSrc  string
+	BodySrc  string
 }
 
 type menuPageData struct {
-	Styles  []stylesData
-	Songs   []songsData
-	RoomKey string
-	WssURL  string
+	Styles         []stylesData
+	Songs          []songsData
+	RoomKey        string
+	ConnectedUsers []userInfo
+	WssURL         string
 }
 
 type userAvatarData struct {
@@ -107,39 +113,20 @@ func homePageHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func sendConnectedUserInfo(db *sqlx.DB, roomID string) error {
-	userIDs := roomIDDict[roomID]
-	for _, userID := range userIDs {
-		const query = `
-			SELECT
-				name,
-				img_src
-			FROM
-				users
-			WHERE id = ?`
-
-		var data struct {
-			UserName string `db:"name"`
-			ImgSrc   string `db:"img_src"`
-		}
-
-		id, err := strconv.Atoi(userID)
-		if err != nil {
-			return err
-		}
-		err = db.Get(&data, query, id)
-		if err != nil {
-			return err
-		}
-		broadcastJoiningUserID <- []string{"add", roomID, userID, data.UserName, data.ImgSrc}
-	}
-	return nil
-}
-
 func handleRoom(db *sqlx.DB) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
 		roomID := vars["id"]
+
+		var room activeRoomData
+		err := getJsonCookie(r, "activeRoomCookie", &room)
+		if err != nil {
+			http.Redirect(w, r, "/room", http.StatusFound)
+		}
+		if room.ActiveRoomID != roomID {
+			http.Redirect(w, r, "/room/"+room.ActiveRoomID, http.StatusFound)
+		}
+
 		_, exists := roomIDDict[roomID]
 		if !exists {
 			w.WriteHeader(404)
@@ -165,11 +152,19 @@ func handleRoom(db *sqlx.DB) func(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
+		users, err := getConnectedUsers(roomID, db)
+		if err != nil {
+			http.Error(w, "Internal Server Error", 500)
+			log.Println(err)
+			return
+		}
+
 		data := menuPageData{
-			Styles:  styles,
-			Songs:   songs,
-			RoomKey: roomID,
-			WssURL:  "wss://" + r.Host + "/roomWS/" + roomID,
+			Styles:         styles,
+			Songs:          songs,
+			RoomKey:        roomID,
+			ConnectedUsers: users,
+			WssURL:         "wss://" + r.Host + "/roomWS/" + roomID,
 		}
 
 		err = tmpl.Execute(w, data)
@@ -178,31 +173,37 @@ func handleRoom(db *sqlx.DB) func(w http.ResponseWriter, r *http.Request) {
 			log.Println(err.Error())
 			return
 		}
-
-		go func() {
-			time.Sleep(1000 * time.Millisecond)
-			err = sendConnectedUserInfo(db, roomID)
-			if err != nil {
-				http.Error(w, "Internal Server Error", 500)
-				log.Println(err.Error())
-				return
-			}
-		}()
 	}
 }
 
 func handleCreateRoom(w http.ResponseWriter, r *http.Request) {
-	rand.Seed(time.Now().UnixNano())
-	var roomID int
-	for {
-		roomID = rand.Intn(100)
-		_, exists := roomIDDict[fmt.Sprintf("%d", roomID)]
-		if !exists {
-			break
+	var room activeRoomData
+	err := getJsonCookie(r, "activeRoomCookie", &room)
+	if err != nil {
+		rand.Seed(time.Now().UnixNano())
+		var roomID int
+		for {
+			roomID = rand.Intn(100)
+			_, exists := roomIDDict[fmt.Sprintf("%d", roomID)]
+			if !exists {
+				break
+			}
 		}
+		roomIDDict[fmt.Sprintf("%d", roomID)] = []string{}
+		room.ActiveRoomID = fmt.Sprintf("%d", roomID)
+		err := setJsonCookie(w, "activeRoomCookie", room, time.Hour*24)
+		if err != nil {
+			log.Println("Error setting active room cookie:", err)
+			http.Error(w, "Internal Server Error", 500)
+			return
+		}
+		http.Redirect(w, r, fmt.Sprintf("/room/%d", roomID), http.StatusFound)
 	}
-	roomIDDict[fmt.Sprintf("%d", roomID)] = []string{}
-	http.Redirect(w, r, fmt.Sprintf("/room/%d", roomID), http.StatusFound)
+	_, exists := roomIDDict[room.ActiveRoomID]
+	if !exists {
+		roomIDDict[room.ActiveRoomID] = []string{}
+	}
+	http.Redirect(w, r, "/room/"+room.ActiveRoomID, http.StatusFound)
 }
 
 func joinPageHandler(w http.ResponseWriter, r *http.Request) {
