@@ -143,6 +143,7 @@ socket.onmessage = function (event) {
         let bodyImgSrc = parts[3];
         let faceImgSrc = parts[4];
         let hatImgSrc = parts[5];
+        console.log(parts[3], parts[4],parts[5 ])
         addUser(userID, userName, bodyImgSrc, faceImgSrc, hatImgSrc);
     } else if (action === "remove") {
         removeUser(userID)
