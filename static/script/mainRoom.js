@@ -140,11 +140,10 @@ socket.onmessage = function (event) {
     let userID = parts[1];
     if (action === "add") {
         let userName = parts[2];
-        let bodyImgSrc = parts[3];
-        let faceImgSrc = parts[4];
-        let hatImgSrc = parts[5];
-        console.log(parts[3], parts[4],parts[5 ])
-        addUser(userID, userName, bodyImgSrc, faceImgSrc, hatImgSrc);
+        let hatImgSrc = "../" + parts[3];
+        let faceImgSrc = "../" + parts[4];
+        let bodyImgSrc = "../" + parts[5];
+        addUser(userID, userName, hatImgSrc, faceImgSrc, bodyImgSrc);
     } else if (action === "remove") {
         removeUser(userID)
     }
@@ -155,7 +154,7 @@ socket.onclose = function (event) {
     console.log("WebSocket mainRoom connection closed.");
 };
 
-function addUser(userID, userName, bodyImgSrc, faceImgSrc, hatImgSrc) {
+function addUser(userID, userName, hatImgSrc, faceImgSrc, bodyImgSrc) {
     console.log('Пользователь присоединился: ' + userID);
     connectedUsers.push({"userID": userID, "userName": userName, "bodyImgSrc": bodyImgSrc, "faceImgSrc": faceImgSrc, "hatImgSrc": hatImgSrc});
 

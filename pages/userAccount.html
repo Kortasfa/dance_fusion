@@ -9,6 +9,10 @@
 	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 	<link href="../static/css/userAccount.css " type="text/css" rel="stylesheet"/>
 	<script src="../static/script/userAccount.js" defer></script>
+	<script>
+		let userScore = "{{ .UserScore }}";
+		console.log("У этого пользователя", userScore, "очков");
+	</script>
 </head>
 <body>
 <div class="customization">

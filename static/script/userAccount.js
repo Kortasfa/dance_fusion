@@ -6,6 +6,24 @@ const item = document.querySelectorAll('.type');
 const userLvl = parseInt(document.getElementById('level').innerText);
 const saveButton = document.getElementById('saveButton');
 
+function getJsonCookie(name) {
+    const cookies = document.cookie.split(';');
+    for (let i = 0; i < cookies.length; i++) {
+        const cookie = cookies[i].trim();
+        if (cookie.startsWith(name + '=')) {
+            const encodedValue = cookie.substring(name.length + 1);
+            const decodedValue = decodeURIComponent(encodedValue);
+            return JSON.parse(decodedValue);
+        }
+    }
+    return null;
+}
+
+const userInfo = getJsonCookie("userInfoCookie");
+userHat.src = userInfo.HatSrc;
+userFace.src = userInfo.FaceSrc;
+userBody.src = userInfo.BodySrc;
+
 function openElement(type){
     let nameType = '.' + type.id;
     let itemSelect = document.querySelectorAll(nameType);
