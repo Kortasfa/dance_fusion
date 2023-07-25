@@ -88,22 +88,48 @@ $(document).ready(function () {
     playButton.on('click', function () {
         if (readyGame) {
             socket.send(songName);
-            socket.close() // Закрываем вебсокет mainRoom
+            socket.close(); // Закрываем вебсокет mainRoom
 
-            contentContainer.load("/static/html/game.html", function () {
-                const video = $('#video-dance')[0];
-                const src = $('#video-src')[0];
-                src.setAttribute('src', fullSongName);
+            function loadScript(url) {
+                return new Promise(function (resolve, reject) {
+                    const script = document.createElement('script');
+                    script.src = url;
+                    script.onload = resolve;
+                    script.onerror = reject;
+                    document.head.appendChild(script);
+                });
+            }
 
-                video.addEventListener('loadeddata', function () {
-                    video.play();
+            async function loadEdgeImpulseAndRunImpulse() {
+                try {
+                    await loadScript('/static/test/edge-impulse-standalone.js');
+                    await loadScript('/static/test/run-impulse.js');
+                    console.log('Both scripts loaded and executed successfully.');
+                    // You can now call any functions or perform actions from the loaded scripts.
+                    // For example: Module.onRuntimeInitialized();
+                } catch (error) {
+                    console.error('Error loading scripts:', error);
+                }
+            }
+
+            loadEdgeImpulseAndRunImpulse().then(r => {
+                contentContainer.load("/static/html/game.html", function () {
+                    // This function will be executed after the new content is loaded.
+                    const video = $('#video-dance')[0];
+                    const src = $('#video-src')[0];
+                    src.setAttribute('src', fullSongName);
+
+                    video.addEventListener('loadeddata', function () {
+                        video.play();
+                    });
+
                 });
             });
-
             return false;
         }
     });
 });
+
 
 
 function showVideo(videoID) {

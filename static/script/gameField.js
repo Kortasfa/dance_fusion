@@ -6,6 +6,7 @@ let scorePerfect = 33;
 const danceVideo = document.getElementById("video-dance");
 const modalElem = document.getElementById("pop-up");
 const btnContinue = document.getElementById("btn-continue");
+
 function getUsersByCookie() {
     for (let i = 0; i < connectedUsers.length; i++) {
         let userID = connectedUsers[i]["userID"];
@@ -38,6 +39,7 @@ function addStats(){
         info[i].innerText = info[i].innerText + ' ' + score[i].innerText;
     }
 }
+
 getUsersByCookie();
 
 danceVideo.addEventListener('ended', showStats);
@@ -82,4 +84,21 @@ function AddScore(userID, Score){
             effect.classList.add("hidden")
         }, 1000);
     }
+}
+
+function loadScript(url, callback)
+{
+    // adding the script element to the head as suggested before
+    var head = document.getElementsByTagName('head')[0];
+    var script = document.createElement('script');
+    script.type = 'text/javascript';
+    script.src = url;
+
+    // then bind the event to the callback function
+    // there are several events for cross browser compatibility
+    script.onreadystatechange = callback;
+    script.onload = callback;
+
+    // fire the loading
+    head.appendChild(script);
 }

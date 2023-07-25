@@ -99,7 +99,7 @@ func joinPageWSHandler(w http.ResponseWriter, r *http.Request) {
 	for {
 		_, _, err := conn.ReadMessage()
 		if err != nil {
-			delete(roomWSDict, conn)
+			delete(joinPageWSDict, conn)
 			break
 		}
 	}
@@ -176,7 +176,7 @@ func handleJoinPageWSMessages() { // broadcastJoinPageWSMessage <- []string{User
 					if err != nil {
 						return
 					}
-					delete(roomWSDict, wsConnect)
+					delete(joinPageWSDict, wsConnect)
 				}
 			}
 		}

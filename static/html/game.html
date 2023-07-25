@@ -1,10 +1,7 @@
 <html lang="en">
-<head>
-    <title>Dance Fusion</title>
-    <link rel="stylesheet" href="/static/css/gameField.css"/>
-    <script src="/static/script/gameField.js" defer></script>
-</head>
 <body class="main">
+<link rel="stylesheet" href="/static/css/gameField.css"/>
+<script src="/static/script/gameField.js" defer></script>
 <div class="rank">
     <div class="rank__hero" id="hero1">
         <img class="hero__rating-good hidden" src="/static/img/good.gif" alt="">
@@ -81,6 +78,7 @@
         await classifier.init();
         let project = classifier.getProjectInfo();
         console.log(project.owner + ' / ' + project.name + ' (version ' + project.deploy_version + ')');
+        console.log('123');
 
         let socket = new WebSocket("wss://" + window.location.hostname + "/neuralWS/" + WssURL.split("/").pop().trim());
 
