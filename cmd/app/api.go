@@ -51,13 +51,13 @@ func getJoinedUserData(db *sqlx.DB) func(w http.ResponseWriter, r *http.Request)
 			}
 		}
 		roomIDDict[data.RoomID] = append(roomIDDict[data.RoomID], fmt.Sprintf("%d", data.UserID)) //////////// Мы добавляем туда ID пользователя
-		userName, imgSrc, err := getUserInfo(db, fmt.Sprintf("%d", data.UserID))
+		user, err := getUserInfo(db, data.UserID)
 		if err != nil {
 			http.Error(w, "Internal server error", 500)
 			log.Println(err.Error())
 			return
 		}
-		broadcastJoiningUserID <- []string{"add", data.RoomID, fmt.Sprintf("%d", data.UserID), userName, imgSrc}
+		broadcastJoiningUserID <- []string{"add", data.RoomID, fmt.Sprintf("%d", data.UserID), user.UserName, user.HatSrc, user.FaceSrc, user.BodySrc}
 		w.WriteHeader(200)
 	}
 }
@@ -98,16 +98,11 @@ func getRegisteredUserData(db *sqlx.DB) func(w http.ResponseWriter, r *http.Requ
 			return
 		}
 
-		_, imgSrc, err := getUserInfo(db, fmt.Sprintf("%d", userID))
+		user, err := getUserInfo(db, userID)
 		if err != nil {
 			http.Error(w, "Internal Server Error", 500)
 			log.Println(err.Error())
 			return
-		}
-		user := userInfo{
-			UserID:   userID,
-			UserName: userName,
-			ImgSrc:   imgSrc,
 		}
 		err = setJsonCookie(w, "userInfoCookie", user, 24*time.Hour)
 		if err != nil {
@@ -144,16 +139,11 @@ func getLoginUserData(db *sqlx.DB) func(w http.ResponseWriter, r *http.Request) 
 			return
 		}
 		if exists {
-			_, imgSrc, err := getUserInfo(db, fmt.Sprintf("%d", userID))
+			user, err := getUserInfo(db, userID)
 			if err != nil {
 				http.Error(w, "Internal Server Error", 500)
 				log.Println(err.Error())
 				return
-			}
-			user := userInfo{
-				UserID:   userID,
-				UserName: data.UserName,
-				ImgSrc:   imgSrc,
 			}
 			err = setJsonCookie(w, "userInfoCookie", user, 24*time.Hour)
 			if err != nil {
@@ -196,8 +186,8 @@ func getMotion(w http.ResponseWriter, r *http.Request) {
 			//fmt.Println("отправляем", gameFieldID, data.SelectedRoomID)
 			err := conn.WriteMessage(websocket.TextMessage, reqData)
 			if err != nil {
-				delete(gameFieldWSDict, conn)
 				err := conn.Close()
+				delete(gameFieldWSDict, conn)
 				if err != nil {
 					w.WriteHeader(409)
 					return
@@ -303,6 +293,15 @@ func getUserAvatar(db *sqlx.DB) func(w http.ResponseWriter, r *http.Request) {
 		}
 
 		err = changeUserAvatar(db, userAvatar, user.UserID)
+		if err != nil {
+			http.Error(w, "Internal Server Error", 500)
+			log.Println(err.Error())
+			return
+		}
+		user.HatSrc = userAvatar.HatSrc
+		user.FaceSrc = userAvatar.FaceSrc
+		user.BodySrc = userAvatar.BodySrc
+		err = setJsonCookie(w, "userInfoCookie", user, 24*time.Hour)
 		if err != nil {
 			http.Error(w, "Internal Server Error", 500)
 			log.Println(err.Error())

@@ -50,7 +50,9 @@ type songsData struct {
 type userInfo struct {
 	UserID   int
 	UserName string
-	ImgSrc   string
+	HatSrc   string
+	FaceSrc  string
+	BodySrc  string
 }
 
 type menuPageData struct {
@@ -86,9 +88,10 @@ type bodyData struct {
 }
 
 type customPageData struct {
-	Faces  []facesData
-	Bodies []bodyData
-	Hats   []hatData
+	Faces     []facesData
+	Bodies    []bodyData
+	Hats      []hatData
+	UserScore int
 }
 
 func homePageHandler(w http.ResponseWriter, r *http.Request) {
@@ -286,7 +289,8 @@ func logIn(w http.ResponseWriter, r *http.Request) {
 
 func customPageHandler(db *sqlx.DB) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
-		_, err := r.Cookie("userInfoCookie")
+		var user userInfo
+		err := getJsonCookie(r, "userInfoCookie", &user)
 		if err != nil {
 			http.Redirect(w, r, "/logIn", http.StatusFound)
 			return
@@ -318,10 +322,18 @@ func customPageHandler(db *sqlx.DB) func(w http.ResponseWriter, r *http.Request)
 			return
 		}
 
+		userScore, err := getScoreByUserID(db, user.UserID)
+		if err != nil {
+			http.Error(w, "Internal Server Error", 500)
+			log.Println(err)
+			return
+		}
+
 		data := customPageData{
-			Faces:  faces,
-			Bodies: bodies,
-			Hats:   hats,
+			Faces:     faces,
+			Bodies:    bodies,
+			Hats:      hats,
+			UserScore: userScore,
 		}
 
 		err = tmpl.Execute(w, data)

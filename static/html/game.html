@@ -11,8 +11,12 @@
         <img class="hero__rating-perfect hidden" src="/static/img/perfect.gif" alt="">
         <img class="hero__rating-ok hidden" src="/static/img/OK.gif" alt="">
         <img class="hero__rating-x hidden" src="/static/img/X.png" alt="">
-        <img class="hero__avatar" id="heroImg1" src="" alt="">
-        <span class="hero__name" id="heroName1">Name 1</span>
+        <div  class="user__head">
+            <div class="head__body"><img class="body" id="bodyImg1" alt=""></div>
+            <div class="head__face"><img class="face" id="faceImg1" alt=""></div>
+            <div class="head__hat"><img class="hat" id="hatImg1" alt=""></div>
+        </div>
+        <span class="hero__name">Name 1</span>
         <div class="hero__score">
           <img class="score__star" src="/static/img/star_white.svg">
           <img class="score__star" src="/static/img/star_white.svg">
@@ -21,14 +25,18 @@
           <img class="score__star" src="/static/img/star_white.svg">
           <img class="score__star score__star_mega  hidden" src="/static/img/mega_star.svg">
         </div>
-      </div>
-      <div class="rank__hero hidden" id="hero2">
-        <img class="hero__avatar" id="heroImg2" src="" alt="">
+    </div>
+    <div class="rank__hero hidden" id="hero2">
+        <div  class="user__head">
+            <div class="head__body"><img class="body" id="bodyImg2" alt=""></div>
+            <div class="head__face"><img class="face" id="faceImg2" alt=""></div>
+            <div class="head__hat"><img class="hat" id="hatImg2" alt=""></div>
+        </div>
         <img class="hero__rating-good hidden" src="/static/img/good.gif" alt="">
         <img class="hero__rating-perfect hidden" src="/static/img/perfect.gif" alt="">
         <img class="hero__rating-ok hidden" src="/static/img/OK.gif" alt="">
         <img class="hero__rating-x hidden" src="/static/img/X.png" alt="">
-        <span class="hero__name" id="heroName2">Name 2</span>
+        <span class="hero__name">Name 2</span>
         <div class="hero__score">
           <img class="score__star" src="/static/img/star_white.svg">
           <img class="score__star" src="/static/img/star_white.svg">
@@ -37,14 +45,18 @@
           <img class="score__star" src="/static/img/star_white.svg">
           <img class="score__star score__star_mega  hidden" src="/static/img/mega_star.svg">
         </div>
-      </div>
-      <div class="rank__hero hidden" id="hero3">
-        <img class="hero__avatar" id="heroImg3" src="" alt="">
+    </div>
+    <div class="rank__hero hidden" id="hero3">
+        <div  class="user__head">
+            <div class="head__body"><img class="body" id="bodyImg3" alt=""></div>
+            <div class="head__face"><img class="face" id="faceImg3" alt=""></div>
+            <div class="head__hat"><img class="hat" id="hatImg3" alt=""></div>
+        </div>
         <img class="hero__rating-good hidden" src="/static/img/good.gif" alt="">
         <img class="hero__rating-perfect hidden" src="/static/img/perfect.gif" alt="">
         <img class="hero__rating-ok hidden" src="/static/img/OK.gif" alt="">
         <img class="hero__rating-x hidden" src="/static/img/X.png" alt="">
-        <span class="hero__name" id="heroName3">Name 3</span>
+        <span class="hero__name">Name 3</span>
         <div class="hero__score">
           <img class="score__star" src="/static/img/star_white.svg">
           <img class="score__star" src="/static/img/star_white.svg">
@@ -53,14 +65,18 @@
           <img class="score__star" src="/static/img/star_white.svg">
           <img class="score__star score__star_mega  hidden" src="/static/img/mega_star.svg">
         </div>
-      </div>
-      <div class="rank__hero hidden" id="hero4">
-        <img class="hero__avatar" id="heroImg4" src="" alt="">
+    </div>
+    <div class="rank__hero hidden" id="hero4">
+        <div  class="user__head">
+            <div class="head__body"><img class="body" id="bodyImg4" alt=""></div>
+            <div class="head__face"><img class="face" id="faceImg4" alt=""></div>
+            <div class="head__hat"><img class="hat" id="hatImg4" alt=""></div>
+        </div>
         <img class="hero__rating-good hidden" src="/static/img/good.gif" alt="">
         <img class="hero__rating-perfect hidden" src="/static/img/perfect.gif" alt="">
         <img class="hero__rating-ok hidden" src="/static/img/OK.gif" alt="">
         <img class="hero__rating-x hidden" src="/static/img/X.png" alt="">
-        <span class="hero__name" id="heroName4">Name 4</span>
+        <span class="hero__name">Name 4</span>
         <div class="hero__score">
           <img class="score__star" src="/static/img/star_white.svg">
           <img class="score__star" src="/static/img/star_white.svg">
@@ -135,7 +151,7 @@
           socket.onopen = function (event) {
               console.log("WebSocket connection established.");
           };
-          
+
           let maxPoint;
 
           socket.onmessage = function (event) {

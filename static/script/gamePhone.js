@@ -7,7 +7,8 @@ const emptyID = document.getElementById("id-empty");
 const fullID = document.getElementById("id-full");
 const btnLogOut = document.getElementById("logout");
 const user = document.querySelector(".users");
-const menu = document.querySelector(".menu")
+const menu = document.querySelector(".menu");
+const custom = document.getElementById("custom");
 
 function setJsonCookie(name, value, expirationDays) {
     const jsonValue = JSON.stringify(value);
@@ -38,7 +39,9 @@ const userInfo = getJsonCookie("userInfoCookie");
 let userID = userInfo.UserID;
 
 document.querySelector('.user__name').textContent = userInfo.UserName;
-document.querySelector('.user__avatar').src = userInfo.ImgSrc;
+document.querySelector('.body').src = "../" + userInfo.BodySrc;
+document.querySelector('.face').src = "../" + userInfo.FaceSrc;
+document.querySelector('.hat').src = "../" + userInfo.HatSrc;
 
 function sendMessage() {
     if (enterInRoom.value === "") {
@@ -163,9 +166,6 @@ function joinRoom(userID) {
             megaStar.classList.add("hidden");
             stars.forEach(element => element.src = "/static/img/star_white.svg");
             handleDanceData(receivedJSON["motions"]);
-            console.log("Получил JSON", receivedJSON);
-            console.log(receivedJSON["max_score"]);
-            console.log(receivedJSON["motions"]);
             document.querySelector('.dance-block__connection').innerText = 'Dance!';
         }
     };
@@ -255,6 +255,7 @@ function userMenu() {
 btnLogOut.addEventListener("click", exitFromAccount)
 btnGo.addEventListener("click", sendMessage);
 user.addEventListener("click", userMenu);
+custom.addEventListener("click", function() {window.location.href = 'custom '});
 
 
 if (window.DeviceMotionEvent && window.DeviceOrientationEvent) {
@@ -283,7 +284,7 @@ if (window.DeviceMotionEvent && window.DeviceOrientationEvent) {
     function startRecording(name, duration) {
         window.addEventListener('devicemotion', handleSensorData, true);
         window.addEventListener('deviceorientation', handleSensorData, true);
-        setTimeout(function () {stopRecording(name);}, duration * 1300); // 1000 /// // / / /// / / / / / / / / / / /  / /              /////
+        setTimeout(function () {stopRecording(name);}, duration * 1300);
     }
 
     function stopRecording(name) {

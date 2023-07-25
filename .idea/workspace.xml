@@ -4,12 +4,11 @@
     <option name="autoReloadType" value="ALL" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="ec2f077e-e8c5-407a-9336-0f39d6d727b9" name="Changes" comment="merge dasha-mvp1 in main_test_2407">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+    <list default="true" id="ec2f077e-e8c5-407a-9336-0f39d6d727b9" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cmd/app/api.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/app/api.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cmd/app/handlers.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/app/handlers.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cmd/app/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/app/main.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmd/app/wsHandlers.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/app/wsHandlers.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/static/css/gameField.css" beforeDir="false" afterPath="$PROJECT_DIR$/static/css/gameField.css" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/static/html/game.html" beforeDir="false" afterPath="$PROJECT_DIR$/static/html/game.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/static/motion_list/forgetYou.json" beforeDir="false" afterPath="$PROJECT_DIR$/static/motion_list/forgetYou.json" afterDir="false" />

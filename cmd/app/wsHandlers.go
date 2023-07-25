@@ -124,6 +124,7 @@ func neuralWSHandler(w http.ResponseWriter, r *http.Request) {
 		}
 	}(conn)
 	gameFieldWSDict[conn] = gameFieldID
+	fmt.Println(len(gameFieldWSDict))
 	for {
 		_, _, err := conn.ReadMessage()
 		if err != nil {
@@ -143,8 +144,10 @@ func handleRoomWSMessages() {
 			message := ""
 			if action == "add" {
 				userName := mesArr[3]
-				imgSrc := mesArr[4]
-				message = action + "|" + userID + "|" + userName + "|" + imgSrc
+				hatSrc := mesArr[4]
+				faceSrc := mesArr[5]
+				bodySrc := mesArr[6]
+				message = action + "|" + userID + "|" + userName + "|" + hatSrc + "|" + faceSrc + "|" + bodySrc
 			} else {
 				message = action + "|" + userID
 			}

@@ -16,16 +16,22 @@ function getUsersByCookie() {
     for (let i = 0; i < connectedUsers.length; i++) {
         let userID = connectedUsers[i]["userID"];
         let userName = connectedUsers[i]["userName"];
-        let imgSrc = connectedUsers[i]["imgSrc"];
+        let bodyImgSrc = connectedUsers[i]["bodyImgSrc"];
+        let faceImgSrc = connectedUsers[i]["faceImgSrc"];
+        let hatImgSrc = connectedUsers[i]["hatImgSrc"];
         let userScore = document.getElementById('user-score' + (i + 1));
         let indexUser = document.getElementById('hero' + (i + 1));
-        let indexUserName = document.getElementById('heroName' + (i + 1));
-        let indexUserImg = document.getElementById('heroImg' + (i + 1));
+        let indexUserName = indexUser.querySelector(".hero__name");
+        let indexUserBodyImg = indexUser.querySelector(".body");
+        let indexUserFaceImg = indexUser.querySelector(".face");
+        let indexUserHatImg = indexUser.querySelector(".hat");
         userScore.innerText = userName + ":";
         userScore.classList.remove('hidden');
         indexUser.classList.remove('hidden');
         indexUser.id = userID;
-        indexUserImg.src =  '../' + imgSrc;
+        indexUserBodyImg.src = bodyImgSrc;
+        indexUserFaceImg.src = faceImgSrc;
+        indexUserHatImg.src = hatImgSrc;
         indexUserName.innerText = userName;
     }
 }
