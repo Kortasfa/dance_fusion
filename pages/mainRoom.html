@@ -14,7 +14,7 @@
 		let WssURL = "{{ .WssURL }}"
 		window.addEventListener('load', function() {
 			{{ range .ConnectedUsers }}
-				addUser("{{ .UserID }}", "{{ .UserName }}", "{{ .ImgSrc }}");
+				addUser("{{ .UserID }}", "{{ .UserName }}", "../{{ .HatSrc }}", "../{{ .FaceSrc }}", "../{{ .BodySrc }}");
 			{{ end }}
 			document.getElementById("needUser").innerText = "Join and start playing";
 		});

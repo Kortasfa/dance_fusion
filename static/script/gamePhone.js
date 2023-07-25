@@ -39,9 +39,9 @@ const userInfo = getJsonCookie("userInfoCookie");
 let userID = userInfo.UserID;
 
 document.querySelector('.user__name').textContent = userInfo.UserName;
-document.querySelector('.body').src = userInfo.BodyImgSrc;
-document.querySelector('.face').src = userInfo.FaceImgSrc;
-document.querySelector('.hat').src = userInfo.HatImgSrc;
+document.querySelector('.body').src = "../" + userInfo.BodySrc;
+document.querySelector('.face').src = "../" + userInfo.FaceSrc;
+document.querySelector('.hat').src = "../" + userInfo.HatSrc;
 
 function sendMessage() {
     if (enterInRoom.value === "") {

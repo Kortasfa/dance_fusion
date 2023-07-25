@@ -50,7 +50,9 @@ type songsData struct {
 type userInfo struct {
 	UserID   int
 	UserName string
-	ImgSrc   string
+	HatSrc   string
+	FaceSrc  string
+	BodySrc  string
 }
 
 type menuPageData struct {
