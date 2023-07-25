@@ -92,6 +92,7 @@ let socket;
 let value;
 let pix;
 let percentage;
+let maxTheory;
 let scale = document.querySelector(".dance-block__rating-scale");
 const starOne = document.getElementById("star-1");
 const starTwo = document.getElementById("star-2");
@@ -107,7 +108,6 @@ function joinRoom(userID) {
     };
 
     socket.onmessage = function(event) {
-        let maxTheory = 5600;
         let maxPractice = maxTheory - maxTheory * 0.2; //4480
         let receivedData = event.data;
         let receivedJSON = JSON.parse(receivedData);
@@ -156,11 +156,16 @@ function joinRoom(userID) {
             stop = 0;
             pix = 0;
             percentage = 0;
+            maxTheory = receivedJSON["max_score"];
+            sendMaxPoint(enterInRoom.value, maxTheory).then(() => {})
+            //sendMaxPoint(enterInRoom.value, maxTheory).then(() => {})
             scale.style.height = 0 + 'px';
             megaStar.classList.add("hidden");
             stars.forEach(element => element.src = "/static/img/star_white.svg");
-            handleDanceData(receivedJSON);
+            handleDanceData(receivedJSON["motions"]);
             console.log("Получил JSON", receivedJSON);
+            console.log(receivedJSON["max_score"]);
+            console.log(receivedJSON["motions"]);
             document.querySelector('.dance-block__connection').innerText = 'Dance!';
         }
     };
@@ -170,6 +175,23 @@ function joinRoom(userID) {
     };
 }
 
+async function sendMaxPoint(roomID, maxTheory) {
+    const response = await fetch("/api/sendMaxPoint", {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            "roomID": roomID,
+            "maxPoint": maxTheory,
+        }),
+    });
+    if (response.ok) {
+        console.log('Максимальный балл отправлен');
+    } else {
+        console.log('Не удалось отправить максимальный балл');
+    }
+}
 
 window.onbeforeunload = exitFromGame;
 async function exitFromGame() {

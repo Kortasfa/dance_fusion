@@ -4,11 +4,16 @@
     <option name="autoReloadType" value="ALL" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="ec2f077e-e8c5-407a-9336-0f39d6d727b9" name="Changes" comment="merge main_test_2407 in dasha-mvp1">
+    <list default="true" id="ec2f077e-e8c5-407a-9336-0f39d6d727b9" name="Changes" comment="merge dasha-mvp1 in main_test_2407">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pages/gamePhone.html" beforeDir="false" afterPath="$PROJECT_DIR$/pages/gamePhone.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/static/css/gamePhone.css" beforeDir="false" afterPath="$PROJECT_DIR$/static/css/gamePhone.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/app/api.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/app/api.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/app/handlers.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/app/handlers.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/app/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/app/main.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/app/wsHandlers.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/app/wsHandlers.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/static/css/gameField.css" beforeDir="false" afterPath="$PROJECT_DIR$/static/css/gameField.css" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/static/html/game.html" beforeDir="false" afterPath="$PROJECT_DIR$/static/html/game.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/static/motion_list/forgetYou.json" beforeDir="false" afterPath="$PROJECT_DIR$/static/motion_list/forgetYou.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/static/script/gameField.js" beforeDir="false" afterPath="$PROJECT_DIR$/static/script/gameField.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/static/script/gamePhone.js" beforeDir="false" afterPath="$PROJECT_DIR$/static/script/gamePhone.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -18,12 +23,18 @@
   </component>
   <component name="GOROOT" url="file:///usr/lib/go-1.20" />
   <component name="Git.Merge.Settings">
-    <option name="BRANCH" value="origin/main_test_2007" />
+    <option name="BRANCH" value="origin/dasha-mvp1" />
+    <option name="OPTIONS">
+      <set>
+        <option value="NO_FF" />
+        <option value="NO_COMMIT" />
+      </set>
+    </option>
   </component>
   <component name="Git.Settings">
     <option name="RECENT_BRANCH_BY_REPOSITORY">
       <map>
-        <entry key="$PROJECT_DIR$" value="main_test_2007" />
+        <entry key="$PROJECT_DIR$" value="main_test_2407" />
       </map>
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -52,6 +63,27 @@
     &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;
   }
 }</component>
+  <component name="RunManager">
+    <configuration default="true" type="GoApplicationRunConfiguration" factoryName="Go Application">
+      <module name="dance_fusion" />
+      <working_directory value="$PROJECT_DIR$" />
+      <kind value="PACKAGE" />
+      <package value="dance_fusion" />
+      <directory value="$PROJECT_DIR$" />
+      <filePath value="$PROJECT_DIR$" />
+      <method v="2" />
+    </configuration>
+    <configuration default="true" type="GoTestRunConfiguration" factoryName="Go Test">
+      <module name="dance_fusion" />
+      <working_directory value="$PROJECT_DIR$" />
+      <kind value="DIRECTORY" />
+      <package value="dance_fusion" />
+      <directory value="$PROJECT_DIR$" />
+      <filePath value="$PROJECT_DIR$" />
+      <framework value="gotest" />
+      <method v="2" />
+    </configuration>
+  </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
     <task id="LOCAL-00001" summary="merge main_test_2407 in dasha-mvp1">
@@ -62,7 +94,15 @@
       <option name="project" value="LOCAL" />
       <updated>1690214476433</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="merge dasha-mvp1 in main_test_2407">
+      <option name="closed" value="true" />
+      <created>1690226113152</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1690226113152</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -70,7 +110,8 @@
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="merge main_test_2407 in dasha-mvp1" />
-    <option name="LAST_COMMIT_MESSAGE" value="merge main_test_2407 in dasha-mvp1" />
+    <MESSAGE value="merge dasha-mvp1 in main_test_2407" />
+    <option name="LAST_COMMIT_MESSAGE" value="merge dasha-mvp1 in main_test_2407" />
   </component>
   <component name="VgoProject">
     <settings-migrated>true</settings-migrated>

@@ -346,5 +346,48 @@ func sendPointToJoin(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 	w.WriteHeader(200)
+}
 
+func getMaxScore(w http.ResponseWriter, r *http.Request) {
+	reqData, err := io.ReadAll(r.Body)
+	if err != nil {
+		http.Error(w, "Parsing error", 500)
+		log.Println(err.Error())
+		return
+	}
+	var data struct {
+		RoomID   string
+		MaxPoint int
+	}
+	err = json.Unmarshal(reqData, &data)
+	if err != nil {
+		http.Error(w, "JSON parsing error", 500)
+		log.Println(err.Error())
+		return
+	}
+	fmt.Println(data.RoomID, data.MaxPoint)
+	go func() {
+		isSend := false
+		for {
+			for conn, gameFieldID := range gameFieldWSDict {
+				if gameFieldID == data.RoomID {
+					err := conn.WriteMessage(websocket.TextMessage, reqData)
+					isSend = true
+					if err != nil {
+						delete(gameFieldWSDict, conn)
+						err := conn.Close()
+						if err != nil {
+							w.WriteHeader(409)
+							return
+						}
+					}
+					break
+				}
+			}
+			if isSend {
+				break
+			}
+		}
+	}()
+	w.WriteHeader(200)
 }
