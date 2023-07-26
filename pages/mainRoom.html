@@ -4,6 +4,7 @@
 	<meta charset="UTF-8"/>
 	<title>Let's dance</title>
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/gh/davidshimjs/qrcodejs/qrcode.min.js"></script>
 	<script src="../static/script/mainRoom.js" defer></script>
 	<link rel="preconnect" href="https://fonts.googleapis.com"/>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -30,6 +31,7 @@
 				<a class="guide__title">Code room</a>
 				<a class="guide__code" id="CodeRoom">{{ .RoomKey }}</a>
 			</div>
+			<div id="qrcode"></div>
 			<img src="../static/img/question-answer-svgrepo-com.svg" class="header__icon" id="openGuide" alt="">
 		</div>
 	</div>
