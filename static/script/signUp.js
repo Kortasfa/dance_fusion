@@ -5,6 +5,10 @@ const signUpBtn = document.getElementById("btn-sign-up");
 const warningUsername = document.getElementById("username-taken");
 const usernameEmpty = document.getElementById("username-empty");
 const passwordEmpty = document.getElementById("password-empty");
+
+nameField.oninput = function() {
+    this.value = this.value.substr(0, 15);
+}
 function signUp() {
     let userInfo = {
         "userName": nameField.value,
