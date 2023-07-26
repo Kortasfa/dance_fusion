@@ -48,6 +48,7 @@ func main() {
 	r.HandleFunc("/api/exitFromAccount", exitFromAccount)
 	r.HandleFunc("/api/custom", getUserAvatar(dbx)).Methods("POST")
 	r.HandleFunc("/api/sendPoint", sendPointToJoin).Methods("POST")
+	r.HandleFunc("/api/sendMaxPoint", getMaxScore).Methods("POST")
 
 	go handleRoomWSMessages()
 	go handleJoinPageWSMessages()
@@ -64,5 +65,5 @@ func main() {
 }
 
 func openDB() (*sql.DB, error) {
-	return sql.Open(dbDriverName, "root:P@ssw0rd@tcp(localhost:3306)/dance_fusion?charset=utf8mb4&collation=utf8mb4_unicode_ci&parseTime=true")
+	return sql.Open(dbDriverName, "root:root@tcp(localhost:3306)/dance_fusion?charset=utf8mb4&collation=utf8mb4_unicode_ci&parseTime=true")
 }

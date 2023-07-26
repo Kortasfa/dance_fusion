@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <title>Dance Fusion</title>
@@ -17,7 +18,14 @@
             <div class="head__hat"><img class="hat" id="hatImg1" alt=""></div>
         </div>
         <span class="hero__name">Name 1</span>
-        <span class="hero__score">0</span>
+        <div class="hero__score">
+          <img class="score__star" src="/static/img/star_white.svg">
+          <img class="score__star" src="/static/img/star_white.svg">
+          <img class="score__star" src="/static/img/star_white.svg">
+          <img class="score__star" src="/static/img/star_white.svg">
+          <img class="score__star" src="/static/img/star_white.svg">
+          <img class="score__star score__star_mega  hidden" src="/static/img/mega_star.svg">
+        </div>
     </div>
     <div class="rank__hero hidden" id="hero2">
         <div  class="user__head">
@@ -30,7 +38,14 @@
         <img class="hero__rating-ok hidden" src="/static/img/OK.gif" alt="">
         <img class="hero__rating-x hidden" src="/static/img/X.png" alt="">
         <span class="hero__name">Name 2</span>
-        <span class="hero__score">0</span>
+        <div class="hero__score">
+          <img class="score__star" src="/static/img/star_white.svg">
+          <img class="score__star" src="/static/img/star_white.svg">
+          <img class="score__star" src="/static/img/star_white.svg">
+          <img class="score__star" src="/static/img/star_white.svg">
+          <img class="score__star" src="/static/img/star_white.svg">
+          <img class="score__star score__star_mega  hidden" src="/static/img/mega_star.svg">
+        </div>
     </div>
     <div class="rank__hero hidden" id="hero3">
         <div  class="user__head">
@@ -43,7 +58,14 @@
         <img class="hero__rating-ok hidden" src="/static/img/OK.gif" alt="">
         <img class="hero__rating-x hidden" src="/static/img/X.png" alt="">
         <span class="hero__name">Name 3</span>
-        <span class="hero__score">0</span>
+        <div class="hero__score">
+          <img class="score__star" src="/static/img/star_white.svg">
+          <img class="score__star" src="/static/img/star_white.svg">
+          <img class="score__star" src="/static/img/star_white.svg">
+          <img class="score__star" src="/static/img/star_white.svg">
+          <img class="score__star" src="/static/img/star_white.svg">
+          <img class="score__star score__star_mega  hidden" src="/static/img/mega_star.svg">
+        </div>
     </div>
     <div class="rank__hero hidden" id="hero4">
         <div  class="user__head">
@@ -56,7 +78,14 @@
         <img class="hero__rating-ok hidden" src="/static/img/OK.gif" alt="">
         <img class="hero__rating-x hidden" src="/static/img/X.png" alt="">
         <span class="hero__name">Name 4</span>
-        <span class="hero__score">0</span>
+        <div class="hero__score">
+          <img class="score__star" src="/static/img/star_white.svg">
+          <img class="score__star" src="/static/img/star_white.svg">
+          <img class="score__star" src="/static/img/star_white.svg">
+          <img class="score__star" src="/static/img/star_white.svg">
+          <img class="score__star" src="/static/img/star_white.svg">
+          <img class="score__star score__star_mega  hidden" src="/static/img/mega_star.svg">
+        </div>
       </div>
   </div>
   <div class="dance-block__ratingScale"></div>
@@ -66,7 +95,6 @@
   <video id="video-dance" class="video-dance" type="video/mp4" width="100%" autoplay="autoplay">
       <source id="video-src" src="../video/previews/americanGirl.mp4">
   </video>
-  <
   <div class="pop-up hidden" id="pop-up">
       <div class="pop-up__pop-up-box">
           <span class="pop-up-box__question">Total score</span>
@@ -124,6 +152,8 @@
               console.log("WebSocket connection established.");
           };
 
+          let maxPoint;
+
           socket.onmessage = function (event) {
               try {
                   let jsonData = JSON.parse(event.data);
@@ -131,6 +161,11 @@
                       console.log("Удаляем пользователя на чёрт");
                       removeUser(jsonData.ExitingUser);
                       return;
+                  }
+                  if ("maxPoint" in jsonData) {
+                    maxPoint = jsonData["maxPoint"];
+                    console.log("MaxPoint = ", jsonData["maxPoint"]);
+                    return;
                   }
                   let moveName = jsonData.name;
                   let motionString = jsonData.motionString;
@@ -163,137 +198,128 @@
                       console.log(res["results"]);
                       for (let motionDict of res["results"]) {
                           if (motionDict["label"] === moveName) {
-                              score = motionDict["value"];
-                              if (moveName === "up-down-click") {
-                                  let sameMoveOne = res["results"].find(item => item.label === "hands-up-and-down");
-                                  score = Math.max(motionDict["value"], sameMoveOne.value, sameMoveTwo.value);
-                                  if (score > 0.01 && score < 0.1) {
-                                      score = 0.2;
-                                  }
+                            score = motionDict["value"];
+                            if (moveName === "up-down-click") {
+                              let sameMoveOne = res["results"].find(item => item.label === "hands-up-and-down");
+                              let sameMoveTwo = res["results"].find(item => item.label === "up-down-hands");
+                              score = Math.max(motionDict["value"], sameMoveOne.value, sameMoveTwo.value);
+                              if (score > 0.01 && score < 0.1) {
+                                score = 0.2;
                               }
-                              if (moveName === "up-down-hands") {
-                                  let sameMoveOne = res["results"].find(item => item.label === "hands-up-and-down");
-                                  score = Math.max(motionDict["value"], sameMoveOne.value);
-                                  if (score > 0.0001 && score < 0.01) {
-                                      score = 0.2;
-                                  }
-                                if (score > 0.01 && score < 0.1) {
-                                  score = 0.2;
-                                }
+                            }
+                            if (moveName === "up-down-hands") {
+                              let sameMoveOne = res["results"].find(item => item.label === "hands-up-and-down");
+                              score = Math.max(motionDict["value"], sameMoveOne.value);
+                              if (score > 0.001 && score < 0.1) {
+                                score = 0.2;
                               }
-                              if (moveName === "collapsing-breeding-locks") {
-                                  if (score > 0.001 && score < 0.005) {
-                                      score = 0.2
-                                  }
-                                  if (score >= 0.005 && score < 0.01) {
-                                      score = 0.3;
-                                  }
-                                  if (score >= 0.01) {
-                                      score = 0.4;
-                                  }
+                            }
+                            if (moveName === "collapsing-breeding-locks") {
+                              if (score > 0.001 && score < 0.005) {
+                                score = 0.2
+                              }
+                              if (score >= 0.005 && score < 0.01) {
+                                score = 0.3;
+                              }
+                              if (score >= 0.01) {
+                                score = 0.4;
+                              }
+
+                            }
+                            if (moveName === "going-to-the-side-with-clapping") {
+                              if (score > 0.001 && score < 0.05) {
+                                score = 0.2;
+                              }
+                              if (score >= 0.05 & score < 0.1) {
+                                score = 0.3;
+                              }
+                              if (score >= 0.1) {
+                                score = 0.4;
+                              }
+
+                            }
+                            if (moveName === "hands-up-and-down") {
+                              let sameMoveOne = res["results"].find(item => item.label === "up-down-click");
+                              let sameMoveTwo = res["results"].find(item => item.label === "up-down-hands");
+                              score = Math.max(motionDict["value"], sameMoveOne.value - 0.1, sameMoveTwo.value - 0.1);
+                              if (score > 0.01 && score < 0.1) {
+                                score = 0.2;
+                              }
+                            }
+                            if (moveName === "hands-up-down-sideways") {
+                              if (score > 0.001 && score < 0.05) {
+                                score = 0.2;
+                              }
+                              if (score >= 0.05 && score < 0.1) {
+                                score = 0.3;
+                              }
+                              if (score >= 0.1) {
+                                score = 0.4;
+                              }
+
+                            }
+                            if (moveName === "side-hit") {
+                              let sameMoveOne = res["results"].find(item => item.label === "hands-up-and-down");
+                              score = Math.max(motionDict["value"], sameMoveOne.value);
+                              if (score > 0.01 && score < 0.05) {
+                                score = 0.2;
+                              }
+                              if (score >= 0.05 & score < 0.1) {
+                                score = 0.3;
+                              }
+                              if (score >= 0.1) {
+                                score = 0.4;
 
                               }
-                              if (moveName === "going-to-the-side-with-clapping") {
-                                  if (score > 0.001 && score < 0.05) {
-                                      score = 0.2;
-                                  }
-                                  if (score >= 0.05 && score < 0.1) {
-                                      score = 0.3;
-                                  }
-                                  if (score >= 0.1) {
-                                      score = 0.4;
-                                  }
-
+                            }
+                            if (moveName === "down-from-the-middle-in-arc") {
+                              let sameMoveOne = res["results"].find(item => item.label === "hands-up-and-down");
+                              score = Math.max(motionDict["value"], sameMoveOne.value);
+                              if (score > 0.01 && score < 0.1) {
+                                score = 0.1;
                               }
-                              if (moveName === "hands-up-and-down") {
-                                  let sameMoveTwo = res["results"].find(item => item.label === "up-down-hands");
-                                  score = Math.max(motionDict["value"], sameMoveTwo.value - 0.1);
-                                  if (score > 0.01 && score < 0.1) {
-                                      score = 0.2;
-                                  }
+                            }
+                            if (moveName === "collapsing-breeding-locks") {
+                              let sameMoveOne = res["results"].find(item => item.label === "up-down-hands");
+                              score = Math.max(motionDict["value"], sameMoveOne.value);
+                              if (score > 0.01 && score < 0.1) {
+                                score = 0.1;
                               }
-                              if (moveName === "hands-up-down-sideways") {
-                                  if (score > 0.0001 && score < 0.05) {
-                                      score = 0.2;
-                                  }
-                                  if (score >= 0.05 && score < 0.1) {
-                                      score = 0.3;
-                                  }
-                                  if (score >= 0.1) {
-                                      score = 0.4;
-                                  }
-
+                            }
+                            if (moveName === "draw-circle") {
+                              let sameMoveOne = res["results"].find(item => item.label === "hands-up-and-down");
+                              let sameMoveTwo = res["results"].find(item => item.label === "up-down-hands");
+                              score = Math.max(motionDict["value"], sameMoveOne.value, sameMoveTwo.value);
+                              if (score > 0.01 && score < 0.1) {
+                                score = 0.1;
                               }
-                              if (moveName === "side-hit") {
-                                  if (score > 0.001 && score < 0.05) {
-                                      score = 0.2;
-                                  }
-                                  if (score >= 0.05 && score < 0.1) {
-                                      score = 0.3;
-                                  }
-                                  if (score >= 0.1) {
-                                      score = 0.4;
-
-                                  }
+                            }
+                            if (moveName === "i-am-strong") {
+                              let sameMoveOne = res["results"].find(item => item.label === "gold-turn");
+                              let sameMoveTwo = res["results"].find(item => item.label === "gold-circle");
+                              let sameMoveThree = res["results"].find(item => item.label === "hands-up-and-down");
+                              score = Math.max(motionDict["value"], sameMoveOne.value, sameMoveTwo.value, sameMoveThree.value);
+                              if (score > 0.01 && score < 0.1) {
+                                score = 0.1;
                               }
-                              if (moveName === "down-from-the-middle-in-arc") {
-                                  let sameMoveOne = res["results"].find(item => item.label === "hands-up-and-down");
-                                  score = Math.max(motionDict["value"], sameMoveOne.value);
-                                if (score > 0.001 && score < 0.05) {
-                                  score = 0.2;
-                                }
-                                if (score >= 0.05 & score < 0.1) {
-                                  score = 0.3;
-                                }
+                            }
+                            if (moveName === "broad-back") {
+                              let sameMoveOne = res["results"].find(item => item.label === "hands-up-and-down");
+                              score = Math.max(motionDict["value"], sameMoveOne.value);
+                              if (score > 0.01 && score < 0.1) {
+                                score = 0.1;
                               }
-                              if (moveName === "collapsing-breeding-locks") {
-                                if (score > 0.01 && score < 0.05) {
-                                  score = 0.2;
-                                }
-                                if (score >= 0.05 & score < 0.1) {
-                                  score = 0.3;
-                                }
+                            }
+                            if (moveName === "like-a-chicken") {
+                              let sameMoveOne = res["results"].find(item => item.label === "hands-up-and-down");
+                              score = Math.max(motionDict["value"], sameMoveOne.value);
+                              if (score > 0.01 && score < 0.1) {
+                                score = 0.1;
                               }
-                              if (moveName === "draw-circle") {
-                                if (score > 0.01 && score < 0.05) {
-                                  score = 0.2;
-                                }
-                                if (score >= 0.05 & score < 0.1) {
-                                  score = 0.3;
-                                }
-                              }
-                              if (moveName === "i-am-strong") {
-                                  let sameMoveOne = res["results"].find(item => item.label === "gold-turn");
-                                  let sameMoveTwo = res["results"].find(item => item.label === "gold-circle");
-                                  score = Math.max(motionDict["value"], sameMoveOne.value, sameMoveTwo.value);
-                                if (score > 0.001 && score < 0.05) {
-                                  score = 0.2;
-                                }
-                                if (score >= 0.05 && score < 0.1) {
-                                  score = 0.3;
-                                }
-                              }
-                              if (moveName === "broad-back") {
-                                  let sameMoveOne = res["results"].find(item => item.label === "hands-up-and-down");
-                                  score = Math.max(motionDict["value"], sameMoveOne.value);
-                                if (score > 0.001 && score < 0.05) {
-                                  score = 0.1;
-                                }
-                                if (score >= 0.05 && score < 0.1) {
-                                  score = 0.2;
-                                }
-                              }
-                              if (moveName === "like-a-chicken") {
-                                  let sameMoveOne = res["results"].find(item => item.label === "hands-up-and-down");
-                                  score = Math.max(motionDict["value"], sameMoveOne.value);
-                                if (score > 0.001 && score < 0.05) {
-                                  score = 0.1;
-                                }
-                                if (score >= 0.05 && score < 0.1) {
-                                  score = 0.3;
-                                }
-                              }
+                            }
                               if (moveName === "gold-circle") {
+                                let sameMoveOne = res["results"].find(item => item.label === "up-down-click");
+                                score = Math.max(motionDict["value"], sameMoveOne.value);
                                   if (score > 0.001 && score <= 1) {
                                       score = 2;
                                   }
@@ -311,7 +337,6 @@
                       console.log(moveName);
                       console.log(score);
                       let point = 0;
-                      let val = 0;
                       if (score >= 0.4 && score <= 1) {
                           point = 40;
                       }
@@ -333,16 +358,7 @@
                         point = 200;
                       }
                       console.log('Кол-во баллов', point);
-                      addScore(userID.toString(), point);
-                    // console.log("score: " + score);
-                    // val += score;
-                    // console.log("value: " + val);
-                    // let percentage = (val / maxPractice);
-                    // console.log("percentage: " + percentage);
-                    // let pix = 250 * percentage;
-                    // console.log("pix: " + pix);
-                    // scaleHeight += pix;
-                    // console.log("scaleHeight: " + scaleHeight);
+                      addScore(userID.toString(), point, maxPoint);
                       sendPoint(userID, point).then(() => {})
                   } else {
                       console.log('Лежит', deviationCount);
