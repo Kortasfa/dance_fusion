@@ -211,3 +211,11 @@ function removeUser(userID) {
         indexUserName.id = 'userName' + (i - 1);
     }
 }
+
+
+const domain = window.location.protocol + "//" + window.location.hostname + "/join";
+const qr = new QRCode(document.getElementById("qrcode"), {
+    text: domain,
+    width: 125, // Увеличенная ширина
+    height: 125, // Увеличенная высота
+});
