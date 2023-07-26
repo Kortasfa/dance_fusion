@@ -56,6 +56,7 @@ function closeGuide() {
 }
 
 let songName = '';
+let songNeuro = '';
 let fullSongName = '';
 let readySong = false;
 
@@ -66,6 +67,14 @@ function onImageClick(element) {
     const videoPlayer = document.getElementById('videoPlayer');
 
     songName = document.querySelector('.song' + element.id).innerHTML;
+
+    songNeuro = camelCase(songName);
+
+    function camelCase(value) {
+        return value.toLowerCase().replace(/\s+(.)/g, function(match, group1) {
+            return group1.toUpperCase();
+        });
+    }
     readySong = true;
     changeButton();
 
@@ -81,55 +90,36 @@ Array.from(test).forEach(function (element) {
     });
 });
 
-$(document).ready(function () {
+$(document).ready(function() {
     const playButton = $('#play');
     const contentContainer = $('#content');
 
-    playButton.on('click', function () {
+    playButton.on('click', function() {
         if (readyGame) {
-            socket.send(songName);
-            socket.close(); // Закрываем вебсокет mainRoom
+            // Load the first script
+            $.getScript('/static/test/edge-impulse-standalone.js', function() {
+                // Once the first script is loaded, load the second script
+                $.getScript('/static/test/run-impulse.js', function() {
+                    // After both scripts are loaded, load the page by AJAX
+                    contentContainer.load('/static/html/game.html', function() {
+                        const video = $('#video-dance')[0];
+                        const src = $('#video-src')[0];
+                        src.setAttribute('src', fullSongName);
 
-            function loadScript(url) {
-                return new Promise(function (resolve, reject) {
-                    const script = document.createElement('script');
-                    script.src = url;
-                    script.onload = resolve;
-                    script.onerror = reject;
-                    document.head.appendChild(script);
-                });
-            }
-
-            async function loadEdgeImpulseAndRunImpulse() {
-                try {
-                    await loadScript('/static/test/edge-impulse-standalone.js');
-                    await loadScript('/static/test/run-impulse.js');
-                    console.log('Both scripts loaded and executed successfully.');
-                    // You can now call any functions or perform actions from the loaded scripts.
-                    // For example: Module.onRuntimeInitialized();
-                } catch (error) {
-                    console.error('Error loading scripts:', error);
-                }
-            }
-
-            loadEdgeImpulseAndRunImpulse().then(r => {
-                contentContainer.load("/static/html/game.html", function () {
-                    // This function will be executed after the new content is loaded.
-                    const video = $('#video-dance')[0];
-                    const src = $('#video-src')[0];
-                    src.setAttribute('src', fullSongName);
-
-                    video.addEventListener('loadeddata', function () {
-                        video.play();
+                        // Wait for 5 seconds before playing the video
+                            video.addEventListener('loadeddata', function() {
+                                video.play();
+                                socket.send(songName);
+                                socket.close(); // Закрываем вебсокет mainRoom
+                            });
                     });
-
                 });
             });
+
             return false;
         }
     });
 });
-
 
 
 function showVideo(videoID) {

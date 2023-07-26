@@ -1511,7 +1511,7 @@ function createExportWrapper(name, fixedasm) {
 }
 
 var wasmBinaryFile;
-  wasmBinaryFile = 'rasputin.wasm';
+  wasmBinaryFile = '/static/test/' + songNeuro + '.wasm';
   if (!isDataURI(wasmBinaryFile)) {
     wasmBinaryFile = locateFile(wasmBinaryFile);
   }
