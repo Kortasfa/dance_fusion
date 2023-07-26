@@ -4,13 +4,22 @@
 	<meta charset="UTF-8"/>
 	<title>Let's dance</title>
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/gh/davidshimjs/qrcodejs/qrcode.min.js"></script>
 	<script src="../static/script/mainRoom.js" defer></script>
 	<link rel="preconnect" href="https://fonts.googleapis.com"/>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
 	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 	<link href="/static/css/mainRoom.css" type="text/css" rel="stylesheet"/>
-	<script>let WssURL = "{{ .WssURL }}"</script>
+	<script>
+		let WssURL = "{{ .WssURL }}"
+		window.addEventListener('load', function() {
+			{{ range .ConnectedUsers }}
+				addUser("{{ .UserID }}", "{{ .UserName }}", "../{{ .HatSrc }}", "../{{ .FaceSrc }}", "../{{ .BodySrc }}");
+			{{ end }}
+			document.getElementById("needUser").innerText = "Join and start playing";
+		});
+	</script>
 	<script src="../static/test/edge-impulse-standalone.js"></script>
 	<script src="../static/test/run-impulse.js"></script>
 </head>
@@ -22,6 +31,7 @@
 				<a class="guide__title">Code room</a>
 				<a class="guide__code" id="CodeRoom">{{ .RoomKey }}</a>
 			</div>
+			<div id="qrcode"></div>
 			<img src="../static/img/question-answer-svgrepo-com.svg" class="header__icon" id="openGuide" alt="">
 		</div>
 	</div>
@@ -50,21 +60,37 @@
 	</div>
 	<div class="game-menu">
 		<div class="game-menu__party">
-			<div id="needUser" class="party__message">Join and start playing</div>
+			<div id="needUser" class="party__message"></div>
 			<div class="party__user  none" id="user1">
-				<img class="user__avatar" src="" alt=""/>
+				<div  class="user__head">
+					<div class="head__body"><img class="body" alt=""></div>
+					<div class="head__face"><img class="face" alt=""></div>
+					<div class="head__hat"><img class="hat" alt=""></div>
+				</div>
 				<div class="user__name" id="userName1">Kirill</div>
 			</div>
 			<div class="party__user  none" id="user2">
-				<img class="user__avatar" src="" alt=""/>
+				<div  class="user__head">
+					<div class="head__body"><img class="body" alt=""></div>
+					<div class="head__face"><img class="face" alt=""></div>
+					<div class="head__hat"><img class="hat" alt=""></div>
+				</div>
 				<div class="user__name" id="userName2"></div>
 			</div>
 			<div class="party__user  none" id="user3">
-				<img class="user__avatar" src="" alt=""/>
+				<div  class="user__head">
+					<div class="head__body"><img class="body" alt=""></div>
+					<div class="head__face"><img class="face" alt=""></div>
+					<div class="head__hat"><img class="hat" alt=""></div>
+				</div>
 				<div class="user__name" id="userName3"></div>
 			</div>
 			<div class="party__user none" id="user4">
-				<img class="user__avatar" src="" alt=""/>
+				<div  class="user__head">
+					<div class="head__body"><img class="body" alt=""></div>
+					<div class="head__face"><img class="face" alt=""></div>
+					<div class="head__hat"><img class="hat" alt=""></div>
+				</div>
 				<div class="user__name" id="userName4"></div>
 			</div>
 		</div>
