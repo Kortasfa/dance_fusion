@@ -1,6 +1,8 @@
 package main
 
 import (
+	"database/sql"
+	"fmt"
 	"github.com/jmoiron/sqlx"
 	"log"
 )
@@ -124,28 +126,70 @@ func credentialExists(db *sqlx.DB, userName string, password string) (int, bool,
 	return userIDs[0], true, nil
 }
 
-func getUserInfo(db *sqlx.DB, userID string) (string, string, error) {
+func getUserInfo(db *sqlx.DB, userID int) (userInfo, error) {
 	const query = `
 		SELECT
+			id,
 			name,
-			img_src
+			img_hat,
+			img_face,
+			img_body
 		FROM
 			users
 		WHERE
-		   id=?
+			id = ?
 	`
-	row := db.QueryRow(query, userID)
-	//data := new(userData)
-	data := new(struct {
+
+	var user struct {
 		UserID   int    `db:"id"`
 		UserName string `db:"name"`
-		ImgSrc   string `db:"img_src"`
-	})
-	err := row.Scan(&data.UserName, &data.ImgSrc)
-	if err != nil {
-		return "", "", err
+		HatSrc   string `db:"img_hat"`
+		FaceSrc  string `db:"img_face"`
+		BodySrc  string `db:"img_body"`
 	}
-	return data.UserName, data.ImgSrc, nil
+
+	err := db.Get(&user, query, userID)
+	if err != nil {
+		return userInfo{}, err
+	}
+
+	return userInfo{
+		UserID:   user.UserID,
+		UserName: user.UserName,
+		HatSrc:   user.HatSrc,
+		FaceSrc:  user.FaceSrc,
+		BodySrc:  user.BodySrc,
+	}, nil
+}
+
+func getConnectedUsers(roomID string, db *sqlx.DB) ([]userInfo, error) {
+	userIDs := roomIDDict[roomID]
+	var users []userInfo
+
+	for _, userID := range userIDs {
+		const query = `
+			SELECT
+				id,
+				name,
+				img_hat,
+				img_face,
+				img_body
+			FROM
+				users
+			WHERE
+				id = ?`
+
+		row := db.QueryRow(query, userID)
+		var user userInfo
+
+		err := row.Scan(&user.UserID, &user.UserName, &user.HatSrc, &user.FaceSrc, &user.BodySrc)
+		if err != nil {
+			return nil, err
+		}
+		users = append(users, user)
+	}
+
+	return users, nil
 }
 
 func getHatData(db *sqlx.DB) ([]hatData, error) {
@@ -210,15 +254,37 @@ func getBodyData(db *sqlx.DB) ([]bodyData, error) {
 
 func changeUserAvatar(db *sqlx.DB, field userAvatarData, userID int) error {
 	const query = `
-	UPDATE
-		users
-	SET
-		img_hat = ?,
-        img_face = ?,
-        img_body = ?
-	WHERE id = ?
+		UPDATE
+			users
+		SET
+			img_hat = ?,
+			img_face = ?,
+			img_body = ?
+		WHERE id = ?
 	`
 
 	_, err := db.Exec(query, field.HatSrc, field.FaceSrc, field.BodySrc, userID)
 	return err
+}
+
+func getScoreByUserID(db *sqlx.DB, userID int) (int, error) {
+	const query = `
+		SELECT
+			score
+		FROM
+			users
+		WHERE
+			id = ?
+	`
+
+	var score int
+	err := db.QueryRow(query, userID).Scan(&score)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return 0, fmt.Errorf("пользователь с ID %d не найден", userID)
+		}
+		return 0, err
+	}
+
+	return score, nil
 }

@@ -1,8 +1,8 @@
-*
-{
+* {
     font-weight: normal;
     background-repeat: no-repeat;
     margin: 0;
+    user-select: none;
 }
 
 .customization{

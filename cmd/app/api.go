@@ -51,13 +51,13 @@ func getJoinedUserData(db *sqlx.DB) func(w http.ResponseWriter, r *http.Request)
 			}
 		}
 		roomIDDict[data.RoomID] = append(roomIDDict[data.RoomID], fmt.Sprintf("%d", data.UserID)) //////////// Мы добавляем туда ID пользователя
-		userName, imgSrc, err := getUserInfo(db, fmt.Sprintf("%d", data.UserID))
+		user, err := getUserInfo(db, data.UserID)
 		if err != nil {
 			http.Error(w, "Internal server error", 500)
 			log.Println(err.Error())
 			return
 		}
-		broadcastJoiningUserID <- []string{"add", data.RoomID, fmt.Sprintf("%d", data.UserID), userName, imgSrc}
+		broadcastJoiningUserID <- []string{"add", data.RoomID, fmt.Sprintf("%d", data.UserID), user.UserName, user.HatSrc, user.FaceSrc, user.BodySrc}
 		w.WriteHeader(200)
 	}
 }
@@ -98,16 +98,11 @@ func getRegisteredUserData(db *sqlx.DB) func(w http.ResponseWriter, r *http.Requ
 			return
 		}
 
-		_, imgSrc, err := getUserInfo(db, fmt.Sprintf("%d", userID))
+		user, err := getUserInfo(db, userID)
 		if err != nil {
 			http.Error(w, "Internal Server Error", 500)
 			log.Println(err.Error())
 			return
-		}
-		user := userInfo{
-			UserID:   userID,
-			UserName: userName,
-			ImgSrc:   imgSrc,
 		}
 		err = setJsonCookie(w, "userInfoCookie", user, 24*time.Hour)
 		if err != nil {
@@ -144,16 +139,11 @@ func getLoginUserData(db *sqlx.DB) func(w http.ResponseWriter, r *http.Request) 
 			return
 		}
 		if exists {
-			_, imgSrc, err := getUserInfo(db, fmt.Sprintf("%d", userID))
+			user, err := getUserInfo(db, userID)
 			if err != nil {
 				http.Error(w, "Internal Server Error", 500)
 				log.Println(err.Error())
 				return
-			}
-			user := userInfo{
-				UserID:   userID,
-				UserName: data.UserName,
-				ImgSrc:   imgSrc,
 			}
 			err = setJsonCookie(w, "userInfoCookie", user, 24*time.Hour)
 			if err != nil {
@@ -197,11 +187,11 @@ func getMotion(w http.ResponseWriter, r *http.Request) {
 			err := conn.WriteMessage(websocket.TextMessage, reqData)
 			if err != nil {
 				err := conn.Close()
+				delete(gameFieldWSDict, conn)
 				if err != nil {
 					w.WriteHeader(409)
 					return
 				}
-				delete(roomWSDict, conn)
 			}
 			w.WriteHeader(200)
 			return
@@ -252,10 +242,10 @@ func exitFromGame(r *http.Request) (int, string, error) {
 			err := conn.WriteMessage(websocket.TextMessage, messageData)
 			if err != nil {
 				err := conn.Close()
+				delete(gameFieldWSDict, conn)
 				if err != nil {
 					return 0, "", err
 				}
-				delete(roomWSDict, conn)
 			}
 			break
 		}
@@ -308,5 +298,95 @@ func getUserAvatar(db *sqlx.DB) func(w http.ResponseWriter, r *http.Request) {
 			log.Println(err.Error())
 			return
 		}
+		user.HatSrc = userAvatar.HatSrc
+		user.FaceSrc = userAvatar.FaceSrc
+		user.BodySrc = userAvatar.BodySrc
+		err = setJsonCookie(w, "userInfoCookie", user, 24*time.Hour)
+		if err != nil {
+			http.Error(w, "Internal Server Error", 500)
+			log.Println(err.Error())
+			return
+		}
 	}
+}
+
+func sendPointToJoin(w http.ResponseWriter, r *http.Request) {
+	reqData, err := io.ReadAll(r.Body)
+	if err != nil {
+		http.Error(w, "Internal Server Error", 500)
+		log.Println(err)
+		return
+	}
+
+	var data struct {
+		UserID int
+		Point  int
+	}
+
+	err = json.Unmarshal(reqData, &data)
+	if err != nil {
+		http.Error(w, "Internal Server Error Unmarshall", 500)
+		log.Println(err.Error())
+		return
+	}
+	for conn, userID := range joinPageWSDict {
+		if strconv.Itoa(data.UserID) == userID {
+			err := conn.WriteMessage(websocket.TextMessage, reqData)
+			if err != nil {
+				err := conn.Close()
+				delete(joinPageWSDict, conn)
+				if err != nil {
+					w.WriteHeader(409)
+					log.Println(err.Error())
+					return
+				}
+			}
+			break
+		}
+	}
+	w.WriteHeader(200)
+}
+
+func getMaxScore(w http.ResponseWriter, r *http.Request) {
+	reqData, err := io.ReadAll(r.Body)
+	if err != nil {
+		http.Error(w, "Parsing error", 500)
+		log.Println(err.Error())
+		return
+	}
+	var data struct {
+		RoomID   string
+		MaxPoint int
+	}
+	err = json.Unmarshal(reqData, &data)
+	if err != nil {
+		http.Error(w, "JSON parsing error", 500)
+		log.Println(err.Error())
+		return
+	}
+	fmt.Println(data.RoomID, data.MaxPoint)
+	go func() {
+		isSend := false
+		for {
+			for conn, gameFieldID := range gameFieldWSDict {
+				if gameFieldID == data.RoomID {
+					err := conn.WriteMessage(websocket.TextMessage, reqData)
+					isSend = true
+					if err != nil {
+						delete(gameFieldWSDict, conn)
+						err := conn.Close()
+						if err != nil {
+							w.WriteHeader(409)
+							return
+						}
+					}
+					break
+				}
+			}
+			if isSend {
+				break
+			}
+		}
+	}()
+	w.WriteHeader(200)
 }

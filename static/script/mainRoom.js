@@ -156,8 +156,10 @@ socket.onmessage = function (event) {
     let userID = parts[1];
     if (action === "add") {
         let userName = parts[2];
-        let imgSrc = parts[3];
-        addUser(userID, userName, imgSrc);
+        let hatImgSrc = "../" + parts[3];
+        let faceImgSrc = "../" + parts[4];
+        let bodyImgSrc = "../" + parts[5];
+        addUser(userID, userName, hatImgSrc, faceImgSrc, bodyImgSrc);
     } else if (action === "remove") {
         removeUser(userID)
     }
@@ -168,17 +170,21 @@ socket.onclose = function (event) {
     console.log("WebSocket mainRoom connection closed.");
 };
 
-function addUser(userID, userName, imgSrc) {
+function addUser(userID, userName, hatImgSrc, faceImgSrc, bodyImgSrc) {
     console.log('Пользователь присоединился: ' + userID);
-    connectedUsers.push({"userID": userID, "userName": userName, "imgSrc": imgSrc});
+    connectedUsers.push({"userID": userID, "userName": userName, "bodyImgSrc": bodyImgSrc, "faceImgSrc": faceImgSrc, "hatImgSrc": hatImgSrc});
 
     let userMessage = document.getElementById('needUser');
     userMessage.classList.add('none');
     let indexUser = document.getElementById('user' + connectedUsers.length);
     let indexUserName = document.getElementById('userName' + connectedUsers.length);
-    let indexUserImg = indexUser.querySelector(".user__avatar");
+    let indexUserBodyImg = indexUser.querySelector(".body");
+    let indexUserFaceImg = indexUser.querySelector(".face");
+    let indexUserHatImg = indexUser.querySelector(".hat");
     indexUser.classList.remove('none');
-    indexUserImg.src = '../' + imgSrc;
+    indexUserBodyImg.src = bodyImgSrc;
+    indexUserFaceImg.src = faceImgSrc;
+    indexUserHatImg.src = hatImgSrc;
     indexUserName.innerText = userName;
 
     readyPlayer = true;
@@ -221,3 +227,11 @@ function removeUser(userID) {
         indexUserName.id = 'userName' + (i - 1);
     }
 }
+
+
+const domain = window.location.protocol + "//" + window.location.hostname + "/join";
+const qr = new QRCode(document.getElementById("qrcode"), {
+    text: domain,
+    width: 125, // Увеличенная ширина
+    height: 125, // Увеличенная высота
+});
