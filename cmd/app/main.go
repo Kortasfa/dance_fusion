@@ -48,6 +48,7 @@ func main() {
 	r.HandleFunc("/api/exitFromAccount", exitFromAccount)
 	r.HandleFunc("/api/custom", getUserAvatar(dbx)).Methods("POST")
 	r.HandleFunc("/api/sendPoint", sendPointToJoin).Methods("POST")
+	r.HandleFunc("/api/sendMaxPoint", getMaxScore).Methods("POST")
 
 	go handleRoomWSMessages()
 	go handleJoinPageWSMessages()
