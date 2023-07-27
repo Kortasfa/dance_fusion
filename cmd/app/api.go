@@ -365,28 +365,25 @@ func getMaxScore(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	fmt.Println(data.RoomID, data.MaxPoint)
-	go func() {
-		isSend := false
-		for {
-			for conn, gameFieldID := range gameFieldWSDict {
-				if gameFieldID == data.RoomID {
-					err := conn.WriteMessage(websocket.TextMessage, reqData)
-					isSend = true
+	broadcastJoinPageWSMessage <- []string{data.RoomID, string(reqData)}
+	w.WriteHeader(200)
+}
+
+func danceInfoHandleMessages() {
+	for mesArr := range broadcastGameFieldWSMessage {
+		for conn, gameFieldID := range gameFieldWSDict {
+			roomID := mesArr[0]
+			data := mesArr[1]
+			if gameFieldID == roomID {
+				err := conn.WriteMessage(websocket.TextMessage, []byte(data))
+				if err != nil {
+					err := conn.Close()
+					delete(gameFieldWSDict, conn)
 					if err != nil {
-						delete(gameFieldWSDict, conn)
-						err := conn.Close()
-						if err != nil {
-							w.WriteHeader(409)
-							return
-						}
+						return
 					}
-					break
 				}
 			}
-			if isSend {
-				break
-			}
 		}
-	}()
-	w.WriteHeader(200)
+	}
 }

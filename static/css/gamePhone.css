@@ -94,7 +94,7 @@
     opacity: 0;
 }
 
-.btn-log-out {
+.btn-leave-room {
     position: absolute;
     top: 20px;
     right: 10px;
@@ -168,7 +168,7 @@
     flex-direction: column;
     align-items: center;
     gap: 20px;
-    margin-bottom: 250px;
+    margin-bottom: 50px;
 }
 
 .dance-block__connection {
