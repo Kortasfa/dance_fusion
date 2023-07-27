@@ -387,3 +387,47 @@ func danceInfoHandleMessages() {
 		}
 	}
 }
+
+func getBestPlayer(db *sqlx.DB) func(w http.ResponseWriter, r *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
+		songID, err := strconv.Atoi(r.FormValue("song_id"))
+		if err != nil {
+			http.Error(w, "Invalid song ID", http.StatusBadRequest)
+			log.Println(err.Error())
+			return
+		}
+
+		bestPlayerData, err := getBestPlayerInfo(db, songID)
+		if err != nil {
+			http.Error(w, "Error getting best player information", http.StatusInternalServerError)
+			log.Println(err.Error())
+			fmt.Println("Тут")
+			return
+		}
+
+		if bestPlayerData.UserID == 0 {
+			w.Header().Set("Content-Type", "application/json")
+			w.Write([]byte("{}"))
+			return
+		}
+		fmt.Println(bestPlayerData.UserID)
+		userData, err := getUserInfo(db, bestPlayerData.UserID)
+		if err != nil {
+			http.Error(w, "Error getting user information", http.StatusInternalServerError)
+			log.Println(err.Error())
+			fmt.Println("Вот")
+			return
+		}
+
+		response := struct {
+			UserInfo  userInfo
+			BestScore int
+		}{
+			UserInfo:  userData,
+			BestScore: bestPlayerData.Score,
+		}
+
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(response)
+	}
+}

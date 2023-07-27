@@ -135,6 +135,38 @@
             }
         }
 
+        function getBestPlayer(songID) {
+            fetch("api/getBestPlayer", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: `song_id=${songID}`,
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Server Error');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.UserInfo) {
+                        console.log('Best Player Info:');
+                        console.log('User ID:', data.UserInfo.UserID);
+                        console.log('User Name:', data.UserInfo.UserName);
+                        console.log('Hat Src:', data.UserInfo.HatSrc);
+                        console.log('Face Src:', data.UserInfo.FaceSrc);
+                        console.log('Body Src:', data.UserInfo.BodySrc);
+                        console.log('Best Score:', data.BestScore);
+                    } else {
+                        console.log('Best Player Info not available for this song.');
+                    }
+                })
+                .catch(error => {
+                    console.log('Error:', error);
+                });
+        }
+
         (async () => {
             let classifier = new EdgeImpulseClassifier();
             await classifier.init();

@@ -7,7 +7,7 @@ CREATE TABLE users(
     `img_hat` VARCHAR(255) NOT NULL  DEFAULT 'static/img/hat/withoutHat.png',
     `img_body` VARCHAR(255) NOT NULL  DEFAULT 'static/img/body/fff76e.png',
     `img_face` VARCHAR(255) NOT NULL  DEFAULT 'static/img/face/7.png',
-    `score` INTEGER NOT NULL DEFAULT 0
+    `total_score` INTEGER NOT NULL DEFAULT 0
 ) ENGINE = InnoDB
 CHARACTER SET = utf8mb4
 COLLATE utf8mb4_unicode_ci;
