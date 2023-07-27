@@ -22,4 +22,5 @@ VALUES
     ("Kiss Me More", "Doja Cat Ft. Sza", "static/img/kissMeMore.jpg", "static/video/kissMeMore.mp4", "static/video/previews/kissMeMore.mp4", 1, "static/motion_list/forgetYou.json"),
     ("Dynamite", "Tajo Cruz", "static/img/dynamite.jpg", "static/video/dynamite.mp4", "static/video/previews/dynamite.mp4", 1, "static/motion_list/forgetYou.json"),
     ("Oops I Did It Again", "Britney Spears", "static/img/oopsIDidItAgain.jpg", "static/video/previews/ooopsIDidItAgain.mp4", "static/video/previews/ooopsIDidItAgain.mp4", 1, "static/motion_list/forgetYou.json"),
-    ("Montero", "Lil Nas X", "static/img/montero.jpg", "static/video/montero.mp4", "static/video/previews/montero.mp4", 1, "static/motion_list/forgetYou.json");
+    ("Montero", "Lil Nas X", "static/img/montero.jpg", "static/video/montero.mp4", "static/video/previews/montero.mp4", 1, "static/motion_list/forgetYou.json"),
+    ("10", "Rasputin"," 'Boney M'", "static/img/rasputin.jpg", "static/video/full/rasputin.mp4", "static/video/previews/rasputin.mp4", 1, "static/motion_list/rasputin.json");
