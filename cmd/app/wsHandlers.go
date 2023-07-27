@@ -53,6 +53,7 @@ func roomWSHandler(db *sqlx.DB) func(w http.ResponseWriter, r *http.Request) {
 					userID := userSlice[i]
 					motionListPath := motionListPaths[i]
 					fmt.Println("Надо отправить JSON этому", userID)
+					fmt.Println("Надо отправить motionListPath этому", userID, "вот json", motionListPath)
 					fileContent, err := ioutil.ReadFile(motionListPath)
 					if err != nil {
 						http.Error(w, "Внутренняя ошибка сервера", http.StatusInternalServerError)
