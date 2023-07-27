@@ -50,21 +50,27 @@ func getSongsData(db *sqlx.DB) ([]songsData, error) {
 	return data, nil
 }
 
-func getMotionListPath(db *sqlx.DB, songName string) (string, error) {
+func getMotionListPath(db *sqlx.DB, songName string) ([]string, error) {
 	const query = `
 		SELECT
-			motion_list_path
+			first_player,
+			second_player,
+			third_player,
+			fourth_player
 		FROM
-			songs
+			motion_list_path
 		WHERE
 		   song_name=?
 	`
 
-	var motionListPath string
-	err := db.QueryRow(query, songName).Scan(&motionListPath)
+	var playerOnePath, playerTwoPath, playerThreePath, playerFourPath string
+	err := db.QueryRow(query, songName).Scan(&playerOnePath, &playerTwoPath, &playerThreePath, &playerFourPath)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
+
+	// Создаем срез и добавляем пути к файлам для каждого игрока
+	motionListPath := []string{playerOnePath, playerTwoPath, playerThreePath, playerFourPath}
 
 	return motionListPath, nil
 }

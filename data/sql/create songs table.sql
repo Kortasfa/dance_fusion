@@ -12,7 +12,7 @@ CREATE TABLE songs(
 CHARACTER SET = utf8mb4
 COLLATE utf8mb4_unicode_ci;
 
-INSERT INTO songs(song_name, author_name, image_src, video_src, preview_video_src, style_id, motion_list_path)
+INSERT INTO songs(song_name, author_name, image_src, video_src, preview_video_src, style_id)
 VALUES
 	("Forget You", "Cee Lo Green", "static/img/forgetYou.jpg", 'static/video/full/forgetYouFull.mp4', "static/video/previews/forgetYou.mp4", 3),
     ("1999", "Charli XCX & Troye Sivan", "static/img/1999.jpg", "static/video/1999.mp4", "static/video/previews/1999.mp4", 1),
