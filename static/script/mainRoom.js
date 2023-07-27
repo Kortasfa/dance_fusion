@@ -56,6 +56,7 @@ function closeGuide() {
 }
 
 let songName = '';
+let songNeuro = '';
 let fullSongName = '';
 let readySong = false;
 
@@ -66,6 +67,14 @@ function onImageClick(element) {
     const videoPlayer = document.getElementById('videoPlayer');
 
     songName = document.querySelector('.song' + element.id).innerHTML;
+
+    songNeuro = camelCase(songName);
+
+    function camelCase(value) {
+        return value.toLowerCase().replace(/\s+(.)/g, function(match, group1) {
+            return group1.toUpperCase();
+        });
+    }
     readySong = true;
     changeButton();
 
@@ -81,29 +90,35 @@ Array.from(test).forEach(function (element) {
     });
 });
 
-$(document).ready(function () {
+$(document).ready(function() {
     const playButton = $('#play');
     const contentContainer = $('#content');
 
-    playButton.on('click', function () {
+    playButton.on('click', function() {
         if (readyGame) {
-            socket.send(songName);
-            socket.close() // Закрываем вебсокет mainRoom
+            // Load the first script
+            $.getScript('/static/test/edge-impulse-standalone.js', function() {
+                // Once the first script is loaded, load the second script
+                $.getScript('/static/test/run-impulse.js', function() {
+                    // After both scripts are loaded, load the page by AJAX
+                    contentContainer.load('/static/html/game.html', function() {
+                        const video = $('#video-dance')[0];
+                        const src = $('#video-src')[0];
+                        src.setAttribute('src', fullSongName);
 
-            contentContainer.load("/static/html/game.html", function () {
-                const video = $('#video-dance')[0];
-                const src = $('#video-src')[0];
-                src.setAttribute('src', fullSongName);
-
-                video.addEventListener('loadeddata', function () {
-                    video.play();
+                        video.addEventListener('loadeddata', function() {
+                            video.play();
+                            socket.send(songName);
+                            socket.close(); // Закрываем вебсокет mainRoom
+                        });
+                    });
                 });
             });
-
             return false;
         }
     });
 });
+
 
 
 function showVideo(videoID) {

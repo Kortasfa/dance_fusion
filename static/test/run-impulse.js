@@ -1,10 +1,11 @@
 // Classifier module
+
 let classifierInitialized = false;
 Module.onRuntimeInitialized = function() {
     classifierInitialized = true;
 };
 
-class EdgeImpulseClassifier {
+class   EdgeImpulseClassifier {
     _initialized = false;
 
     init() {
