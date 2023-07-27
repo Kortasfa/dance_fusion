@@ -1,12 +1,12 @@
-*
-{
+* {
     font-weight: normal;
     background-repeat: no-repeat;
     margin: 0;
+    user-select: none;
 }
 
 .customization{
-    background-color: #0DF2BF;
+    background-color: #FFE973;
     display: flex;
     flex-direction: column;
     align-content: center;
@@ -14,11 +14,11 @@
 }
 
 .character__avatar{
-    background-color: #F20D40;
+    background-color: #d9a0e7;
     border-radius: 0 0 10px 10px;
     margin-bottom: 45px;
     display: flex;
-    border: 2px solid #6c0909;
+    border: 5px dashed #670080;
     border-top: 0px;
 }
 
@@ -30,8 +30,8 @@
     border-radius: 50%;
     text-align: center;
     margin: 25px 0 0 25px;
-    border: 2px solid #6c0909;
-    background: aqua;
+    border: 3px dashed #670080;
+    background-color: #BD63D4;
 }
 
 .level{
@@ -41,16 +41,25 @@
 
 .avatar{
     display: flex;
-    margin: 25px auto 1px auto;
+    margin: 65px auto 1px auto;
     flex-direction: column;
     max-width: 180px;
+}
+
+.avatar-save{
+    position: absolute;
+    margin: 26px 0 0 275px;
+    width: 41px;
+    border-radius: 50%;
+    border: 3px dashed #670080;
+    background-color: #BD63D4;
 }
 
 .avatar__head{
     position: relative;
     margin: 0 auto;
-    height: 100px;
-    width: 100px;
+    height: 90px;
+    width: 90px;
 }
 
 .avatar__name{
@@ -60,16 +69,33 @@
     text-align: center;
 }
 
-.head__circle{
+.head__body{
     position: absolute;
+}
+
+.user-body{
+    width: 90px;
+    height: 90px;
 }
 
 .head__face{
     position: absolute;
+    margin: 8px 5px;
+}
+
+.user-face{
+    width: 80px;
+    height: 80px;
 }
 
 .head__hat{
     position: absolute;
+    margin: -65px 3px;
+}
+
+.user-hat{
+    width: 86px;
+    height: 90px;
 }
 
 .customization__character{
@@ -98,9 +124,14 @@
     width: 25%;
     text-align: center;
     border-radius: 10px 10px 0 0 ;
-    border-style: solid;
-    border-color: #6c0909;
-    background-color: #F20D40;
+    border: 3px dashed #670080;
+    background-color: #d9a0e7;
+    border-bottom-width: 0;
+}
+
+.type-selected{
+    border: solid #670080;
+    background-color: #BD63D4;
     border-bottom-width: 0;
 }
 
@@ -114,14 +145,14 @@
 }
 
 .option__element{
-    background-color: #F20D40;
+    background-color: #d9a0e7;
     width: 356px;
-    height: calc(100vh - 252px);
+    height: calc(100vh - 291px);
     display: flex;
     flex-wrap: wrap;
     justify-content: space-around;
     align-content: flex-start;
-    border: 2px solid #6c0909;
+    border: 5px dashed #670080;
     border-radius: 10px;
     overflow-y: auto;
 }
@@ -130,9 +161,58 @@
 }
 
 .element{
-    width: 106px;
-    height: 140px;
-    margin-top: 10px;
+    width: 100px;
+    height: 125px;
+    margin: 5px 0 5px 0;
     border-radius: 10px;
-    border: 2px solid #6c0909;
+    border: 5px dashed #670080;
+    display: flex;
+}
+
+.element__hat{
+    width: 90px;
+    height: 90px;
+    margin: 8px auto;
+}
+
+.element__face{
+    width: 80px;
+    height: 80px;
+    margin: 8px auto;
+}
+
+.element__body{
+    width: 90px;
+    height: 90px;
+    margin: 8px auto;
+}
+
+.none{
+    display: none;
+}
+
+.unavailable{
+    background-color: rgba(0, 0, 0, 0.3);
+    position: relative;
+}
+
+.unavailable::before,
+.unavailable::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 165%;
+    height: 5px;
+    background-color: #ff1111;
+    border-radius: 2px;
+}
+
+.unavailable::before {
+    transform: translate(-50%, -50%) rotate(52deg);
+}
+
+.unavailable::after {
+    transform: translate(-50%, -50%) rotate(-52deg);
 }

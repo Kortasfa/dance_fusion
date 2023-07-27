@@ -6,3 +6,31 @@ CREATE TABLE faces(
 ) ENGINE = InnoDB
 CHARACTER SET = utf8mb4
 COLLATE utf8mb4_unicode_ci;
+
+INSERT INTO faces (id, recommended_level, face_src) VALUES
+(1, 0, '../static/img/face/7.png'),
+(2, 0, '../static/img/face/6.png'),
+(3, 1, '../static/img/face/5.png'),
+(4, 2, '../static/img/face/4.png'),
+(5, 3, '../static/img/face/3.png'),
+(6, 4, '../static/img/face/2.png'),
+(7, 4, '../static/img/face/1.png'),
+(8, 11, '../static/img/hat/smileFace.png'),
+(9, 13, '../static/img/face/simpleFace.png'),
+(10, 13, '../static/img/face/frightenedFace.png'),
+(11, 13, '../static/img/face/angryFace.png'),
+(12, 13, '../static/img/face/puzzledFace.png'),
+(13, 13, '../static/img/face/whatFace.png'),
+(14, 14, '../static/img/face/deadInsideFace.png'),
+(15, 14, '../static/img/face/pickUpFace.png'),
+(16, 14, '../static/img/face/scaredFace.png'),
+(17, 14, '../static/img/face/smileFace.png'),
+(18, 14, '../static/img/face/stupidFace.png'),
+(19, 14, '../static/img/face/unhappyFace.png'),
+(20, 14, '../static/img/face/wFace.png'),
+(21, 14, '../static/img/face/whatFace.png'),
+(22, 14, '../static/img/face/yourFace.png'),
+(23, 14, '../static/img/face/loveFace.png'),
+(24, 14, '../static/img/face/funFace.png'),
+(25, 14, '../static/img/face/badFace.png'),
+(26, 14, '../static/img/face/fullFace.png');
