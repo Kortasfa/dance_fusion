@@ -106,20 +106,19 @@ $(document).ready(function() {
                         const src = $('#video-src')[0];
                         src.setAttribute('src', fullSongName);
 
-                        // Wait for 5 seconds before playing the video
-                            video.addEventListener('loadeddata', function() {
-                                video.play();
-                                socket.send(songName);
-                                socket.close(); // Закрываем вебсокет mainRoom
-                            });
+                        video.addEventListener('loadeddata', function() {
+                            video.play();
+                            socket.send(songName);
+                            socket.close(); // Закрываем вебсокет mainRoom
+                        });
                     });
                 });
             });
-
             return false;
         }
     });
 });
+
 
 
 function showVideo(videoID) {

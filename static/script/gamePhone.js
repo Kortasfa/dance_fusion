@@ -159,7 +159,7 @@ function joinRoom(userID) {
             stop = 0;
             pix = 0;
             percentage = 0;
-            maxTheory = receivedJSON["max_score"];
+            maxTheory = receivedJSON["maxPoint"];
             sendMaxPoint(enterInRoom.value, maxTheory).then(() => {})
             //sendMaxPoint(enterInRoom.value, maxTheory).then(() => {})
             scale.style.height = 0 + 'px';
@@ -348,12 +348,11 @@ function sendDataToServer(data) {
                 console.log('Ошибка при отправке данных: ', error);
             });
     } else {
-        console.log('123');
+        console.log('игра остановлена');
     }
 }
 
 function handleDanceData(danceDataJson) {
-    //let oldStartTime = 0;
     for (let danceData of danceDataJson) {
         setTimeout(function () {
                 if (stop !== 1) {
@@ -361,6 +360,5 @@ function handleDanceData(danceDataJson) {
                 }
             },
             (danceData['start_time']) * 1000);
-        //oldStartTime += danceData['start_time'];
     }
 }

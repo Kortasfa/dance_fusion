@@ -117,140 +117,140 @@
             }
         }
 
-      async function sendPoint(userID, point) {
-        const response = await fetch("/api/sendPoint", {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            "UserID": userID,
-            "point": point,
-          }),
-        });
-        if (response.ok) {
-          console.log('Балл отправлен');
-        } else {
-          console.log('Не удалось отправить балл');
+        async function sendPoint(userID, point) {
+            const response = await fetch("/api/sendPoint", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    "UserID": userID,
+                    "point": point,
+                }),
+            });
+            if (response.ok) {
+                console.log('Балл отправлен');
+            } else {
+                console.log('Не удалось отправить балл');
+            }
         }
-      }
 
-      (async () => {
-          let classifier = new EdgeImpulseClassifier();
-          await classifier.init();
-          let project = classifier.getProjectInfo();
-          console.log(project.owner + ' / ' + project.name + ' (version ' + project.deploy_version + ')');
+        (async () => {
+            let classifier = new EdgeImpulseClassifier();
+            await classifier.init();
+            let project = classifier.getProjectInfo();
+            console.log(project.owner + ' / ' + project.name + ' (version ' + project.deploy_version + ')');
 
-          let socket = new WebSocket("wss://" + window.location.hostname + "/neuralWS/" + WssURL.split("/").pop().trim());
+            let socket = new WebSocket("wss://" + window.location.hostname + "/neuralWS/" + WssURL.split("/").pop().trim());
 
-          socket.onopen = function (event) {
-              console.log("WebSocket connection established.");
-          };
+            socket.onopen = function (event) {
+                console.log("WebSocket connection established.");
+            };
 
-          let maxPoint;
+            let maxPoint;
 
-          socket.onmessage = function (event) {
-              try {
-                  let jsonData = JSON.parse(event.data);
-                  if ("ExitingUser" in jsonData) {
-                      console.log("Удаляем пользователя на чёрт");
-                      removeUser(jsonData.ExitingUser);
-                      return;
-                  }
-                  if ("maxPoint" in jsonData) {
-                    maxPoint = jsonData["maxPoint"];
-                    console.log("MaxPoint = ", jsonData["maxPoint"]);
-                    return;
-                  }
-                  let moveName = jsonData.name;
-                  let motionString = jsonData.motionString;
-                  let userID = jsonData.userID;
-                  let features = motionString.split(',').map(x => Number(x.trim()));
+            socket.onmessage = function (event) {
+                try {
+                    let jsonData = JSON.parse(event.data);
+                    if ("ExitingUser" in jsonData) {
+                        console.log("Удаляем пользователя на чёрт");
+                        removeUser(jsonData.ExitingUser);
+                        return;
+                    }
+                    if ("maxPoint" in jsonData) {
+                        maxPoint = jsonData["maxPoint"];
+                        console.log("MaxPoint = ", jsonData["maxPoint"]);
+                        return;
+                    }
+                    let moveName = jsonData.name;
+                    let motionString = jsonData.motionString;
+                    let userID = jsonData.userID;
+                    let features = motionString.split(',').map(x => Number(x.trim()));
 
-                  let deviationCount = 0;
-                  let startValues = [0, 0, 0];
-                  let indexInOneRecord = 0;
-                  for (let value of features) {
-                      if (value !== 0 && (indexInOneRecord > 2)) {
-                          if (startValues[5 - indexInOneRecord] === 0) {
-                              startValues[5 - indexInOneRecord] = value;
-                          } else if (Math.abs(Math.abs(value) - Math.abs(startValues[5 - indexInOneRecord])) > 20) {
-                              deviationCount += 1;
-                          }
-                          if (deviationCount > 5) {
-                              break;
-                          }
-                      }
-                      indexInOneRecord += 1;
-                      if (indexInOneRecord === 6) {
-                          indexInOneRecord = 0;
-                      }
-                  }
-
-                  if (deviationCount > 5) {
-                      let res = classifier.classify(features); // результат оценки нейросетью JSON
-                      let score = -1;
-                      console.log(res["results"]);
-                      for (let motionDict of res["results"]) {
-                          if (motionDict["label"] === moveName) {
-                            score = motionDict["value"];
-                            if (moveName === "up-down-click") {
-                              let sameMoveOne = res["results"].find(item => item.label === "hands-up-and-down");
-                              let sameMoveTwo = res["results"].find(item => item.label === "up-down-hands");
-                              score = Math.max(motionDict["value"], sameMoveOne.value, sameMoveTwo.value);
-                              if (score > 0.01 && score < 0.1) {
-                                score = 0.2;
-                              }
+                    let deviationCount = 0;
+                    let startValues = [0, 0, 0];
+                    let indexInOneRecord = 0;
+                    for (let value of features) {
+                        if (value !== 0 && (indexInOneRecord > 2)) {
+                            if (startValues[5 - indexInOneRecord] === 0) {
+                                startValues[5 - indexInOneRecord] = value;
+                            } else if (Math.abs(Math.abs(value) - Math.abs(startValues[5 - indexInOneRecord])) > 20) {
+                                deviationCount += 1;
                             }
-                            if (moveName === "up-down-hands") {
-                              let sameMoveOne = res["results"].find(item => item.label === "hands-up-and-down");
-                              score = Math.max(motionDict["value"], sameMoveOne.value);
-                              if (score > 0.001 && score < 0.1) {
-                                score = 0.2;
-                              }
+                            if (deviationCount > 5) {
+                                break;
                             }
-                            if (moveName === "collapsing-breeding-locks") {
-                              if (score > 0.001 && score < 0.005) {
-                                score = 0.2
-                              }
-                              if (score >= 0.005 && score < 0.01) {
-                                score = 0.3;
-                              }
-                              if (score >= 0.01) {
-                                score = 0.4;
-                              }
+                        }
+                        indexInOneRecord += 1;
+                        if (indexInOneRecord === 6) {
+                            indexInOneRecord = 0;
+                        }
+                    }
 
-                            }
-                            if (moveName === "going-to-the-side-with-clapping") {
-                              if (score > 0.001 && score < 0.05) {
-                                score = 0.2;
-                              }
-                              if (score >= 0.05 & score < 0.1) {
-                                score = 0.3;
-                              }
-                              if (score >= 0.1) {
-                                score = 0.4;
-                              }
+                    if (deviationCount > 5) {
+                        let res = classifier.classify(features); // результат оценки нейросетью JSON
+                        let score = -1;
+                        console.log(res["results"]);
+                        for (let motionDict of res["results"]) {
+                            if (motionDict["label"] === moveName) {
+                                score = motionDict["value"];
+                                if (moveName === "up-down-click") {
+                                    let sameMoveOne = res["results"].find(item => item.label === "hands-up-and-down");
+                                    let sameMoveTwo = res["results"].find(item => item.label === "up-down-hands");
+                                    score = Math.max(motionDict["value"], sameMoveOne.value, sameMoveTwo.value);
+                                    if (score > 0.01 && score < 0.1) {
+                                        score = 0.2;
+                                    }
+                                }
+                                if (moveName === "up-down-hands") {
+                                    let sameMoveOne = res["results"].find(item => item.label === "hands-up-and-down");
+                                    score = Math.max(motionDict["value"], sameMoveOne.value);
+                                    if (score > 0.001 && score < 0.1) {
+                                        score = 0.2;
+                                    }
+                                }
+                                if (moveName === "collapsing-breeding-locks") {
+                                    if (score > 0.001 && score < 0.005) {
+                                        score = 0.2
+                                    }
+                                    if (score >= 0.005 && score < 0.01) {
+                                        score = 0.3;
+                                    }
+                                    if (score >= 0.01) {
+                                        score = 0.4;
+                                    }
 
-                            }
-                            if (moveName === "hands-up-and-down") {
-                              let sameMoveOne = res["results"].find(item => item.label === "up-down-click");
-                              let sameMoveTwo = res["results"].find(item => item.label === "up-down-hands");
-                              score = Math.max(motionDict["value"], sameMoveOne.value - 0.1, sameMoveTwo.value - 0.1);
-                              if (score > 0.01 && score < 0.1) {
-                                score = 0.2;
-                              }
-                            }
-                            if (moveName === "hands-up-down-sideways") {
-                              if (score > 0.001 && score < 0.05) {
-                                score = 0.2;
-                              }
-                              if (score >= 0.05 && score < 0.1) {
-                                score = 0.3;
-                              }
-                              if (score >= 0.1) {
-                                score = 0.4;
-                              }
+                                }
+                                if (moveName === "going-to-the-side-with-clapping") {
+                                    if (score > 0.001 && score < 0.05) {
+                                        score = 0.2;
+                                    }
+                                    if (score >= 0.05 & score < 0.1) {
+                                        score = 0.3;
+                                    }
+                                    if (score >= 0.1) {
+                                        score = 0.4;
+                                    }
+
+                                }
+                                if (moveName === "hands-up-and-down") {
+                                    let sameMoveOne = res["results"].find(item => item.label === "up-down-click");
+                                    let sameMoveTwo = res["results"].find(item => item.label === "up-down-hands");
+                                    score = Math.max(motionDict["value"], sameMoveOne.value - 0.1, sameMoveTwo.value - 0.1);
+                                    if (score > 0.01 && score < 0.1) {
+                                        score = 0.2;
+                                    }
+                                }
+                                if (moveName === "hands-up-down-sideways") {
+                                    if (score > 0.001 && score < 0.05) {
+                                        score = 0.2;
+                                    }
+                                    if (score >= 0.05 && score < 0.1) {
+                                        score = 0.3;
+                                    }
+                                    if (score >= 0.1) {
+                                        score = 0.4;
+                                    }
 
                                 }
                                 if (moveName === "side-hit") {
@@ -329,40 +329,41 @@
                                 }
                             }
                         }
-                      console.log(moveName);
-                      console.log(score);
-                      let point = 0;
-                      if (score >= 0.4 && score <= 1) {
-                          point = 40;
-                      }
-                      if (score >= 0.3 && score < 0.4) {
-                          point =Math.round(score * 400 / 4);
+                        console.log(moveName);
+                        console.log(score);
+                        let point = 0;
+                        if (score >= 0.4 && score <= 1) {
+                            point = 40;
+                        }
+                        if (score >= 0.3 && score < 0.4) {
+                            point = Math.round(score * 400 / 4);
 
-                      }
-                      if (score >= 0.2 && score < 0.3) {
-                          point = Math.round(score * 100) + 5;
+                        }
+                        if (score >= 0.2 && score < 0.3) {
+                            point = Math.round(score * 100) + 5;
 
-                      }
-                      if (score > 0.1 && score < 0.2) {
-                          point = Math.round(score * 100) + 7;
-                      }
-                      if (score <= 0.1 && score > 0) {
-                          point = Math.round(score * 100) + 9;
-                      }
-                      if (score === 2) {
-                          point = 200;
-                      }
-                      console.log('Кол-во баллов', point);
-                      addScore(userID.toString(), point, maxPoint);
-                      sendPoint(userID, point).then(() => {})
-                  } else {
-                      console.log('Лежит', deviationCount);
-                      addScore(userID.toString(), 0);
-                  }
-              } catch (ex) {
-                  console.log(ex);
-              }
-          };
+                        }
+                        if (score > 0.1 && score < 0.2) {
+                            point = Math.round(score * 100) + 7;
+                        }
+                        if (score <= 0.1 && score > 0) {
+                            point = Math.round(score * 100) + 9;
+                        }
+                        if (score === 2) {
+                            point = 200;
+                        }
+                        console.log('Кол-во баллов', point);
+                        addScore(userID.toString(), point, maxPoint);
+                        sendPoint(userID, point).then(() => {
+                        })
+                    } else {
+                        console.log('Лежит', deviationCount);
+                        addScore(userID.toString(), 0);
+                    }
+                } catch (ex) {
+                    console.log(ex);
+                }
+            };
 
             socket.onclose = function (event) {
                 console.log("WebSocket connection closed.");
