@@ -78,17 +78,23 @@
 }
 
 .header__guide{
-    height: 125px;
-    width: 265px;
+    height: 250px;
+    width: 189px;
+    margin: 0 auto;
     display: flex;
     text-align: center;
     border-radius: 0 0 0 10px;
     flex-wrap: nowrap;
+    flex-direction: column;
 }
 
 .header__icon{
-    height: 68px;
-    margin: auto;
+    height: 55px;
+    margin: 0 5px 0 auto;
+}
+
+.qrcode{
+    margin: 0 auto;
 }
 
 .guide__title{
@@ -98,7 +104,13 @@
 }
 
 .guide__code{
-    font: normal 400 48px/1.54 'Roboto';
+    font: normal 400 48px 'Roboto';
+    margin: 0 0 -1px 63px;
+}
+
+.guide__subtitle{
+    display: flex;
+    margin-bottom: 5px;
 }
 
 .body__view_song{
@@ -239,7 +251,7 @@
    }
 
 .songs{
-    margin: 27px 0px 0px 10px;
+    margin: 27px 0 0 10px;
     overflow: auto;
     overflow-x: hidden;
     height: 590px;
@@ -333,8 +345,33 @@
     width: 86px;
     height: 90px;
 }
+@media screen and (max-width: 1577px){
+    .btn-back {
+        margin-bottom: 250px;
+    }
+}
+@media screen and (max-width: 1560px) and (max-height: 800px){
+    .songs{
+        height: 380px
+    }
 
+    .header__guide {
+        height: 132px;
+        width: 333px;
+        flex-direction: row
+    }
+
+    .btn-back {
+        margin-bottom: 285px;
+    }
+}
 @media screen and (max-width: 1180px) {
+    .header__guide{
+        height: 250px;
+        width: 189px;
+        margin: 0 auto;
+        flex-direction: column;
+    }
     .content {
     margin: auto;
     display: flex;
@@ -346,7 +383,7 @@
     flex-direction: column;
 }
     .songs {
-    margin: 25px 0px 15px 10px;
+    margin: 25px 0 15px 10px;
     overflow: auto;
     overflow-x: hidden;
     height: 353px;}
@@ -439,6 +476,41 @@
         margin: 15px;
         width: 42px;
     }
+    .user__head{
+        position: relative;
+        margin: 0 auto;
+        height: 60px;
+        width: 60px;
+    }
 
+    .head__body{
+        position: absolute;
+    }
 
+    .body{
+        width: 60px;
+        height: 60px;
+    }
+
+    .head__face{
+        margin: 6px 3px;
+    }
+
+    .face{
+        width: 54px;
+        height: 54px;
+    }
+
+    .head__hat{
+        margin: -47px 0px;
+    }
+
+    .hat{
+        width: 60px;
+        height: 60px;
+    }
+    .party__user {
+        margin: 15px;
+        width: 60px;
+    }
 }

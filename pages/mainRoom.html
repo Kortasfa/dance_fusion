@@ -1,10 +1,12 @@
 <!DOCTYPE html>
-<html lang="en" id="content">
+<html lang="en">
 <head>
 	<meta charset="UTF-8"/>
 	<title>Let's dance</title>
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
 	<script src="https://cdn.jsdelivr.net/gh/davidshimjs/qrcodejs/qrcode.min.js"></script>
+	<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-ajaxtransport-xdomainrequest/1.0.4/jquery.xdomainrequest.min.js"></script>
 	<script src="../static/script/mainRoom.js" defer></script>
 	<link rel="preconnect" href="https://fonts.googleapis.com"/>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -20,21 +22,19 @@
 			document.getElementById("needUser").innerText = "Join and start playing";
 		});
 	</script>
-	<script src="../static/test/edge-impulse-standalone.js"></script>
-	<script src="../static/test/run-impulse.js"></script>
 </head>
-<body class="page">
+<body class="page" id="content">
 <header class="header">
-	<div>
 		<div class="header__guide">
 			<div>
 				<a class="guide__title">Code room</a>
-				<a class="guide__code" id="CodeRoom">{{ .RoomKey }}</a>
+				<div class="guide__subtitle">
+					<a class="guide__code" id="CodeRoom">{{ .RoomKey }}</a>
+					<img src="../static/img/question-answer-svgrepo-com.svg" class="header__icon" id="openGuide" alt="">
+				</div>
 			</div>
-			<div id="qrcode"></div>
-			<img src="../static/img/question-answer-svgrepo-com.svg" class="header__icon" id="openGuide" alt="">
+			<div class="qrcode" id="qrcode"></div>
 		</div>
-	</div>
 </header>
 <div class="content">
 	<img class="btn-back hide" id="returnButton" src="../static/img/Group%206.svg" alt="">
@@ -63,33 +63,33 @@
 			<div id="needUser" class="party__message"></div>
 			<div class="party__user  none" id="user1">
 				<div  class="user__head">
-					<div class="head__body"><img class="body" alt=""></div>
-					<div class="head__face"><img class="face" alt=""></div>
-					<div class="head__hat"><img class="hat" alt=""></div>
+					<div class="head__body"><img src="" class="body" alt=""></div>
+					<div class="head__face"><img src="" class="face" alt=""></div>
+					<div class="head__hat"><img  src="" class="hat" alt=""></div>
 				</div>
 				<div class="user__name" id="userName1">Kirill</div>
 			</div>
 			<div class="party__user  none" id="user2">
 				<div  class="user__head">
-					<div class="head__body"><img class="body" alt=""></div>
-					<div class="head__face"><img class="face" alt=""></div>
-					<div class="head__hat"><img class="hat" alt=""></div>
+					<div class="head__body"><img src="" class="body" alt=""></div>
+					<div class="head__face"><img src="" class="face" alt=""></div>
+					<div class="head__hat"><img  src="" class="hat" alt=""></div>
 				</div>
 				<div class="user__name" id="userName2"></div>
 			</div>
 			<div class="party__user  none" id="user3">
 				<div  class="user__head">
-					<div class="head__body"><img class="body" alt=""></div>
-					<div class="head__face"><img class="face" alt=""></div>
-					<div class="head__hat"><img class="hat" alt=""></div>
+					<div class="head__body"><img src="" class="body" alt=""></div>
+					<div class="head__face"><img src="" class="face" alt=""></div>
+					<div class="head__hat"><img  src="" class="hat" alt=""></div>
 				</div>
 				<div class="user__name" id="userName3"></div>
 			</div>
 			<div class="party__user none" id="user4">
 				<div  class="user__head">
-					<div class="head__body"><img class="body" alt=""></div>
-					<div class="head__face"><img class="face" alt=""></div>
-					<div class="head__hat"><img class="hat" alt=""></div>
+					<div class="head__body"><img src="" class="body" alt=""></div>
+					<div class="head__face"><img src="" class="face" alt=""></div>
+					<div class="head__hat"><img  src="" class="hat" alt=""></div>
 				</div>
 				<div class="user__name" id="userName4"></div>
 			</div>
