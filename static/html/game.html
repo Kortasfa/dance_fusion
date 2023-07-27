@@ -152,6 +152,7 @@
             socket.onmessage = function (event) {
                 try {
                     let jsonData = JSON.parse(event.data);
+                    console.log(jsonData);
                     if ("ExitingUser" in jsonData) {
                         console.log("Удаляем пользователя на чёрт");
                         removeUser(jsonData.ExitingUser);
