@@ -166,6 +166,31 @@
                     console.log('Error:', error);
                 });
         }
+        function updateBestUserInfo(songID, userID, score) {
+            const data = {
+                song_id: songID,
+                user_id: userID,
+                score: score
+            };
+
+            fetch('/api/updateBestPlayer', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            })
+                .then(response => {
+                    if (response.ok) {
+                        console.log('Best User Info updated successfully.');
+                    } else {
+                        console.error('Error updating Best User Info', response.statusText);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+        }
 
         (async () => {
             let classifier = new EdgeImpulseClassifier();

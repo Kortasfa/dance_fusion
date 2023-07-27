@@ -431,3 +431,42 @@ func getBestPlayer(db *sqlx.DB) func(w http.ResponseWriter, r *http.Request) {
 		json.NewEncoder(w).Encode(response)
 	}
 }
+
+func updateBestPlayer(db *sqlx.DB) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		reqData, err := io.ReadAll(r.Body)
+		if err != nil {
+			http.Error(w, "Parsing error", 500)
+			log.Println(err.Error())
+			return
+		}
+		var data struct {
+			SongID int `json:"song_id"`
+			UserID int `json:"user_id"`
+			Score  int `json:"score"`
+		}
+		err = json.Unmarshal(reqData, &data)
+		if err != nil {
+			http.Error(w, "JSON parsing error", 500)
+			log.Println(err.Error())
+			return
+		}
+
+		const query = `
+			UPDATE
+				songs
+			SET
+				best_player_id = ?, best_score = ?
+			WHERE
+			    id = ?
+		`
+
+		_, err = db.Exec(query, data.UserID, data.Score, data.SongID)
+		if err != nil {
+			http.Error(w, "Error updating best player info", http.StatusInternalServerError)
+			log.Println(err.Error())
+			return
+		}
+		w.WriteHeader(http.StatusOK)
+	}
+}
