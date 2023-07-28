@@ -30,7 +30,7 @@ function getUsersByCookie() {
         indexUser.classList.remove('hidden');
         indexUser.id = userID;
         let indexUserScale = document.getElementById("scale-" + (i + 1));
-        indexUserScale.id = "scale-" + userID;
+        indexUserScale.id = "scale-" + userID + "-for-user";
         indexUserBodyImg.src = bodyImgSrc;
         indexUserFaceImg.src = faceImgSrc;
         indexUserHatImg.src = hatImgSrc;
@@ -62,7 +62,7 @@ btnContinue.addEventListener("click", function () {
 let valueScore= 0;
 function addScore(userID, score, maxScore){
     let user = document.getElementById(userID);
-    let scale = document.getElementById("scale-" + userID)
+    let scale = document.getElementById("scale-" + userID + "-for-user")
     let maxPractice = maxScore - 0.2 * maxScore;
     if (valueScore > 5600) return
     valueScore += score;
@@ -100,8 +100,6 @@ function addScore(userID, score, maxScore){
         megaStar.src = "/static/img/mega-star.svg"
         megaStar.classList.remove("hidden");
     }
-    
-    valueScore += score;
     console.log("valueScore: ", valueScore);
     if (score > scorePerfect){
         let effect = user.querySelector(".hero__rating-perfect");
