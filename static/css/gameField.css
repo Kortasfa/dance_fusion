@@ -49,34 +49,52 @@
     color: #6ade10;
 }
 
-.ratingScales {
+.rating-scales {
     position: absolute;
     display: flex;
     flex-direction: row;
+    align-items: end;
     left: 20px;
-    bottom: 100px;
+    bottom: -350px;
 }
 
-.ratingScales__user-scale {
+.rating-scales__user-scale {
     width: 30px;
     max-height: 300px;
     height: 0;
 }
 
-.ratingScales__user-scale_scale-1 {
+.rating-scales__user-scale_scale-1 {
     background-color: #8c06ab;
 }
 
-.ratingScales__user-scale_scale-2 {
+.rating-scales__user-scale_scale-2 {
     background-color: #e8d30b;
 }
 
-.ratingScales__user-scale_scale-3 {
+.rating-scales__user-scale_scale-3 {
     background-color: #009dff;
 }
 
-.ratingScales__user-scale_scale-4 {
+.rating-scales__user-scale_scale-4 {
     background-color: #6ade10;
+}
+
+.rating-scales__rating-stars {
+    margin-left: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.rating-stars__star {
+    width: 50px;
+    height: 50px;
+}
+
+.rating-stars__star_mega-star {
+    width: 60px;
+    height: 60px;
 }
 
 .hero__score {

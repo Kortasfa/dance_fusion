@@ -6,12 +6,13 @@ let scorePerfect = 33;
 const danceVideo = document.getElementById("video-dance");
 const modalElem = document.getElementById("pop-up");
 const btnContinue = document.getElementById("btn-continue");
-const megaStar = document.querySelectorAll(".score__star")[5];
-const starOne = document.querySelectorAll(".score__star")[0];
-const starTwo = document.querySelectorAll(".score__star")[1];
-const starThree = document.querySelectorAll(".score__star")[2];
-const starFour = document.querySelectorAll(".score__star")[3];
-const starFive = document.querySelectorAll(".score__star")[4];
+const starOneScale = document.getElementById("star-1");
+const starTwoScale = document.getElementById("star-2");
+const starThreeScale = document.getElementById("star-3");
+const starFourScale = document.getElementById("star-4");
+const starFiveScale = document.getElementById("star-5");
+const megaStarScale = document.getElementById("mega-star");
+
 function getUsersByCookie() {
     for (let i = 0; i < connectedUsers.length; i++) {
         let userID = connectedUsers[i]["userID"];
@@ -31,10 +32,23 @@ function getUsersByCookie() {
         indexUser.id = userID;
         let indexUserScale = document.getElementById("scale-" + (i + 1));
         indexUserScale.id = "scale-" + userID + "-for-user";
+        indexUserScale.classList.remove("hidden");
         indexUserBodyImg.src = bodyImgSrc;
         indexUserFaceImg.src = faceImgSrc;
         indexUserHatImg.src = hatImgSrc;
         indexUserName.innerText = userName;
+        let megaStar = document.querySelectorAll(".score__star")[5];
+        megaStar.id = "mega-star-" + userID;
+        let starOne = document.querySelectorAll(".score__star")[0];
+        starOne.id = "star-1-" + userID;
+        let starTwo = document.querySelectorAll(".score__star")[1];
+        starTwo.id = "star-2-" + userID;
+        let starThree = document.querySelectorAll(".score__star")[2];
+        starThree.id = "star-3-" + userID;
+        let starFour = document.querySelectorAll(".score__star")[3];
+        starFour.id = "star-4-" + userID;
+        let starFive = document.querySelectorAll(".score__star")[4];
+        starFive.id = "star-5-" + userID;
     }
 }
 
@@ -60,47 +74,34 @@ btnContinue.addEventListener("click", function () {
 })
 
 let valueScore= 0;
-function addScore(userID, score, maxScore){
+function addScore(userID, score, maxScore) {
+    let starComplete = 0;
     let user = document.getElementById(userID);
     let scale = document.getElementById("scale-" + userID + "-for-user")
-    let maxPractice = maxScore - 0.2 * maxScore;
+    let maxPractice = 0.8 * maxScore;
+    let starOne = document.getElementById("star-1-" + userID);
+    let starTwo = document.getElementById("star-2-" + userID);
+    let starThree= document.getElementById("star-3-" + userID);
+    let starFour = document.getElementById("star-4-" + userID);
+    let starFive = document.getElementById("star-5-" + userID);
+    let megaStar = document.getElementById("mega-star" + userID);
     if (valueScore > 5600) return
     valueScore += score;
     console.log("valueScore: " + valueScore);
-    if (valueScore <= maxTheory) {
+    if (valueScore <= maxScore) {
         console.log("valueScore: " + valueScore);
         percentage = (valueScore / maxPractice);
         console.log("percentage: " + percentage);
         pix = 250 * percentage;
         console.log("pix: " + pix);
     }
-    if (valueScore > maxTheory) {
+    if (valueScore > maxScore) {
         percentage = (valueScore / maxTheory);
         console.log("percentage: " + percentage);
         pix = 50 * percentage;
         console.log("pix: " + pix);
     }
     scale.style.height = pix + 'px';
-    if (valueScore >= 0.2 * maxPractice) {
-        starOne.src = "/static/img/star_blue.svg"
-    }
-    if (valueScore >= 0.4 * maxPractice) {
-        starTwo.src = "/static/img/star_blue.svg"
-    }
-    if (valueScore >= 0.6 * maxPractice) {
-        starThree.src = "/static/img/star_blue.svg"
-    }
-    if (valueScore >= 0.8 * maxPractice) {
-        starFour.src = "/static/img/star_blue.svg"
-    }
-    if (valueScore >= maxPractice) {
-        starFive.src = "/static/img/star_blue.svg"
-    }
-    if (valueScore >= 0.9 * maxTheory) {
-        megaStar.src = "/static/img/mega-star.svg"
-        megaStar.classList.remove("hidden");
-    }
-    console.log("valueScore: ", valueScore);
     if (score > scorePerfect){
         let effect = user.querySelector(".hero__rating-perfect");
         effect.classList.remove("hidden");
@@ -135,22 +136,48 @@ function addScore(userID, score, maxScore){
         }, 1000);
     }
     if (valueScore >= 0.2 * maxPractice) {
-        starOne.src = "/static/img/star_blue.svg"
-        //поставить флаг и отслеживать, а потом закрашивать звёздочки, если уже кто-то набрал
+        starOne.src = "/static/img/star_blue.svg";
+        starComplete = 1;
+        console.log("ПОЯВИЛАСЬ ЗВЕЗДА ", starComplete)
     }
     if (valueScore >= 0.4 * maxPractice) {
         starTwo.src = "/static/img/star_blue.svg"
+        starComplete = 2;
     }
     if (valueScore >= 0.6 * maxPractice) {
         starThree.src = "/static/img/star_blue.svg"
+        starComplete = 3;
     }
     if (valueScore >= 0.8 * maxPractice) {
         starFour.src = "/static/img/star_blue.svg"
+        starComplete = 4;
     }
     if (valueScore >= maxPractice) {
         starFive.src = "/static/img/star_blue.svg"
+        starComplete = 5;
     }
     if (valueScore >= 0.9 * maxScore) {
         megaStar.classList.remove("hidden");
+        starComplete = 6;
+    }
+    switch(starComplete) {
+        case 1:
+            starOneScale.src = "/static/img/star_blue.svg"
+            break;
+        case 2:
+            starTwoScale.src = "/static/img/star_blue.svg"
+            break;
+        case 3:
+            starThreeScale.src = "/static/img/star_blue.svg"
+            break;
+        case 4:
+            starFourScale.src = "/static/img/star_blue.svg"
+            break;
+        case 5:
+            starFiveScale.src = "/static/img/star_blue.svg"
+            break;
+        case 6:
+            megaStarScale.classList.remove("hidden");
+            break;
     }
 }

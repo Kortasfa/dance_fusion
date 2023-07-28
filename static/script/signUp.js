@@ -7,7 +7,7 @@ const usernameEmpty = document.getElementById("username-empty");
 const passwordEmpty = document.getElementById("password-empty");
 
 nameField.oninput = function() {
-    this.value = this.value.substr(0, 15);
+    this.value = this.value.substr(0, 10);
 }
 function signUp() {
     let userInfo = {

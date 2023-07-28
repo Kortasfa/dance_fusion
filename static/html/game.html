@@ -83,11 +83,19 @@
         </div>
     </div>
   </div>
-  <div class="ratingScales">
-    <div class="ratingScales__user-scale ratingScales__user-scale_scale-1" id="scale-1"></div>
-    <div class="ratingScales__user-scale ratingScales__user-scale_scale-2" id="scale-2"></div>
-    <div class="ratingScales__user-scale ratingScales__user-scale_scale-3" id="scale-3"></div>
-    <div class="ratingScales__user-scale ratingScales__user-scale_scale-4" id="scale-4"></div>
+  <div class="rating-scales">
+    <div class="rating-scales__user-scale rating-scales__user-scale_scale-1" id="scale-1"></div>
+    <div class="rating-scales__user-scale rating-scales__user-scale_scale-2 hidden" id="scale-2"></div>
+    <div class="rating-scales__user-scale rating-scales__user-scale_scale-3 hidden" id="scale-3"></div>
+    <div class="rating-scales__user-scale rating-scales__user-scale_scale-4" id="scale-4"></div>
+    <div class="rating-scales__rating-stars">
+      <img class="rating-stars__star hidden rating-stars__star_mega-star" id="mega-star" src="/static/img/mega_star.svg">
+      <img class="rating-stars__star" id="star-5" src="/static/img/star_white.svg" alt="">
+      <img class="rating-stars__star" id="star-4" src="/static/img/star_white.svg" alt="">
+      <img class="rating-stars__star" id="star-3" src="/static/img/star_white.svg" alt="">
+      <img class="rating-stars__star" id="star-2" src="/static/img/star_white.svg" alt="">
+      <img class="rating-stars__star" id="star-1" src="/static/img/star_white.svg" alt="">
+    </div>
   </div>
   <a class="btn-exit" href="/room">
     <img src="/static/img/log_out.svg" alt="">
@@ -214,6 +222,7 @@
           socket.onmessage = function (event) {
               try {
                   let jsonData = JSON.parse(event.data);
+                  console.log(jsonData);
                   if ("ExitingUser" in jsonData) {
                       console.log("Удаляем пользователя на чёрт");
                       removeUser(jsonData.ExitingUser);

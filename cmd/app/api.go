@@ -365,28 +365,9 @@ func getDataSongJson(w http.ResponseWriter, r *http.Request) {
 		log.Println(err.Error())
 		return
 	}
-	fmt.Println(data.RoomID, data.MaxPoint)
-	broadcastJoinPageWSMessage <- []string{data.RoomID, string(reqData)}
+	fmt.Println(data.RoomID, data.MaxPoint, data.ColorID)
+	broadcastGameFieldWSMessage <- []string{data.RoomID, string(reqData)}
 	w.WriteHeader(200)
-}
-
-func danceInfoHandleMessages() {
-	for mesArr := range broadcastGameFieldWSMessage {
-		for conn, gameFieldID := range gameFieldWSDict {
-			roomID := mesArr[0]
-			data := mesArr[1]
-			if gameFieldID == roomID {
-				err := conn.WriteMessage(websocket.TextMessage, []byte(data))
-				if err != nil {
-					err := conn.Close()
-					delete(gameFieldWSDict, conn)
-					if err != nil {
-						return
-					}
-				}
-			}
-		}
-	}
 }
 
 func getBestPlayer(db *sqlx.DB) func(w http.ResponseWriter, r *http.Request) {

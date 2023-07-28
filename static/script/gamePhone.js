@@ -108,7 +108,7 @@ const starThree = document.getElementById("star-3");
 const starFour = document.getElementById("star-4");
 const starFive = document.getElementById("star-5");
 const megaStar = document.getElementById("mega-star");
-const stars = document.querySelectorAll(".rating-stars__star")
+const stars = document.querySelectorAll(".rating-stars__star");
 function joinRoom(userID) {
     socket = new WebSocket("wss://" + window.location.hostname + "/ws/joinToRoom/" + userID);
     socket.onopen = function(event) {
@@ -119,6 +119,7 @@ function joinRoom(userID) {
         let maxPractice = maxTheory - maxTheory * 0.2; //4480
         let receivedData = event.data;
         let receivedJSON = JSON.parse(receivedData);
+        console.log(receivedJSON);
         if ("point" in receivedJSON) {
             let score = receivedJSON["point"];
             console.log("score: " + score);
@@ -190,7 +191,7 @@ async function sendSongJson(roomID, maxTheory, colorID) {
         body: JSON.stringify({
             "roomID": roomID,
             "maxPoint": maxTheory,
-            "colorID": colorID,
+            "colorID": colorID
         }),
     });
     if (response.ok) {

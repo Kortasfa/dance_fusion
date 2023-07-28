@@ -186,7 +186,7 @@
 .party__user{
     margin: 27px;
     margin-top: 40px;
-    width: 84px;
+    width: fit-content;
 }
 
 .user__avatar{
