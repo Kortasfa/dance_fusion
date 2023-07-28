@@ -81,7 +81,7 @@ func getRegisteredUserData(db *sqlx.DB) func(w http.ResponseWriter, r *http.Requ
 			return
 		}
 		userName := data.UserName
-		exists, err := userExists(db, data.UserName)
+		_, exists, err := userExists(db, data.UserName)
 		if err != nil {
 			http.Error(w, "Internal Server Error", 500)
 			log.Println(err.Error())
@@ -402,13 +402,17 @@ func getBestPlayer(db *sqlx.DB) func(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			http.Error(w, "Error getting best player information", http.StatusInternalServerError)
 			log.Println(err.Error())
-			fmt.Println("Тут")
 			return
 		}
 
 		if bestPlayerData.UserID == 0 {
 			w.Header().Set("Content-Type", "application/json")
-			w.Write([]byte("{}"))
+			_, err = w.Write([]byte("{}"))
+			if err != nil {
+				http.Error(w, "Json send error", http.StatusInternalServerError)
+				log.Println(err.Error())
+				return
+			}
 			return
 		}
 		fmt.Println(bestPlayerData.UserID)
@@ -416,7 +420,6 @@ func getBestPlayer(db *sqlx.DB) func(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			http.Error(w, "Error getting user information", http.StatusInternalServerError)
 			log.Println(err.Error())
-			fmt.Println("Вот")
 			return
 		}
 
@@ -429,7 +432,12 @@ func getBestPlayer(db *sqlx.DB) func(w http.ResponseWriter, r *http.Request) {
 		}
 
 		w.Header().Set("Content-Type", "application/json")
-		json.NewEncoder(w).Encode(response)
+		err = json.NewEncoder(w).Encode(response)
+		if err != nil {
+			http.Error(w, "Json send error", http.StatusInternalServerError)
+			log.Println(err.Error())
+			return
+		}
 	}
 }
 
@@ -452,19 +460,89 @@ func updateBestPlayer(db *sqlx.DB) http.HandlerFunc {
 			log.Println(err.Error())
 			return
 		}
-
-		const query = `
-			UPDATE
-				songs
-			SET
-				best_player_id = ?, best_score = ?
-			WHERE
-			    id = ?
-		`
-
-		_, err = db.Exec(query, data.UserID, data.Score, data.SongID)
+		err = updateBestPlayerSQL(db, data.SongID, data.UserID, data.Score)
 		if err != nil {
 			http.Error(w, "Error updating best player info", http.StatusInternalServerError)
+			log.Println(err.Error())
+			return
+		}
+		w.WriteHeader(http.StatusOK)
+	}
+}
+
+func changeUserName(db *sqlx.DB) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		reqData, err := io.ReadAll(r.Body)
+		if err != nil {
+			http.Error(w, "Parsing error", 500)
+			log.Println(err.Error())
+			return
+		}
+		var data struct {
+			UserID      int    `json:"user_id"`
+			NewUserName string `json:"new_user_name"`
+		}
+		err = json.Unmarshal(reqData, &data)
+		if err != nil {
+			http.Error(w, "JSON parsing error", 500)
+			log.Println(err.Error())
+			return
+		}
+		userID, exists, err := userExists(db, data.NewUserName)
+		if err != nil {
+			http.Error(w, "SQL request error", 500)
+			log.Println(err.Error())
+			return
+		}
+		if userID != data.UserID && exists {
+			w.WriteHeader(http.StatusConflict)
+			return
+		}
+		err = updateUserName(db, data.UserID, data.NewUserName)
+		if err != nil {
+			http.Error(w, "Error updating user name", 500)
+			log.Println(err.Error())
+			return
+		}
+		var user userInfo
+		err = getJsonCookie(r, "userInfoCookie", &user)
+		if err != nil {
+			http.Error(w, "Error getting cookie", 500)
+			log.Println(err.Error())
+			return
+		}
+		user.UserName = data.NewUserName
+		err = setJsonCookie(w, "userInfoCookie", user, 24*time.Hour)
+		if err != nil {
+			http.Error(w, "Error setting cookie", 500)
+			log.Println(err.Error())
+			return
+		}
+		w.WriteHeader(http.StatusOK)
+	}
+}
+
+func changeUserPassword(db *sqlx.DB) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		reqData, err := io.ReadAll(r.Body)
+		if err != nil {
+			http.Error(w, "Parsing error", 500)
+			log.Println(err.Error())
+			return
+		}
+		var data struct {
+			UserID          int    `json:"user_id"`
+			NewUserPassword string `json:"new_user_password"`
+		}
+		err = json.Unmarshal(reqData, &data)
+		if err != nil {
+			http.Error(w, "JSON parsing error", 500)
+			log.Println(err.Error())
+			return
+		}
+		err = updateUserPassword(db, data.UserID, data.NewUserPassword)
+		if err != nil {
+			http.Error(w, "Error updating user password", 500)
 			log.Println(err.Error())
 			return
 		}
