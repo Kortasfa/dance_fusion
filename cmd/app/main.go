@@ -49,9 +49,12 @@ func main() {
 	r.HandleFunc("/api/custom", getUserAvatar(dbx)).Methods("POST")
 	r.HandleFunc("/api/sendPoint", sendPointToJoin).Methods("POST")
 	r.HandleFunc("/api/sendDataSongJson", getDataSongJson).Methods("POST")
+	r.HandleFunc("/api/getBestPlayer", getBestPlayer(dbx)).Methods("POST")
+	r.HandleFunc("/api/updateBestPlayer", updateBestPlayer(dbx)).Methods("POST")
 
 	go handleRoomWSMessages()
 	go handleJoinPageWSMessages()
+	go danceInfoHandleMessages()
 
 	r.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir("./static"))))
 

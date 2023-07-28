@@ -35,7 +35,8 @@ func getSongsData(db *sqlx.DB) ([]songsData, error) {
 			video_src,
 			preview_video_src,
 			image_src,
-			style_id
+			style_id,
+			difficulty
 		FROM
 			songs
 	`
@@ -50,21 +51,27 @@ func getSongsData(db *sqlx.DB) ([]songsData, error) {
 	return data, nil
 }
 
-func getMotionListPath(db *sqlx.DB, songName string) (string, error) {
+func getMotionListPath(db *sqlx.DB, songName string) ([]string, error) {
 	const query = `
 		SELECT
-			motion_list_path
+			first_player,
+			second_player,
+			third_player,
+			fourth_player
 		FROM
-			songs
+			motion_list_path
 		WHERE
 		   song_name=?
 	`
 
-	var motionListPath string
-	err := db.QueryRow(query, songName).Scan(&motionListPath)
+	var playerOnePath, playerTwoPath, playerThreePath, playerFourPath string
+	err := db.QueryRow(query, songName).Scan(&playerOnePath, &playerTwoPath, &playerThreePath, &playerFourPath)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
+
+	// Создаем срез и добавляем пути к файлам для каждого игрока
+	motionListPath := []string{playerOnePath, playerTwoPath, playerThreePath, playerFourPath}
 
 	return motionListPath, nil
 }
@@ -80,8 +87,10 @@ func insertNewUser(db *sqlx.DB, userName string, password string) (int, error) {
 		UserImageSrc: "static/img/user_1.png",
 	}
 	query := `
-		INSERT INTO users(name, password, img_src)
-		VALUES (?, ?, ?)`
+		INSERT INTO
+		    users(name, password, img_src)
+		VALUES
+		    (?, ?, ?)`
 	result, err := db.Exec(query, user.UserName, user.Password, user.UserImageSrc)
 	if err != nil {
 		return 0, err
@@ -95,9 +104,12 @@ func insertNewUser(db *sqlx.DB, userName string, password string) (int, error) {
 
 func userExists(db *sqlx.DB, userName string) (bool, error) {
 	const query = `
-			SELECT COUNT(*)
-			FROM users
-			WHERE name = ?`
+			SELECT
+			    COUNT(*)
+			FROM
+			    users
+			WHERE
+			    name = ?`
 	var count int
 	err := db.QueryRow(query, userName).Scan(&count)
 	if err != nil {
@@ -112,9 +124,12 @@ func userExists(db *sqlx.DB, userName string) (bool, error) {
 
 func credentialExists(db *sqlx.DB, userName string, password string) (int, bool, error) {
 	const query = `
-		SELECT id
-		FROM users
-		WHERE name = ? and password = ?`
+		SELECT
+		    id
+		FROM
+		    users
+		WHERE
+		    name = ? and password = ?`
 	var userIDs []int
 	err := db.Select(&userIDs, query, userName, password)
 	if len(userIDs) == 0 {
@@ -260,7 +275,8 @@ func changeUserAvatar(db *sqlx.DB, field userAvatarData, userID int) error {
 			img_hat = ?,
 			img_face = ?,
 			img_body = ?
-		WHERE id = ?
+		WHERE
+		    id = ?
 	`
 
 	_, err := db.Exec(query, field.HatSrc, field.FaceSrc, field.BodySrc, userID)
@@ -270,7 +286,7 @@ func changeUserAvatar(db *sqlx.DB, field userAvatarData, userID int) error {
 func getScoreByUserID(db *sqlx.DB, userID int) (int, error) {
 	const query = `
 		SELECT
-			score
+			total_score
 		FROM
 			users
 		WHERE
@@ -287,4 +303,28 @@ func getScoreByUserID(db *sqlx.DB, userID int) (int, error) {
 	}
 
 	return score, nil
+}
+
+func getBestPlayerInfo(db *sqlx.DB, songID int) (bestPlayerInfo, error) {
+	const query = `
+		SELECT
+		    best_player_id,
+		    best_score
+		FROM
+		    songs
+		WHERE
+		    id = ?`
+	var playerInfo struct {
+		UserID sql.NullInt32
+		Score  sql.NullInt32
+	}
+	err := db.QueryRow(query, songID).Scan(&playerInfo.UserID, &playerInfo.Score)
+	if err != nil {
+		return bestPlayerInfo{}, err
+	}
+
+	return bestPlayerInfo{
+		UserID: int(playerInfo.UserID.Int32),
+		Score:  int(playerInfo.Score.Int32),
+	}, nil
 }

@@ -365,28 +365,109 @@ func getDataSongJson(w http.ResponseWriter, r *http.Request) {
 		log.Println(err.Error())
 		return
 	}
-	go func() {
-		isSend := false
-		for {
-			for conn, gameFieldID := range gameFieldWSDict {
-				if gameFieldID == data.RoomID {
-					err := conn.WriteMessage(websocket.TextMessage, reqData)
-					isSend = true
+	fmt.Println(data.RoomID, data.MaxPoint)
+	broadcastJoinPageWSMessage <- []string{data.RoomID, string(reqData)}
+	w.WriteHeader(200)
+}
+
+func danceInfoHandleMessages() {
+	for mesArr := range broadcastGameFieldWSMessage {
+		for conn, gameFieldID := range gameFieldWSDict {
+			roomID := mesArr[0]
+			data := mesArr[1]
+			if gameFieldID == roomID {
+				err := conn.WriteMessage(websocket.TextMessage, []byte(data))
+				if err != nil {
+					err := conn.Close()
+					delete(gameFieldWSDict, conn)
 					if err != nil {
-						delete(gameFieldWSDict, conn)
-						err := conn.Close()
-						if err != nil {
-							w.WriteHeader(409)
-							return
-						}
+						return
 					}
-					break
 				}
 			}
-			if isSend {
-				break
-			}
 		}
-	}()
-	w.WriteHeader(200)
+	}
+}
+
+func getBestPlayer(db *sqlx.DB) func(w http.ResponseWriter, r *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
+		songID, err := strconv.Atoi(r.FormValue("song_id"))
+		if err != nil {
+			http.Error(w, "Invalid song ID", http.StatusBadRequest)
+			log.Println(err.Error())
+			return
+		}
+
+		bestPlayerData, err := getBestPlayerInfo(db, songID)
+		if err != nil {
+			http.Error(w, "Error getting best player information", http.StatusInternalServerError)
+			log.Println(err.Error())
+			fmt.Println("Тут")
+			return
+		}
+
+		if bestPlayerData.UserID == 0 {
+			w.Header().Set("Content-Type", "application/json")
+			w.Write([]byte("{}"))
+			return
+		}
+		fmt.Println(bestPlayerData.UserID)
+		userData, err := getUserInfo(db, bestPlayerData.UserID)
+		if err != nil {
+			http.Error(w, "Error getting user information", http.StatusInternalServerError)
+			log.Println(err.Error())
+			fmt.Println("Вот")
+			return
+		}
+
+		response := struct {
+			UserInfo  userInfo
+			BestScore int
+		}{
+			UserInfo:  userData,
+			BestScore: bestPlayerData.Score,
+		}
+
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(response)
+	}
+}
+
+func updateBestPlayer(db *sqlx.DB) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		reqData, err := io.ReadAll(r.Body)
+		if err != nil {
+			http.Error(w, "Parsing error", 500)
+			log.Println(err.Error())
+			return
+		}
+		var data struct {
+			SongID int `json:"song_id"`
+			UserID int `json:"user_id"`
+			Score  int `json:"score"`
+		}
+		err = json.Unmarshal(reqData, &data)
+		if err != nil {
+			http.Error(w, "JSON parsing error", 500)
+			log.Println(err.Error())
+			return
+		}
+
+		const query = `
+			UPDATE
+				songs
+			SET
+				best_player_id = ?, best_score = ?
+			WHERE
+			    id = ?
+		`
+
+		_, err = db.Exec(query, data.UserID, data.Score, data.SongID)
+		if err != nil {
+			http.Error(w, "Error updating best player info", http.StatusInternalServerError)
+			log.Println(err.Error())
+			return
+		}
+		w.WriteHeader(http.StatusOK)
+	}
 }

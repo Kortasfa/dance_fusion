@@ -36,27 +36,33 @@ func roomWSHandler(db *sqlx.DB) func(w http.ResponseWriter, r *http.Request) {
 		}
 		fmt.Println("Надо отправить название: ", string(message))
 
-		motionListPath, err := getMotionListPath(db, string(message))
+		motionListPaths, err := getMotionListPath(db, string(message))
 		if err != nil {
-			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+			http.Error(w, "Внутренняя ошибка сервера", http.StatusInternalServerError)
 			log.Println(err.Error())
-			delete(roomWSDict, conn)
-			return
-		}
-
-		fileContent, err := ioutil.ReadFile(motionListPath)
-		if err != nil {
-			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-			log.Println("Ошибка при открытии файла:", err)
 			delete(roomWSDict, conn)
 			return
 		}
 		for roomID, userSlice := range roomIDDict {
 			if roomID == websocketID {
-				for _, userID := range userSlice {
+				i := 0
+				for {
+					if i >= len(userSlice) {
+						break
+					}
+					userID := userSlice[i]
+					motionListPath := motionListPaths[i]
 					fmt.Println("Надо отправить JSON этому", userID)
+					fmt.Println("Надо отправить motionListPath этому", userID, "вот json", motionListPath)
+					fileContent, err := ioutil.ReadFile(motionListPath)
+					if err != nil {
+						http.Error(w, "Внутренняя ошибка сервера", http.StatusInternalServerError)
+						log.Println("Ошибка при открытии файла для игрока", userID, ":", err)
+						delete(roomWSDict, conn)
+						return
+					}
 					broadcastJoinPageWSMessage <- []string{userID, string(fileContent)}
-					err = conn.Close() // Пока закрываем вебсокет, потому что дальше он не испоьлзуется
+					i++
 				}
 				break
 			}
