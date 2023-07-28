@@ -115,3 +115,27 @@ function addScore(userID, score, maxScore){
         megaStar.classList.remove("hidden");
     }
 }
+
+window.onbeforeunload = function() {
+    console.log('Выгоняем всех челов из игры');
+    for (let user of connectedUsers) {
+        expelUser(user["userID"]).then(() => {});
+    }
+}
+async function expelUser(userID) {
+    const response = await fetch("/api/exitFromGame", {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({"userID": userID}),
+    });
+    if (response.ok) {
+        console.log('Выгнал', userID);
+    } else {
+        console.log('Не получилось выгнать', userID);
+    }
+    if (socket) {
+        socket.close();
+    }
+}

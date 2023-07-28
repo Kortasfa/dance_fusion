@@ -11,7 +11,7 @@ CHARACTER SET = utf8mb4
 COLLATE utf8mb4_unicode_ci;
 INSERT INTO motion_list_path(song_name, first_player, second_player, third_player, fourth_player)
 VALUES
-    ("forgetYou", "static/motion_list/forgetYou.json", "static/motion_list/forgetYou.json", "static/motion_list/forgetYou.json", "static/motion_list/forgetYou.json"),
+    ("Forget You", "static/motion_list/forgetYou.json", "static/motion_list/forgetYou.json", "static/motion_list/forgetYou.json", "static/motion_list/forgetYou.json"),
     ("good_4_u", "static/motion_list/good_4_u.json" ,"static/motion_list/good_4_u.json", "static/motion_list/good_4_u.json", "static/motion_list/good_4_u.json"),
-    ("rasputin", "static/motion_list/rasputin.json" ,"static/motion_list/rasputin.json", "static/motion_list/rasputin.json", "static/motion_list/rasputin.json"),
+    ("Rasputin", "static/motion_list/rasputin.json" ,"static/motion_list/rasputin.json", "static/motion_list/rasputin.json", "static/motion_list/rasputin.json"),
     ("mi_mi_mi", "static/motion_list/mi_mi_mi.json" ,"static/motion_list/mi_mi_mi.json", "static/motion_list/mi_mi_mi.json", "static/motion_list/mi_mi_mi.json");
