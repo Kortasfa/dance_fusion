@@ -193,11 +193,6 @@
         }
 
         (async () => {
-            let classifier = new EdgeImpulseClassifier();
-            await classifier.init();
-            let project = classifier.getProjectInfo();
-            console.log(project.owner + ' / ' + project.name + ' (version ' + project.deploy_version + ')');
-
             let socket = new WebSocket("wss://" + window.location.hostname + "/neuralWS/" + WssURL.split("/").pop().trim());
 
             socket.onopen = function (event) {

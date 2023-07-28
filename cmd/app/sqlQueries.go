@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 	"github.com/jmoiron/sqlx"
+	"golang.org/x/crypto/bcrypt"
 	"log"
 )
 
@@ -61,7 +62,7 @@ func getMotionListPath(db *sqlx.DB, songName string) ([]string, error) {
 		FROM
 			motion_list_path
 		WHERE
-		   song_name=?
+		   song_name = ?
 	`
 
 	var playerOnePath, playerTwoPath, playerThreePath, playerFourPath string
@@ -77,21 +78,13 @@ func getMotionListPath(db *sqlx.DB, songName string) ([]string, error) {
 }
 
 func insertNewUser(db *sqlx.DB, userName string, password string) (int, error) {
-	user := struct {
-		UserName     string
-		Password     string
-		UserImageSrc string
-	}{
-		UserName:     userName,
-		Password:     password,
-		UserImageSrc: "static/img/user_1.png",
-	}
+	hash, err := bcrypt.GenerateFromPassword([]byte(password), hashCost)
 	query := `
 		INSERT INTO
-		    users(name, password, img_src)
+		    users(name, password_hash)
 		VALUES
-		    (?, ?, ?)`
-	result, err := db.Exec(query, user.UserName, user.Password, user.UserImageSrc)
+		    (?, ?)`
+	result, err := db.Exec(query, userName, string(hash))
 	if err != nil {
 		return 0, err
 	}
@@ -102,36 +95,16 @@ func insertNewUser(db *sqlx.DB, userName string, password string) (int, error) {
 	return int(userID), nil
 }
 
-func userExists(db *sqlx.DB, userName string) (bool, error) {
-	const query = `
-			SELECT
-			    COUNT(*)
-			FROM
-			    users
-			WHERE
-			    name = ?`
-	var count int
-	err := db.QueryRow(query, userName).Scan(&count)
-	if err != nil {
-		log.Println(err.Error())
-		return false, err
-	}
-	if count > 0 {
-		return true, nil
-	}
-	return false, nil
-}
-
-func credentialExists(db *sqlx.DB, userName string, password string) (int, bool, error) {
+func userExists(db *sqlx.DB, userName string) (int, bool, error) {
 	const query = `
 		SELECT
 		    id
 		FROM
 		    users
 		WHERE
-		    name = ? and password = ?`
+		    name = ?`
 	var userIDs []int
-	err := db.Select(&userIDs, query, userName, password)
+	err := db.Select(&userIDs, query, userName)
 	if len(userIDs) == 0 {
 		return 0, false, nil
 	} else if err != nil {
@@ -139,6 +112,40 @@ func credentialExists(db *sqlx.DB, userName string, password string) (int, bool,
 		return 0, false, err
 	}
 	return userIDs[0], true, nil
+}
+
+func credentialExists(db *sqlx.DB, userName string, password string) (int, bool, error) {
+	const query = `
+		SELECT
+			id, password_hash
+		FROM
+			users
+		WHERE
+			name = ?`
+
+	rows, err := db.Query(query, userName)
+	if err != nil {
+		log.Println("Failed to execute the query")
+		return 0, false, err
+	}
+
+	var (
+		userID       int
+		passwordHash string
+	)
+
+	if rows.Next() {
+		err = rows.Scan(&userID, &passwordHash)
+		if err != nil {
+			log.Println("Failed to retrieve data from the row")
+			return 0, false, err
+		}
+		err = bcrypt.CompareHashAndPassword([]byte(passwordHash), []byte(password))
+		if err == nil {
+			return userID, true, nil
+		}
+	}
+	return 0, false, nil
 }
 
 func getUserInfo(db *sqlx.DB, userID int) (userInfo, error) {
@@ -322,6 +329,7 @@ func getBestPlayerInfo(db *sqlx.DB, songID int) (bestPlayerInfo, error) {
 	if err != nil {
 		return bestPlayerInfo{}, err
 	}
+
 	return bestPlayerInfo{
 		UserID: int(playerInfo.UserID.Int32),
 		Score:  int(playerInfo.Score.Int32),
@@ -345,4 +353,49 @@ func getBotInfo(db *sqlx.DB, botName string) (botInfo, error) {
 		return botInfo{}, err
 	}
 	return botMainInfo, nil
+}
+
+func updateBestPlayerSQL(db *sqlx.DB, songID int, userID int, score int) error {
+	const query = `
+			UPDATE
+				songs
+			SET
+				best_player_id = ?, best_score = ?
+			WHERE
+			    id = ?
+		`
+
+	_, err := db.Exec(query, userID, score, songID)
+	return err
+}
+
+func updateUserName(db *sqlx.DB, userID int, userName string) error {
+	const query = `
+			UPDATE
+				users
+			SET
+				name = ?
+			WHERE
+			    id = ?
+		`
+
+	_, err := db.Exec(query, userName, userID)
+	return err
+}
+
+func updateUserPassword(db *sqlx.DB, userID int, userPassword string) error {
+	const query = `
+			UPDATE
+				users
+			SET
+				password_hash = ?
+			WHERE
+			    id = ?
+		`
+	hash, err := bcrypt.GenerateFromPassword([]byte(userPassword), hashCost)
+	if err != nil {
+		return err
+	}
+	_, err = db.Exec(query, string(hash), userID)
+	return err
 }

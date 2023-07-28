@@ -1,4 +1,4 @@
-    USE dance_fusion;
+USE dance_fusion;
 CREATE TABLE motion_list_path(
                                  `id` INTEGER AUTO_INCREMENT PRIMARY KEY,
                                  `song_name` VARCHAR(255) NOT NULL,

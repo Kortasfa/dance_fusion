@@ -118,13 +118,13 @@ $(document).ready(function() {
                         return response.json();
                     })
                     .then(data => {
-                        if (data.BotInfo) {
+                        console.log(data);
+                        if (data.BotScoresPath) {
                             console.log('Bot Info:');
-                            console.log('Bot Name:', data.BotInfo.BotID);
-                            console.log('Bot Scores Src:', data.BotInfo.BotName);
-                            console.log('Bot Hat Src:', data.BotInfo.BotHatSrc);
-                            console.log('Bot Face Src:', data.BotInfo.BotFaceSrc);
-                            console.log('Bot Body Src:', data.BotInfo.BotBodySrc);
+                            console.log('Bot Scores Src:', data.BotScoresPath);
+                            console.log('Bot Hat Src:', data.BotImgHat);
+                            console.log('Bot Face Src:', data.BotImgFace);
+                            console.log('Bot Body Src:', data.BotImgBody);
                         } else {
                             console.log('Fail');
                         }
@@ -137,16 +137,25 @@ $(document).ready(function() {
                 // Once the first script is loaded, load the second script
                 $.getScript(secondComponent, function() {
                     // After both scripts are loaded, load the page by AJAX
-                    contentContainer.load(thirdComponent, function() {
-                        const video = $('#video-dance')[0];
-                        const src = $('#video-src')[0];
-                        src.setAttribute('src', fullSongName);
-                        video.addEventListener('loadeddata', function() {
-                            video.play();
-                            socket.send(songName);
-                            socket.close(); // Закрываем вебсокет mainRoom
+                    (async () => {
+                        let classifier = new EdgeImpulseClassifier();
+                        await classifier.init();
+                        let project = classifier.getProjectInfo();
+                        console.log(project.owner + ' / ' + project.name + ' (version ' + project.deploy_version + ')');
+
+                        contentContainer.load(thirdComponent, function() {
+                            const video = $('#video-dance')[0];
+                            const src = $('#video-src')[0];
+                            src.setAttribute('src', fullSongName);
+
+                            video.addEventListener('loadeddata', function() {
+                                video.play();
+                                socket.send(songName);
+                                console.log(songName);
+                                socket.close(); // Закрываем вебсокет mainRoom
+                            });
                         });
-                    });
+                    })();
                 });
             });
             return false;
