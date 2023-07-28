@@ -51,6 +51,8 @@ func main() {
 	r.HandleFunc("/api/sendMaxPoint", getMaxScore).Methods("POST")
 	r.HandleFunc("/api/getBestPlayer", getBestPlayer(dbx)).Methods("POST")
 	r.HandleFunc("/api/updateBestPlayer", updateBestPlayer(dbx)).Methods("POST")
+	r.HandleFunc("/api/changeUserName", changeUserName(dbx)).Methods("POST")
+	r.HandleFunc("/api/changeUserPassword", changeUserPassword(dbx)).Methods("POST")
 
 	go handleRoomWSMessages()
 	go handleJoinPageWSMessages()
@@ -63,7 +65,6 @@ func main() {
 		Handler: r,
 		Addr:    port,
 	}
-
 	log.Fatal(srv.ListenAndServe())
 }
 

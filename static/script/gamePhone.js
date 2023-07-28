@@ -222,6 +222,8 @@ async function exitFromGame() {
 }
 
 async function exitFromAccount() {
+    exitFromGame().then(() => {})
+    window.onbeforeunload = null;
     const response = await fetch("/api/exitFromAccount", {
         method: 'POST',
         headers: {

@@ -12,6 +12,8 @@ import (
 	"time"
 )
 
+const hashCost = 8
+
 var upgrader = websocket.Upgrader{
 	ReadBufferSize:  1024,
 	WriteBufferSize: 1024,
