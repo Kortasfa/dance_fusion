@@ -107,17 +107,25 @@ $(document).ready(function() {
                 // Once the first script is loaded, load the second script
                 $.getScript(secondComponent, function() {
                     // After both scripts are loaded, load the page by AJAX
-                    contentContainer.load(thirdComponent, function() {
-                        const video = $('#video-dance')[0];
-                        const src = $('#video-src')[0];
-                        src.setAttribute('src', fullSongName);
+                    (async () => {
+                        let classifier = new EdgeImpulseClassifier();
+                        await classifier.init();
+                        let project = classifier.getProjectInfo();
+                        console.log(project.owner + ' / ' + project.name + ' (version ' + project.deploy_version + ')');
 
-                        video.addEventListener('loadeddata', function() {
-                            video.play();
-                            socket.send(songName);
-                            socket.close(); // Закрываем вебсокет mainRoom
+                        contentContainer.load(thirdComponent, function() {
+                            const video = $('#video-dance')[0];
+                            const src = $('#video-src')[0];
+                            src.setAttribute('src', fullSongName);
+
+                            video.addEventListener('loadeddata', function() {
+                                video.play();
+                                socket.send(songName);
+                                console.log(songName);
+                                socket.close(); // Закрываем вебсокет mainRoom
+                            });
                         });
-                    });
+                    })();
                 });
             });
             return false;

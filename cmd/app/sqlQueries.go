@@ -62,7 +62,7 @@ func getMotionListPath(db *sqlx.DB, songName string) ([]string, error) {
 		FROM
 			motion_list_path
 		WHERE
-		   song_name=?
+		   song_name = ?
 	`
 
 	var playerOnePath, playerTwoPath, playerThreePath, playerFourPath string
