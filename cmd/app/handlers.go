@@ -45,6 +45,7 @@ type songsData struct {
 	VideoSrc        string `db:"video_src"`
 	ImageSrc        string `db:"image_src"`
 	StyleID         int    `db:"style_id"`
+	Difficulty      int    `db:"difficulty"`
 }
 
 type userInfo struct {
@@ -53,6 +54,18 @@ type userInfo struct {
 	HatSrc   string
 	FaceSrc  string
 	BodySrc  string
+}
+
+type bestPlayerInfo struct {
+	UserID int `db:"best_player_id"`
+	Score  int `db:"best_score"`
+}
+
+type botInfo struct {
+	BotScoresPath string `db:"bot_scores_path"`
+	BotImgHat     string `db:"img_hat"`
+	BotImgBody    string `db:"img_body"`
+	BotImgFace    string `db:"img_face"`
 }
 
 type menuPageData struct {

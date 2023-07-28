@@ -387,3 +387,129 @@ func danceInfoHandleMessages() {
 		}
 	}
 }
+
+func getBestPlayer(db *sqlx.DB) func(w http.ResponseWriter, r *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
+		songID, err := strconv.Atoi(r.FormValue("song_id"))
+		if err != nil {
+			http.Error(w, "Invalid song ID", http.StatusBadRequest)
+			log.Println(err.Error())
+			return
+		}
+
+		bestPlayerData, err := getBestPlayerInfo(db, songID)
+		if err != nil {
+			http.Error(w, "Error getting best player information", http.StatusInternalServerError)
+			log.Println(err.Error())
+			fmt.Println("Тут")
+			return
+		}
+
+		if bestPlayerData.UserID == 0 {
+			w.Header().Set("Content-Type", "application/json")
+			w.Write([]byte("{}"))
+			return
+		}
+		fmt.Println(bestPlayerData.UserID)
+		userData, err := getUserInfo(db, bestPlayerData.UserID)
+		if err != nil {
+			http.Error(w, "Error getting user information", http.StatusInternalServerError)
+			log.Println(err.Error())
+			fmt.Println("Вот")
+			return
+		}
+
+		response := struct {
+			UserInfo  userInfo
+			BestScore int
+		}{
+			UserInfo:  userData,
+			BestScore: bestPlayerData.Score,
+		}
+
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(response)
+	}
+}
+
+func updateBestPlayer(db *sqlx.DB) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		reqData, err := io.ReadAll(r.Body)
+		if err != nil {
+			http.Error(w, "Parsing error", 500)
+			log.Println(err.Error())
+			return
+		}
+		var data struct {
+			SongID int `json:"song_id"`
+			UserID int `json:"user_id"`
+			Score  int `json:"score"`
+		}
+		err = json.Unmarshal(reqData, &data)
+		if err != nil {
+			http.Error(w, "JSON parsing error", 500)
+			log.Println(err.Error())
+			return
+		}
+
+		const query = `
+			UPDATE
+				songs
+			SET
+				best_player_id = ?, best_score = ?
+			WHERE
+			    id = ?
+		`
+
+		_, err = db.Exec(query, data.UserID, data.Score, data.SongID)
+		if err != nil {
+			http.Error(w, "Error updating best player info", http.StatusInternalServerError)
+			log.Println(err.Error())
+			return
+		}
+		w.WriteHeader(http.StatusOK)
+	}
+}
+
+func getBotPath(db *sqlx.DB) func(w http.ResponseWriter, r *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
+		botName := r.FormValue("bot_name")
+		if botName == "" {
+			// Обработка случая, когда поле "bot_name" не было отправлено в форме
+			http.Error(w, "Field 'bot_name' is missing or empty", http.StatusBadRequest)
+			return
+		}
+		botData, err := getBotInfo(db, botName)
+		if err != nil {
+			http.Error(w, "Error getting best player information", http.StatusInternalServerError)
+			log.Println(err.Error())
+			fmt.Println("Тут")
+			return
+		}
+		fmt.Println(botData)
+		/*if botData.UserID == 0 {
+			w.Header().Set("Content-Type", "application/json")
+			w.Write([]byte("{}"))
+			return
+		}
+		fmt.Println(botData.UserID)
+		userData, err := getUserInfo(db, bestPlayerData.UserID)
+		if err != nil {
+			http.Error(w, "Error getting user information", http.StatusInternalServerError)
+			log.Println(err.Error())
+			fmt.Println("Вот")
+			return
+		}
+
+		response := struct {
+			UserInfo  userInfo
+			BestScore int
+		}{
+			UserInfo:  userData,
+			BestScore: bestPlayerData.Score,
+		}
+
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(response)*/
+	}
+}

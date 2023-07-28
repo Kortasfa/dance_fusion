@@ -49,6 +49,9 @@ func main() {
 	r.HandleFunc("/api/custom", getUserAvatar(dbx)).Methods("POST")
 	r.HandleFunc("/api/sendPoint", sendPointToJoin).Methods("POST")
 	r.HandleFunc("/api/sendMaxPoint", getMaxScore).Methods("POST")
+	r.HandleFunc("/api/getBestPlayer", getBestPlayer(dbx)).Methods("POST")
+	r.HandleFunc("/api/updateBestPlayer", updateBestPlayer(dbx)).Methods("POST")
+	r.HandleFunc("/api/getBotPath", getBotPath(dbx)).Methods("POST")
 
 	go handleRoomWSMessages()
 	go handleJoinPageWSMessages()
