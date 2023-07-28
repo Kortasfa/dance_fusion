@@ -9,6 +9,7 @@ const btnLogOut = document.getElementById("logout");
 const user = document.querySelector(".users");
 const menu = document.querySelector(".menu");
 const custom = document.getElementById("custom");
+const btnLeaveRoom = document.querySelector(".btn-leave-room")
 
 function setJsonCookie(name, value, expirationDays) {
     const jsonValue = JSON.stringify(value);
@@ -69,6 +70,7 @@ function sendMessage() {
                 emptyID.classList.add("hidden");
                 fullID.classList.add("hidden");
                 warningID.classList.add("hidden");
+                btnLeaveRoom.classList.remove("hidden");
                 console.log("Connected to the room!");
                 joinRoom(userInfo.UserID)
             } else if (XHR.status === 404) {
@@ -161,7 +163,6 @@ function joinRoom(userID) {
             percentage = 0;
             maxTheory = receivedJSON["maxPoint"];
             sendMaxPoint(enterInRoom.value, maxTheory).then(() => {})
-            //sendMaxPoint(enterInRoom.value, maxTheory).then(() => {})
             scale.style.height = 0 + 'px';
             megaStar.classList.add("hidden");
             stars.forEach(element => element.src = "/static/img/star_white.svg");
@@ -193,8 +194,11 @@ async function sendMaxPoint(roomID, maxTheory) {
     }
 }
 
+btnLeaveRoom.addEventListener("click", exitFromGame);
+
 window.onbeforeunload = exitFromGame;
 async function exitFromGame() {
+    btnLeaveRoom.classList.add("hidden");
     const response = await fetch("/api/exitFromGame", {
         method: 'POST',
         headers: {
@@ -218,6 +222,8 @@ async function exitFromGame() {
 }
 
 async function exitFromAccount() {
+    exitFromGame().then(() => {})
+    window.onbeforeunload = null;
     const response = await fetch("/api/exitFromAccount", {
         method: 'POST',
         headers: {
@@ -339,7 +345,7 @@ function sendDataToServer(data) {
                     if (response.status === 409) {
                         stop = 1;
                         exitFromGame().then(r => {})// При закрытии игры не надо выходить из комнаты. Надо оставлять пользователя в комнате. Просто пишем ""
-                        document.querySelector('.dance-block__connection').innerText = 'Комната была закрыта';
+                        document.querySelector('.dance-block__connection').innerText = "The room was closed";
                         window.location.replace("/join")
                     }
                 }

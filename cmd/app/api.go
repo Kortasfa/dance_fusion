@@ -81,7 +81,7 @@ func getRegisteredUserData(db *sqlx.DB) func(w http.ResponseWriter, r *http.Requ
 			return
 		}
 		userName := data.UserName
-		exists, err := userExists(db, data.UserName)
+		_, exists, err := userExists(db, data.UserName)
 		if err != nil {
 			http.Error(w, "Internal Server Error", 500)
 			log.Println(err.Error())
@@ -365,28 +365,186 @@ func getMaxScore(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	fmt.Println(data.RoomID, data.MaxPoint)
-	go func() {
-		isSend := false
-		for {
-			for conn, gameFieldID := range gameFieldWSDict {
-				if gameFieldID == data.RoomID {
-					err := conn.WriteMessage(websocket.TextMessage, reqData)
-					isSend = true
+	broadcastJoinPageWSMessage <- []string{data.RoomID, string(reqData)}
+	w.WriteHeader(200)
+}
+
+func danceInfoHandleMessages() {
+	for mesArr := range broadcastGameFieldWSMessage {
+		for conn, gameFieldID := range gameFieldWSDict {
+			roomID := mesArr[0]
+			data := mesArr[1]
+			if gameFieldID == roomID {
+				err := conn.WriteMessage(websocket.TextMessage, []byte(data))
+				if err != nil {
+					err := conn.Close()
+					delete(gameFieldWSDict, conn)
 					if err != nil {
-						delete(gameFieldWSDict, conn)
-						err := conn.Close()
-						if err != nil {
-							w.WriteHeader(409)
-							return
-						}
+						return
 					}
-					break
 				}
 			}
-			if isSend {
-				break
-			}
 		}
-	}()
-	w.WriteHeader(200)
+	}
+}
+
+func getBestPlayer(db *sqlx.DB) func(w http.ResponseWriter, r *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
+		songID, err := strconv.Atoi(r.FormValue("song_id"))
+		if err != nil {
+			http.Error(w, "Invalid song ID", http.StatusBadRequest)
+			log.Println(err.Error())
+			return
+		}
+
+		bestPlayerData, err := getBestPlayerInfo(db, songID)
+		if err != nil {
+			http.Error(w, "Error getting best player information", http.StatusInternalServerError)
+			log.Println(err.Error())
+			return
+		}
+
+		if bestPlayerData.UserID == 0 {
+			w.Header().Set("Content-Type", "application/json")
+			_, err = w.Write([]byte("{}"))
+			if err != nil {
+				http.Error(w, "Json send error", http.StatusInternalServerError)
+				log.Println(err.Error())
+				return
+			}
+			return
+		}
+		fmt.Println(bestPlayerData.UserID)
+		userData, err := getUserInfo(db, bestPlayerData.UserID)
+		if err != nil {
+			http.Error(w, "Error getting user information", http.StatusInternalServerError)
+			log.Println(err.Error())
+			return
+		}
+
+		response := struct {
+			UserInfo  userInfo
+			BestScore int
+		}{
+			UserInfo:  userData,
+			BestScore: bestPlayerData.Score,
+		}
+
+		w.Header().Set("Content-Type", "application/json")
+		err = json.NewEncoder(w).Encode(response)
+		if err != nil {
+			http.Error(w, "Json send error", http.StatusInternalServerError)
+			log.Println(err.Error())
+			return
+		}
+	}
+}
+
+func updateBestPlayer(db *sqlx.DB) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		reqData, err := io.ReadAll(r.Body)
+		if err != nil {
+			http.Error(w, "Parsing error", 500)
+			log.Println(err.Error())
+			return
+		}
+		var data struct {
+			SongID int `json:"song_id"`
+			UserID int `json:"user_id"`
+			Score  int `json:"score"`
+		}
+		err = json.Unmarshal(reqData, &data)
+		if err != nil {
+			http.Error(w, "JSON parsing error", 500)
+			log.Println(err.Error())
+			return
+		}
+		err = updateBestPlayerSQL(db, data.SongID, data.UserID, data.Score)
+		if err != nil {
+			http.Error(w, "Error updating best player info", http.StatusInternalServerError)
+			log.Println(err.Error())
+			return
+		}
+		w.WriteHeader(http.StatusOK)
+	}
+}
+
+func changeUserName(db *sqlx.DB) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		reqData, err := io.ReadAll(r.Body)
+		if err != nil {
+			http.Error(w, "Parsing error", 500)
+			log.Println(err.Error())
+			return
+		}
+		var data struct {
+			UserID      int    `json:"user_id"`
+			NewUserName string `json:"new_user_name"`
+		}
+		err = json.Unmarshal(reqData, &data)
+		if err != nil {
+			http.Error(w, "JSON parsing error", 500)
+			log.Println(err.Error())
+			return
+		}
+		userID, exists, err := userExists(db, data.NewUserName)
+		if err != nil {
+			http.Error(w, "SQL request error", 500)
+			log.Println(err.Error())
+			return
+		}
+		if userID != data.UserID && exists {
+			w.WriteHeader(http.StatusConflict)
+			return
+		}
+		err = updateUserName(db, data.UserID, data.NewUserName)
+		if err != nil {
+			http.Error(w, "Error updating user name", 500)
+			log.Println(err.Error())
+			return
+		}
+		var user userInfo
+		err = getJsonCookie(r, "userInfoCookie", &user)
+		if err != nil {
+			http.Error(w, "Error getting cookie", 500)
+			log.Println(err.Error())
+			return
+		}
+		user.UserName = data.NewUserName
+		err = setJsonCookie(w, "userInfoCookie", user, 24*time.Hour)
+		if err != nil {
+			http.Error(w, "Error setting cookie", 500)
+			log.Println(err.Error())
+			return
+		}
+		w.WriteHeader(http.StatusOK)
+	}
+}
+
+func changeUserPassword(db *sqlx.DB) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		reqData, err := io.ReadAll(r.Body)
+		if err != nil {
+			http.Error(w, "Parsing error", 500)
+			log.Println(err.Error())
+			return
+		}
+		var data struct {
+			UserID          int    `json:"user_id"`
+			NewUserPassword string `json:"new_user_password"`
+		}
+		err = json.Unmarshal(reqData, &data)
+		if err != nil {
+			http.Error(w, "JSON parsing error", 500)
+			log.Println(err.Error())
+			return
+		}
+		err = updateUserPassword(db, data.UserID, data.NewUserPassword)
+		if err != nil {
+			http.Error(w, "Error updating user password", 500)
+			log.Println(err.Error())
+			return
+		}
+		w.WriteHeader(http.StatusOK)
+	}
 }

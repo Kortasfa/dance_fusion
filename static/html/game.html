@@ -159,6 +159,63 @@
             }
         }
 
+        function getBestPlayer(songID) {
+            fetch("api/getBestPlayer", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: `song_id=${songID}`,
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Server Error');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.UserInfo) {
+                        console.log('Best Player Info:');
+                        console.log('User ID:', data.UserInfo.UserID);
+                        console.log('User Name:', data.UserInfo.UserName);
+                        console.log('Hat Src:', data.UserInfo.HatSrc);
+                        console.log('Face Src:', data.UserInfo.FaceSrc);
+                        console.log('Body Src:', data.UserInfo.BodySrc);
+                        console.log('Best Score:', data.BestScore);
+                    } else {
+                        console.log('Best Player Info not available for this song.');
+                    }
+                })
+                .catch(error => {
+                    console.log('Error:', error);
+                });
+        }
+        function updateBestUserInfo(songID, userID, score) {
+            const data = {
+                song_id: songID,
+                user_id: userID,
+                score: score
+            };
+
+            fetch('/api/updateBestPlayer', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            })
+                .then(response => {
+                    if (response.ok) {
+                        console.log('Best User Info updated successfully.');
+                    } else {
+                        console.error('Error updating Best User Info', response.statusText);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+        }
+
         (async () => {
             let classifier = new EdgeImpulseClassifier();
             await classifier.init();
@@ -176,6 +233,7 @@
             socket.onmessage = function (event) {
                 try {
                     let jsonData = JSON.parse(event.data);
+                    console.log(jsonData);
                     if ("ExitingUser" in jsonData) {
                         console.log("Удаляем пользователя на чёрт");
                         removeUser(jsonData.ExitingUser);
