@@ -565,11 +565,16 @@ func getBotPath(db *sqlx.DB) func(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		fmt.Println(botData)
-
 		response := struct {
-			botInfo botInfo
+			BotScoresPath string
+			BotImgHat     string
+			BotImgBody    string
+			BotImgFace    string
 		}{
-			botInfo: botData,
+			BotScoresPath: botData.BotScoresPath,
+			BotImgHat:     botData.BotImgHat,
+			BotImgBody:    botData.BotImgBody,
+			BotImgFace:    botData.BotImgFace,
 		}
 
 		w.Header().Set("Content-Type", "application/json")

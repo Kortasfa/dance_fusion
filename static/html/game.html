@@ -101,8 +101,24 @@
         </div>
     </div>
     <script>
+        function getReferenceUser() {
+            console.log(connectedUsers);
+            for (let userInfo of connectedUsers) {
+                console.log(userInfo["userID"]);
+                  if (parseInt(userInfo["userID"]) > 0) {
+                    console.log("Новый эталон: ", userInfo["userID"]);
+                    return userInfo["userID"];
+                }
+            }
+        }
         function removeUser(userID) {
             console.log('Пользователь вышел: ' + userID);
+            for (let i = 0; i < connectedUsers.length; i++) {
+                if (connectedUsers[i]["userID"] === userID) {
+                    connectedUsers.splice(i, 1);
+                    break;
+                }
+            }
             const usersBlock = document.querySelector(".rank");
             let index = 0;
             for (const userBlock of usersBlock.children) {
@@ -115,6 +131,8 @@
                     break
                 }
             }
+
+            referenceUser = getReferenceUser()
         }
 
         async function sendPoint(userID, point) {
@@ -191,6 +209,7 @@
                     console.error('Error:', error);
                 });
         }
+        let referenceUser = getReferenceUser();
 
         (async () => {
             let socket = new WebSocket("wss://" + window.location.hostname + "/neuralWS/" + WssURL.split("/").pop().trim());
@@ -412,6 +431,13 @@
                     } else {
                         console.log('Лежит', deviationCount);
                         addScore(userID.toString(), 0);
+                    }
+                    if (referenceUser === userID.toString()) {
+                        for (userInfo of connectedUsers) {
+                            if (parseInt(userInfo["userID"]) < 0) {
+                                addScore(userInfo["userID"], 20);
+                            }
+                        }
                     }
                 } catch (ex) {
                     console.log(ex);

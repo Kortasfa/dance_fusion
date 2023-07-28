@@ -6,7 +6,6 @@ const returnBtn = document.getElementById('returnButton');
 const PlayBtn = document.getElementById('play');
 
 let readyGame = false;
-let numberOfUser = 0;
 let readyPlayer = false;
 let connectedUsers = [];
 
@@ -91,6 +90,7 @@ Array.from(test).forEach(function (element) {
 });
 
 var numb;
+var classifier;
 
 $(document).ready(function() {
     const playButton = $('#play');
@@ -103,42 +103,13 @@ $(document).ready(function() {
             let firstComponent = '/static/test/edge-impulse-standalone.js?version=' + numb;
             let secondComponent = '/static/test/run-impulse.js?version=' + numb;
             let thirdComponent = '/static/html/game.html?version=' + numb;
-            if (songName == "Forget You") {
-                fetch("../api/getBotPath", {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded',
-                    },
-                    body: `bot_name=${"bot_1"}`,
-                })
-                    .then(response => {
-                        if (!response.ok) {
-                            throw new Error('Server Error');
-                        }
-                        return response.json();
-                    })
-                    .then(data => {
-                        console.log(data);
-                        if (data.BotScoresPath) {
-                            console.log('Bot Info:');
-                            console.log('Bot Scores Src:', data.BotScoresPath);
-                            console.log('Bot Hat Src:', data.BotImgHat);
-                            console.log('Bot Face Src:', data.BotImgFace);
-                            console.log('Bot Body Src:', data.BotImgBody);
-                        } else {
-                            console.log('Fail');
-                        }
-                    })
-                    .catch(error => {
-                        console.log('Error:', error);
-                    });
-            }
+            checkForBots(songName);
             $.getScript(firstComponent, function() {
                 // Once the first script is loaded, load the second script
                 $.getScript(secondComponent, function() {
                     // After both scripts are loaded, load the page by AJAX
                     (async () => {
-                        let classifier = new EdgeImpulseClassifier();
+                        classifier = new EdgeImpulseClassifier();
                         await classifier.init();
                         let project = classifier.getProjectInfo();
                         console.log(project.owner + ' / ' + project.name + ' (version ' + project.deploy_version + ')');
@@ -170,6 +141,46 @@ function showVideo(videoID) {
     let video = document.getElementById(videoSrcID);
     let videoPlayer = document.getElementById('videoPlayer');
     videoPlayer.src = video.innerText;
+}
+
+function checkForBots(songName) {
+    let botInfo = {};
+    if (songName == "Forget You") {
+        fetch("../api/getBotPath", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: `bot_name=${"bot_1"}`,
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Server Error');
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.BotScoresPath) {
+                    console.log('Bot Info:');
+                    console.log('Bot Scores Src:', data.BotScoresPath);
+                    console.log('Bot Hat Src:', data.BotImgHat);
+                    console.log('Bot Face Src:', data.BotImgFace);
+                    console.log('Bot Body Src:', data.BotImgBody);
+                    botInfo = data;
+                    addUser("-1","bot_1", "../" + data.BotImgHat, "../" + data.BotImgFace, "../" + data.BotImgBody);
+                    connectedBots.push({"botID": "-1", "userName": "bot_1", "BotBodyImgSrc": data.BotImgHat, "botFaceImgSrc": data.BotImgFace, "botHatImgSrc":  data.BotImgBody, "botScoresSrc":  data.BotScoresPath});
+
+
+
+                } else {
+                    console.log('Fail');
+                }
+            })
+            .catch(error => {
+                console.log('Error:', error);
+                return
+            });
+    }
 }
 
 const parent = document.querySelector('.songs');
