@@ -29,6 +29,8 @@ function getUsersByCookie() {
         userScore.classList.remove('hidden');
         indexUser.classList.remove('hidden');
         indexUser.id = userID;
+        let indexUserScale = document.getElementById("scale-" + (i + 1));
+        indexUserScale.id = "scale-" + userID;
         indexUserBodyImg.src = bodyImgSrc;
         indexUserFaceImg.src = faceImgSrc;
         indexUserHatImg.src = hatImgSrc;
@@ -60,7 +62,45 @@ btnContinue.addEventListener("click", function () {
 let valueScore= 0;
 function addScore(userID, score, maxScore){
     let user = document.getElementById(userID);
+    let scale = document.getElementById("scale-" + userID)
     let maxPractice = maxScore - 0.2 * maxScore;
+    if (valueScore > 5600) return
+    valueScore += score;
+    console.log("valueScore: " + valueScore);
+    if (valueScore <= maxTheory) {
+        console.log("valueScore: " + valueScore);
+        percentage = (valueScore / maxPractice);
+        console.log("percentage: " + percentage);
+        pix = 250 * percentage;
+        console.log("pix: " + pix);
+    }
+    if (valueScore > maxTheory) {
+        percentage = (valueScore / maxTheory);
+        console.log("percentage: " + percentage);
+        pix = 50 * percentage;
+        console.log("pix: " + pix);
+    }
+    scale.style.height = pix + 'px';
+    if (valueScore >= 0.2 * maxPractice) {
+        starOne.src = "/static/img/star_blue.svg"
+    }
+    if (valueScore >= 0.4 * maxPractice) {
+        starTwo.src = "/static/img/star_blue.svg"
+    }
+    if (valueScore >= 0.6 * maxPractice) {
+        starThree.src = "/static/img/star_blue.svg"
+    }
+    if (valueScore >= 0.8 * maxPractice) {
+        starFour.src = "/static/img/star_blue.svg"
+    }
+    if (valueScore >= maxPractice) {
+        starFive.src = "/static/img/star_blue.svg"
+    }
+    if (valueScore >= 0.9 * maxTheory) {
+        megaStar.src = "/static/img/mega-star.svg"
+        megaStar.classList.remove("hidden");
+    }
+    
     valueScore += score;
     console.log("valueScore: ", valueScore);
     if (score > scorePerfect){
@@ -98,6 +138,7 @@ function addScore(userID, score, maxScore){
     }
     if (valueScore >= 0.2 * maxPractice) {
         starOne.src = "/static/img/star_blue.svg"
+        //поставить флаг и отслеживать, а потом закрашивать звёздочки, если уже кто-то набрал
     }
     if (valueScore >= 0.4 * maxPractice) {
         starTwo.src = "/static/img/star_blue.svg"

@@ -347,7 +347,7 @@ func sendPointToJoin(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(200)
 }
 
-func getMaxScore(w http.ResponseWriter, r *http.Request) {
+func getDataSongJson(w http.ResponseWriter, r *http.Request) {
 	reqData, err := io.ReadAll(r.Body)
 	if err != nil {
 		http.Error(w, "Parsing error", 500)
@@ -357,6 +357,7 @@ func getMaxScore(w http.ResponseWriter, r *http.Request) {
 	var data struct {
 		RoomID   string
 		MaxPoint int
+		ColorID  string
 	}
 	err = json.Unmarshal(reqData, &data)
 	if err != nil {
@@ -364,7 +365,6 @@ func getMaxScore(w http.ResponseWriter, r *http.Request) {
 		log.Println(err.Error())
 		return
 	}
-	fmt.Println(data.RoomID, data.MaxPoint)
 	go func() {
 		isSend := false
 		for {

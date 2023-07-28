@@ -16,7 +16,7 @@
             <div class="head__face"><img class="face" id="faceImg1" alt=""></div>
             <div class="head__hat"><img class="hat" id="hatImg1" alt=""></div>
         </div>
-        <span class="hero__name">Name 1</span>
+        <span class="hero__name hero__name_user-one">Name 1</span>
         <div class="hero__score">
           <img class="score__star" src="/static/img/star_white.svg">
           <img class="score__star" src="/static/img/star_white.svg">
@@ -36,7 +36,7 @@
         <img class="hero__rating-perfect hidden" src="/static/img/perfect.gif" alt="">
         <img class="hero__rating-ok hidden" src="/static/img/OK.gif" alt="">
         <img class="hero__rating-x hidden" src="/static/img/X.png" alt="">
-        <span class="hero__name">Name 2</span>
+        <span class="hero__name hero__name_user-two">Name 2</span>
         <div class="hero__score">
           <img class="score__star" src="/static/img/star_white.svg">
           <img class="score__star" src="/static/img/star_white.svg">
@@ -56,7 +56,7 @@
         <img class="hero__rating-perfect hidden" src="/static/img/perfect.gif" alt="">
         <img class="hero__rating-ok hidden" src="/static/img/OK.gif" alt="">
         <img class="hero__rating-x hidden" src="/static/img/X.png" alt="">
-        <span class="hero__name">Name 3</span>
+        <span class="hero__name hero__name_user-three">Name 3</span>
         <div class="hero__score">
           <img class="score__star" src="/static/img/star_white.svg">
           <img class="score__star" src="/static/img/star_white.svg">
@@ -66,7 +66,7 @@
           <img class="score__star score__star_mega  hidden" src="/static/img/mega_star.svg">
         </div>
     </div>
-    <div class="rank__hero hidden" id="hero4">
+    <div class="rank__hero hidden hero__name_user-four" id="hero4">
         <div  class="user__head">
             <div class="head__body"><img class="body" id="bodyImg4" alt=""></div>
             <div class="head__face"><img class="face" id="faceImg4" alt=""></div>
@@ -85,16 +85,20 @@
           <img class="score__star" src="/static/img/star_white.svg">
           <img class="score__star score__star_mega  hidden" src="/static/img/mega_star.svg">
         </div>
-      </div>
+    </div>
   </div>
-  <div class="dance-block__ratingScale"></div>
+  <div class="ratingScales">
+    <div class="ratingScales__user-scale ratingScales__user-scale_scale-1" id="scale-1"></div>
+    <div class="ratingScales__user-scale ratingScales__user-scale_scale-2" id="scale-2"></div>
+    <div class="ratingScales__user-scale ratingScales__user-scale_scale-3" id="scale-3"></div>
+    <div class="ratingScales__user-scale ratingScales__user-scale_scale-4" id="scale-4"></div>
+  </div>
   <a class="btn-exit" href="/room">
-      <img src="/static/img/log_out.svg" alt="">
+    <img src="/static/img/log_out.svg" alt="">
   </a>
   <video id="video-dance" class="video-dance" type="video/mp4" width="100%" autoplay="autoplay">
-      <source id="video-src" src="../video/previews/americanGirl.mp4">
+    <source id="video-src" src="../video/previews/americanGirl.mp4">
   </video>
-  <
   <div class="pop-up hidden" id="pop-up">
       <div class="pop-up__pop-up-box">
           <span class="pop-up-box__question">Total score</span>
@@ -153,7 +157,7 @@
           };
 
           let maxPoint;
-
+          let colorID;
           socket.onmessage = function (event) {
               try {
                   let jsonData = JSON.parse(event.data);
@@ -165,6 +169,11 @@
                   if ("maxPoint" in jsonData) {
                     maxPoint = jsonData["maxPoint"];
                     console.log("MaxPoint = ", jsonData["maxPoint"]);
+                    return;
+                  }
+                  if ("color" in jsonData) {
+                    colorID = jsonData["color"];
+                    console.log("color = ", jsonData["color"]);
                     return;
                   }
                   let moveName = jsonData.name;
