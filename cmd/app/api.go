@@ -487,29 +487,14 @@ func getBotPath(db *sqlx.DB) func(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		fmt.Println(botData)
-		/*if botData.UserID == 0 {
-			w.Header().Set("Content-Type", "application/json")
-			w.Write([]byte("{}"))
-			return
-		}
-		fmt.Println(botData.UserID)
-		userData, err := getUserInfo(db, bestPlayerData.UserID)
-		if err != nil {
-			http.Error(w, "Error getting user information", http.StatusInternalServerError)
-			log.Println(err.Error())
-			fmt.Println("Вот")
-			return
-		}
 
 		response := struct {
-			UserInfo  userInfo
-			BestScore int
+			botInfo botInfo
 		}{
-			UserInfo:  userData,
-			BestScore: bestPlayerData.Score,
+			botInfo: botData,
 		}
 
 		w.Header().Set("Content-Type", "application/json")
-		json.NewEncoder(w).Encode(response)*/
+		json.NewEncoder(w).Encode(response)
 	}
 }

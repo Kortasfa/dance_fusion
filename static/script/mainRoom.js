@@ -126,7 +126,7 @@ $(document).ready(function() {
                             console.log('Bot Face Src:', data.BotInfo.BotFaceSrc);
                             console.log('Bot Body Src:', data.BotInfo.BotBodySrc);
                         } else {
-                            console.log('Best Player Info not available for this song.');
+                            console.log('Fail');
                         }
                     })
                     .catch(error => {

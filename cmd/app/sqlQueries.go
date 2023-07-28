@@ -339,16 +339,10 @@ func getBotInfo(db *sqlx.DB, botName string) (botInfo, error) {
 		    bots
 		WHERE
 		    bot_name = ?`
-	var botMainInfo struct {
-		BotScoresPath string
-		BotImgHat     string
-		BotImgBody    string
-		BotImgFace    string
-	}
+	var botMainInfo botInfo
 	err := db.QueryRow(query, botName).Scan(&botMainInfo.BotScoresPath, &botMainInfo.BotImgHat, &botMainInfo.BotImgBody, &botMainInfo.BotImgFace)
 	if err != nil {
 		return botInfo{}, err
 	}
-	fmt.Println(botInfo{})
-	return botInfo{}, nil
+	return botMainInfo, nil
 }
