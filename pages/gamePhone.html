@@ -13,12 +13,16 @@
   <body class="page">
     <div class="users">
       <div class="users__user">
-        <img class="user__avatar">
+        <div  class="user__head">
+          <div class="head__body"><img class="body" alt=""></div>
+          <div class="head__face"><img class="face"  alt=""></div>
+          <div class="head__hat"><img class="hat" alt=""></div>
+        </div>
         <span class="user__name">Name 1</span>
       </div>
     </div>
     <div class="menu">
-      <div class="menu__point menu__point_border">
+      <div id="custom" class="menu__point menu__point_border">
         <span class="point__text" >Customization</span>
       </div>
       <div class="menu__point menu__point_border">
@@ -28,7 +32,7 @@
         <span class="point__text">Log Out</span>
       </div>
     </div>
-    <img class="btn-log-out" src="/static/img/log_out.svg" onclick="exitFromGame()">
+    <img class="btn-log-out" src="/static/img/log_out.svg" onclick="exitFromGame()" alt="">
     <div class="entrance">
       <div class="logo">
         <span style="--i:1" class="logo__item">D</span>
@@ -55,8 +59,14 @@
     <div class="dance-block hidden">
       <span class="dance-block__connection">You are joined!</span>
       <span class="dance-block__instruction">Please, hold your phone in the right hand</span>
-      <div class="dance-block__ratingScale">
-
+      <div class="dance-block__rating-scale"></div>
+      <div class="dance-block__rating-stars">
+        <img class="rating-stars__star hidden rating-stars__star_megaStar" id="mega-star" src="/static/img/mega_star.svg">
+        <img class="rating-stars__star" id="star-5" src="/static/img/star_white.svg" alt="">
+        <img class="rating-stars__star" id="star-4" src="/static/img/star_white.svg" alt="">
+        <img class="rating-stars__star" id="star-3" src="/static/img/star_white.svg" alt="">
+        <img class="rating-stars__star" id="star-2" src="/static/img/star_white.svg" alt="">
+        <img class="rating-stars__star" id="star-1" src="/static/img/star_white.svg" alt="">
       </div>
     </div>
   </body>

@@ -1,702 +1,706 @@
-[
-  {
-    "start_time": 4.4,
-    "duration": 0.5,
-    "name": "up-down-click"
-  },
-  {
-    "start_time": 5.52,
-    "duration": 0.5,
-    "name": "up-down-click"
-  },
-  {
-    "start_time": 6.35,
-    "duration": 0.5,
-    "name": "up-down-click"
-  },
-  {
-    "start_time": 7.37,
-    "duration": 0.5,
-    "name": "up-down-click"
-  },
-  {
-    "start_time": 8.37,
-    "duration": 0.5,
-    "name": "up-down-click"
-  },
-  {
-    "start_time": 9.25,
-    "duration": 0.5,
-    "name": "up-down-click"
-  },
-  {
-    "start_time": 10.40,
-    "duration": 0.5,
-    "name": "up-down-click"
-  },
-  {
-    "start_time": 11.07,
-    "duration": 0.5,
-    "name": "up-down-click"
-  },
-  {
-    "start_time": 12.12,
-    "duration": 0.5,
-    "name": "up-down-click"
-  },
-  {
-    "start_time": 12.92,
-    "duration": 0.5,
-    "name": "up-down-click"
-  },
-  {
-    "start_time": 13.98,
-    "duration": 0.5,
-    "name": "up-down-click"
-  },
-  {
-    "start_time": 14.88,
-    "duration": 0.5,
-    "name": "up-down-click"
-  },
-  {
-    "start_time": 15.83,
-    "duration": 0.5,
-    "name": "up-down-click"
-  },
-  {
-    "start_time": 16.72,
-    "duration": 0.5,
-    "name": "up-down-click"
-  },
-  {
-    "start_time": 17.64,
-    "duration": 0.5,
-    "name": "up-down-click"
-  },
-  {
-    "start_time": 18.52,
-    "duration": 0.5,
-    "name": "up-down-click"
-  },
-  {
-    "start_time": 19.42,
-    "duration": 0.5,
-    "name": "up-down-click"
-  },
-  {
-    "start_time": 20.49,
-    "duration": 0.5,
-    "name": "up-down-click"
-  },
-  {
-    "start_time": 21.40,
-    "duration": 0.5,
-    "name": "up-down-click"
-  },
-  {
-    "start_time": 22.28,
-    "duration": 0.5,
-    "name": "up-down-click"
-  },
-  {
-    "start_time": 23.5,
-    "duration": 1.2,
-    "name": "up-down-hands"
-  },
-  {
-    "start_time": 25.4,
-    "duration": 1.2,
-    "name": "up-down-hands"
-  },
-  {
-    "start_time": 26.8,
-    "duration": 0.7,
-    "name": "collapsing-breeding-locks"
-  },
-  {
-    "start_time": 27.60,
-    "duration": 0.7,
-    "name": "collapsing-breeding-locks"
-  },
-  {
-    "start_time": 28.40,
-    "duration": 0.7,
-    "name": "collapsing-breeding-locks"
-  },
-  {
-    "start_time": 29.5,
-    "duration": 0.7,
-    "name": "collapsing-breeding-locks"
-  },
-  {
-    "start_time": 30.3,
-    "duration": 0.7,
-    "name": "collapsing-breeding-locks"
-  },
-  {
-    "start_time": 31.3,
-    "duration": 0.7,
-    "name": "collapsing-breeding-locks"
-  },
-  {
-    "start_time": 32.2,
-    "duration": 0.7,
-    "name": "collapsing-breeding-locks"
-  },
-  {
-    "start_time": 33.3,
-    "duration": 0.7,
-    "name": "collapsing-breeding-locks"
-  },
-  {
-    "start_time": 34.1,
-    "duration": 0.7,
-    "name": "collapsing-breeding-locks"
-  },
-  {
-    "start_time": 35.1,
-    "duration": 0.7,
-    "name": "collapsing-breeding-locks"
-  },
-  {
-    "start_time": 36.1,
-    "duration": 0.7,
-    "name": "collapsing-breeding-locks"
-  },
-  {
-    "start_time": 37.1,
-    "duration": 0.7,
-    "name": "collapsing-breeding-locks"
-  },
-  {
-    "start_time": 37.9,
-    "duration": 0.7,
-    "name": "collapsing-breeding-locks"
-  },
-  {
-    "start_time": 39.0,
-    "duration": 1.2,
-    "name": "up-down-hands"
-  },
-  {
-    "start_time": 41.5,
-    "duration": 2.6,
-    "name": "going-to-the-side-with-clapping"
-  },
-  {
-    "start_time": 45.3,
-    "duration": 2.6,
-    "name": "going-to-the-side-with-clapping"
-  },
-  {
-    "start_time": 49.0,
-    "duration": 0.7,
-    "name": "hands-up-and-down"
-  },
-  {
-    "start_time": 49.9,
-    "duration": 0.7,
-    "name": "hands-up-and-down"
-  },
-  {
-    "start_time": 50.8,
-    "duration": 0.7,
-    "name": "hands-up-and-down"
-  },
-  {
-    "start_time": 51.9,
-    "duration": 0.7,
-    "name": "hands-up-and-down"
-  },
-  {
-    "start_time": 52.9,
-    "duration": 0.7,
-    "name": "hands-up-and-down"
-  },
-  {
-    "start_time": 53.7,
-    "duration": 0.7,
-    "name": "hands-up-and-down"
-  },
-  {
-    "start_time": 54.6,
-    "duration": 0.7,
-    "name": "hands-up-and-down"
-  },
-  {
-    "start_time": 56.6,
-    "duration": 1.4,
-    "name": "hands-up-down-sideways"
-  },
-  {
-    "start_time": 58.6,
-    "duration": 1.6,
-    "name": "side-hit"
-  },
-  {
-    "start_time": 60.05,
-    "duration": 1.6,
-    "name": "side-hit"
-  },
-  {
-    "start_time": 62.4,
-    "duration": 1.6,
-    "name": "side-hit"
-  },
-  {
-    "start_time": 64.3,
-    "duration": 1.4,
-    "name": "hands-up-down-sideways"
-  },
-  {
-    "start_time": 66.2,
-    "duration": 1.6,
-    "name": "side-hit"
-  },
-  {
-    "start_time": 67.9,
-    "duration": 1.6,
-    "name": "side-hit"
-  },
-  {
-    "start_time": 71.8,
-    "duration": 1.7,
-    "name": "down-from-the-middle-in-arc"
-  },
-  {
-    "start_time": 73.6,
-    "duration": 1.7,
-    "name": "down-from-the-middle-in-arc"
-  },
-  {
-    "start_time": 75.6,
-    "duration": 1.7,
-    "name": "down-from-the-middle-in-arc"
-  },
-  {
-    "start_time": 77.5,
-    "duration": 1.7,
-    "name": "down-from-the-middle-in-arc"
-  },
-  {
-    "start_time": 79.4,
-    "duration": 0.6,
-    "name": "draw-circle"
-  },
-  {
-    "start_time": 81.2,
-    "duration": 0.6,
-    "name": "draw-circle"
-  },
-  {
-    "start_time": 83.2,
-    "duration": 0.6,
-    "name": "draw-circle"
-  },
-  {
-    "start_time": 84.9,
-    "duration": 0.6,
-    "name": "draw-circle"
-  },
-  {
-    "start_time": 86.8,
-    "duration": 0.7,
-    "name": "collapsing-breeding-locks"
-  },
-  {
-    "start_time": 88.7,
-    "duration": 0.7,
-    "name": "collapsing-breeding-locks"
-  },
-  {
-    "start_time": 90.6,
-    "duration": 0.7,
-    "name": "collapsing-breeding-locks"
-  },
-  {
-    "start_time": 91.6,
-    "duration": 1.0,
-    "name": "gold-circle"
-  },
-  {
-    "start_time": 94.4,
-    "duration": 0.7,
-    "name": "collapsing-breeding-locks"
-  },
-  {
-    "start_time": 95.4,
-    "duration": 0.7,
-    "name": "collapsing-breeding-locks"
-  },
-  {
-    "start_time": 96.3,
-    "duration": 0.7,
-    "name": "collapsing-breeding-locks"
-  },
-  {
-    "start_time": 98.2,
-    "duration": 0.7,
-    "name": "collapsing-breeding-locks"
-  },
-  {
-    "start_time": 101.8,
-    "duration": 2.6,
-    "name": "going-to-the-side-with-clapping"
-  },
-  {
-    "start_time": 105.6,
-    "duration": 2.6,
-    "name": "going-to-the-side-with-clapping"
-  },
-  {
-    "start_time": 109.6,
-    "duration": 0.7,
-    "name": "hands-up-and-down"
-  },
-  {
-    "start_time": 110.5,
-    "duration": 0.7,
-    "name": "hands-up-and-down"
-  },
-  {
-    "start_time": 111.5,
-    "duration": 0.7,
-    "name": "hands-up-and-down"
-  },
-  {
-    "start_time": 112.4,
-    "duration": 0.7,
-    "name": "hands-up-and-down"
-  },
-  {
-    "start_time": 113.4,
-    "duration": 0.7,
-    "name": "hands-up-and-down"
-  },
-  {
-    "start_time": 114.3,
-    "duration": 0.7,
-    "name": "hands-up-and-down"
-  },
-  {
-    "start_time": 115.3,
-    "duration": 0.7,
-    "name": "hands-up-and-down"
-  },
-  {
-    "start_time": 116.3,
-    "duration": 0.7,
-    "name": "hands-up-and-down"
-  },
-  {
-    "start_time": 117.0,
-    "duration": 1.4,
-    "name": "hands-up-down-sideways"
-  },
-  {
-    "start_time": 118.8,
-    "duration": 1.6,
-    "name": "side-hit"
-  },
-  {
-    "start_time": 120.7,
-    "duration": 1.6,
-    "name": "side-hit"
-  },
-  {
-    "start_time": 122.6,
-    "duration": 1.6,
-    "name": "side-hit"
-  },
-  {
-    "start_time": 124.6,
-    "duration": 1.4,
-    "name": "hands-up-down-sideways"
-  },
-  {
-    "start_time": 126.4,
-    "duration": 1.6,
-    "name": "side-hit"
-  },
-  {
-    "start_time": 128.2,
-    "duration": 1.6,
-    "name": "side-hit"
-  },
-  {
-    "start_time": 131.9,
-    "duration": 1.7,
-    "name": "down-from-the-middle-in-arc"
-  },
-  {
-    "start_time": 134.0,
-    "duration": 1.7,
-    "name": "down-from-the-middle-in-arc"
-  },
-  {
-    "start_time": 135.8,
-    "duration": 1.7,
-    "name": "down-from-the-middle-in-arc"
-  },
-  {
-    "start_time": 137.6,
-    "duration": 1.7,
-    "name": "down-from-the-middle-in-arc"
-  },
-  {
-    "start_time": 139.5,
-    "duration": 0.6,
-    "name": "draw-circle"
-  },
-  {
-    "start_time": 141.5,
-    "duration": 0.6,
-    "name": "draw-circle"
-  },
-  {
-    "start_time": 143.4,
-    "duration": 0.6,
-    "name": "draw-circle"
-  },
-  {
-    "start_time": 145.4,
-    "duration": 0.6,
-    "name": "draw-circle"
-  },
-  {
-    "start_time": 147.0,
-    "duration": 0.7,
-    "name": "collapsing-breeding-locks"
-  },
-  {
-    "start_time": 149.0,
-    "duration": 0.7,
-    "name": "collapsing-breeding-locks"
-  },
-  {
-    "start_time": 150.9,
-    "duration": 0.7,
-    "name": "collapsing-breeding-locks"
-  },
-  {
-    "start_time": 151.7,
-    "duration": 1.0,
-    "name": "gold-circle"
-  },
-  {
-    "start_time": 154.8,
-    "duration": 0.7,
-    "name": "hands-up-and-down"
-  },
-  {
-    "start_time": 156.4,
-    "duration": 0.7,
-    "name": "hands-up-and-down"
-  },
-  {
-    "start_time": 159.0,
-    "duration": 1.2,
-    "name": "hands-up-and-down"
-  },
-  {
-    "start_time": 162.5,
-    "duration": 0.8,
-    "name": "i-am-strong"
-  },
-  {
-    "start_time": 164.5,
-    "duration": 0.8,
-    "name": "i-am-strong"
-  },
-  {
-    "start_time": 164.5,
-    "duration": 0.8,
-    "name": "i-am-strong"
-  },
-  {
-    "start_time": 166.0,
-    "duration": 0.6,
-    "name": "up-down-hands"
-  },
-  {
-    "start_time": 166.8,
-    "duration": 0.6,
-    "name": "up-down-hands"
-  },
-  {
-    "start_time": 167.6,
-    "duration": 0.6,
-    "name": "up-down-hands"
-  },
-  {
-    "start_time": 168.6,
-    "duration": 0.6,
-    "name": "up-down-hands"
-  },
-  {
-    "start_time": 170.1,
-    "duration": 0.8,
-    "name": "i-am-strong"
-  },
-  {
-    "start_time": 171.1,
-    "duration": 0.8,
-    "name": "i-am-strong"
-  },
-  {
-    "start_time": 172.0,
-    "duration": 0.8,
-    "name": "i-am-strong"
-  },
-  {
-    "start_time": 172.9,
-    "duration": 0.8,
-    "name": "i-am-strong"
-  },
-  {
-    "start_time": 174.3,
-    "duration": 0.6,
-    "name": "up-down-hands"
-  },
-  {
-    "start_time": 175.2,
-    "duration": 0.6,
-    "name": "up-down-hands"
-  },
-  {
-    "start_time": 176.1,
-    "duration": 0.6,
-    "name": "up-down-hands"
-  },
-  {
-    "start_time": 177.4,
-    "duration": 0.6,
-    "name": "side-hit"
-  },
-  {
-    "start_time": 179.3,
-    "duration": 0.6,
-    "name": "side-hit"
-  },
-  {
-    "start_time": 181.1,
-    "duration": 0.6,
-    "name": "side-hit"
-  },
-  {
-    "start_time": 182.7,
-    "duration": 0.6,
-    "name": "broad-back"
-  },
-  {
-    "start_time": 183.8,
-    "duration": 0.6,
-    "name": "broad-back"
-  },
-  {
-    "start_time": 186.7,
-    "duration": 0.6,
-    "name": "side-hit"
-  },
-  {
-    "start_time": 188.5,
-    "duration": 0.6,
-    "name": "broad-back"
-  },
-  {
-    "start_time": 189.4,
-    "duration": 0.6,
-    "name": "broad-back"
-  },
-  {
-    "start_time": 190.0,
-    "duration": 2.0,
-    "name": "like-a-chicken"
-  },
-  {
-    "start_time": 192.4,
-    "duration": 1.7,
-    "name": "down-from-the-middle-in-arc"
-  },
-  {
-    "start_time": 194.3,
-    "duration": 1.7,
-    "name": "down-from-the-middle-in-arc"
-  },
-  {
-    "start_time": 196.0,
-    "duration": 1.7,
-    "name": "down-from-the-middle-in-arc"
-  },
-  {
-    "start_time": 197.9,
-    "duration": 1.7,
-    "name": "down-from-the-middle-in-arc"
-  },
-  {
-    "start_time": 199.9,
-    "duration": 0.6,
-    "name": "draw-circle"
-  },
-  {
-    "start_time": 201.6,
-    "duration": 0.6,
-    "name": "draw-circle"
-  },
-  {
-    "start_time": 203.6,
-    "duration": 0.6,
-    "name": "draw-circle"
-  },
-  {
-    "start_time": 205.6,
-    "duration": 0.6,
-    "name": "draw-circle"
-  },
-  {
-    "start_time": 207.3,
-    "duration": 0.7,
-    "name": "collapsing-breeding-locks"
-  },
-  {
-    "start_time": 209.3,
-    "duration": 0.7,
-    "name": "collapsing-breeding-locks"
-  },
-  {
-    "start_time": 211.2,
-    "duration": 0.7,
-    "name": "collapsing-breeding-locks"
-  },
-  {
-    "start_time": 212.4,
-    "duration": 1.0,
-    "name": "gold-circle"
-  },
-  {
-    "start_time": 214.9,
-    "duration": 0.7,
-    "name": "collapsing-breeding-locks"
-  },
-  {
-    "start_time": 216.7,
-    "duration": 0.7,
-    "name": "collapsing-breeding-locks"
-  },
-  {
-    "start_time": 218.6,
-    "duration": 0.7,
-    "name": "collapsing-breeding-locks"
-  },
-  {
-    "start_time": 220.5,
-    "duration": 0.7,
-    "name": "collapsing-breeding-locks"
-  },
-  {
-    "start_time": 221.2,
-    "duration": 1.8,
-    "name": "gold-turn"
-  }
-]
+{
+  "maxPoint": 4500,
+  "motions":
+  [
+    {
+      "start_time": 4.4,
+      "duration": 0.5,
+      "name": "up-down-click"
+    },
+    {
+      "start_time": 5.52,
+      "duration": 0.5,
+      "name": "up-down-click"
+    },
+    {
+      "start_time": 6.35,
+      "duration": 0.5,
+      "name": "up-down-click"
+    },
+    {
+      "start_time": 7.37,
+      "duration": 0.5,
+      "name": "up-down-click"
+    },
+    {
+      "start_time": 8.37,
+      "duration": 0.5,
+      "name": "up-down-click"
+    },
+    {
+      "start_time": 9.25,
+      "duration": 0.5,
+      "name": "up-down-click"
+    },
+    {
+      "start_time": 10.40,
+      "duration": 0.5,
+      "name": "up-down-click"
+    },
+    {
+      "start_time": 11.07,
+      "duration": 0.5,
+      "name": "up-down-click"
+    },
+    {
+      "start_time": 12.12,
+      "duration": 0.5,
+      "name": "up-down-click"
+    },
+    {
+      "start_time": 12.92,
+      "duration": 0.5,
+      "name": "up-down-click"
+    },
+    {
+      "start_time": 13.98,
+      "duration": 0.5,
+      "name": "up-down-click"
+    },
+    {
+      "start_time": 14.88,
+      "duration": 0.5,
+      "name": "up-down-click"
+    },
+    {
+      "start_time": 15.83,
+      "duration": 0.5,
+      "name": "up-down-click"
+    },
+    {
+      "start_time": 16.72,
+      "duration": 0.5,
+      "name": "up-down-click"
+    },
+    {
+      "start_time": 17.64,
+      "duration": 0.5,
+      "name": "up-down-click"
+    },
+    {
+      "start_time": 18.52,
+      "duration": 0.5,
+      "name": "up-down-click"
+    },
+    {
+      "start_time": 19.42,
+      "duration": 0.5,
+      "name": "up-down-click"
+    },
+    {
+      "start_time": 20.49,
+      "duration": 0.5,
+      "name": "up-down-click"
+    },
+    {
+      "start_time": 21.40,
+      "duration": 0.5,
+      "name": "up-down-click"
+    },
+    {
+      "start_time": 22.28,
+      "duration": 0.5,
+      "name": "up-down-click"
+    },
+    {
+      "start_time": 23.5,
+      "duration": 1.2,
+      "name": "up-down-hands"
+    },
+    {
+      "start_time": 25.4,
+      "duration": 1.2,
+      "name": "up-down-hands"
+    },
+    {
+      "start_time": 26.8,
+      "duration": 0.7,
+      "name": "collapsing-breeding-locks"
+    },
+    {
+      "start_time": 27.60,
+      "duration": 0.7,
+      "name": "collapsing-breeding-locks"
+    },
+    {
+      "start_time": 28.40,
+      "duration": 0.7,
+      "name": "collapsing-breeding-locks"
+    },
+    {
+      "start_time": 29.5,
+      "duration": 0.7,
+      "name": "collapsing-breeding-locks"
+    },
+    {
+      "start_time": 30.3,
+      "duration": 0.7,
+      "name": "collapsing-breeding-locks"
+    },
+    {
+      "start_time": 31.3,
+      "duration": 0.7,
+      "name": "collapsing-breeding-locks"
+    },
+    {
+      "start_time": 32.2,
+      "duration": 0.7,
+      "name": "collapsing-breeding-locks"
+    },
+    {
+      "start_time": 33.3,
+      "duration": 0.7,
+      "name": "collapsing-breeding-locks"
+    },
+    {
+      "start_time": 34.1,
+      "duration": 0.7,
+      "name": "collapsing-breeding-locks"
+    },
+    {
+      "start_time": 35.1,
+      "duration": 0.7,
+      "name": "collapsing-breeding-locks"
+    },
+    {
+      "start_time": 36.1,
+      "duration": 0.7,
+      "name": "collapsing-breeding-locks"
+    },
+    {
+      "start_time": 37.1,
+      "duration": 0.7,
+      "name": "collapsing-breeding-locks"
+    },
+    {
+      "start_time": 37.9,
+      "duration": 0.7,
+      "name": "collapsing-breeding-locks"
+    },
+    {
+      "start_time": 39.0,
+      "duration": 1.2,
+      "name": "up-down-hands"
+    },
+    {
+      "start_time": 41.5,
+      "duration": 2.6,
+      "name": "going-to-the-side-with-clapping"
+    },
+    {
+      "start_time": 45.3,
+      "duration": 2.6,
+      "name": "going-to-the-side-with-clapping"
+    },
+    {
+      "start_time": 49.0,
+      "duration": 0.7,
+      "name": "hands-up-and-down"
+    },
+    {
+      "start_time": 49.9,
+      "duration": 0.7,
+      "name": "hands-up-and-down"
+    },
+    {
+      "start_time": 50.8,
+      "duration": 0.7,
+      "name": "hands-up-and-down"
+    },
+    {
+      "start_time": 51.9,
+      "duration": 0.7,
+      "name": "hands-up-and-down"
+    },
+    {
+      "start_time": 52.9,
+      "duration": 0.7,
+      "name": "hands-up-and-down"
+    },
+    {
+      "start_time": 53.7,
+      "duration": 0.7,
+      "name": "hands-up-and-down"
+    },
+    {
+      "start_time": 54.6,
+      "duration": 0.7,
+      "name": "hands-up-and-down"
+    },
+    {
+      "start_time": 56.6,
+      "duration": 1.4,
+      "name": "hands-up-down-sideways"
+    },
+    {
+      "start_time": 58.6,
+      "duration": 1.6,
+      "name": "side-hit"
+    },
+    {
+      "start_time": 60.05,
+      "duration": 1.6,
+      "name": "side-hit"
+    },
+    {
+      "start_time": 62.4,
+      "duration": 1.6,
+      "name": "side-hit"
+    },
+    {
+      "start_time": 64.3,
+      "duration": 1.4,
+      "name": "hands-up-down-sideways"
+    },
+    {
+      "start_time": 66.2,
+      "duration": 1.6,
+      "name": "side-hit"
+    },
+    {
+      "start_time": 67.9,
+      "duration": 1.6,
+      "name": "side-hit"
+    },
+    {
+      "start_time": 71.8,
+      "duration": 1.7,
+      "name": "down-from-the-middle-in-arc"
+    },
+    {
+      "start_time": 73.6,
+      "duration": 1.7,
+      "name": "down-from-the-middle-in-arc"
+    },
+    {
+      "start_time": 75.6,
+      "duration": 1.7,
+      "name": "down-from-the-middle-in-arc"
+    },
+    {
+      "start_time": 77.5,
+      "duration": 1.7,
+      "name": "down-from-the-middle-in-arc"
+    },
+    {
+      "start_time": 79.4,
+      "duration": 0.6,
+      "name": "draw-circle"
+    },
+    {
+      "start_time": 81.2,
+      "duration": 0.6,
+      "name": "draw-circle"
+    },
+    {
+      "start_time": 83.2,
+      "duration": 0.6,
+      "name": "draw-circle"
+    },
+    {
+      "start_time": 84.9,
+      "duration": 0.6,
+      "name": "draw-circle"
+    },
+    {
+      "start_time": 86.8,
+      "duration": 0.7,
+      "name": "collapsing-breeding-locks"
+    },
+    {
+      "start_time": 88.7,
+      "duration": 0.7,
+      "name": "collapsing-breeding-locks"
+    },
+    {
+      "start_time": 90.6,
+      "duration": 0.7,
+      "name": "collapsing-breeding-locks"
+    },
+    {
+      "start_time": 91.6,
+      "duration": 1.0,
+      "name": "gold-circle"
+    },
+    {
+      "start_time": 94.4,
+      "duration": 0.7,
+      "name": "collapsing-breeding-locks"
+    },
+    {
+      "start_time": 95.4,
+      "duration": 0.7,
+      "name": "collapsing-breeding-locks"
+    },
+    {
+      "start_time": 96.3,
+      "duration": 0.7,
+      "name": "collapsing-breeding-locks"
+    },
+    {
+      "start_time": 98.2,
+      "duration": 0.7,
+      "name": "collapsing-breeding-locks"
+    },
+    {
+      "start_time": 101.8,
+      "duration": 2.6,
+      "name": "going-to-the-side-with-clapping"
+    },
+    {
+      "start_time": 105.6,
+      "duration": 2.6,
+      "name": "going-to-the-side-with-clapping"
+    },
+    {
+      "start_time": 109.6,
+      "duration": 0.7,
+      "name": "hands-up-and-down"
+    },
+    {
+      "start_time": 110.5,
+      "duration": 0.7,
+      "name": "hands-up-and-down"
+    },
+    {
+      "start_time": 111.5,
+      "duration": 0.7,
+      "name": "hands-up-and-down"
+    },
+    {
+      "start_time": 112.4,
+      "duration": 0.7,
+      "name": "hands-up-and-down"
+    },
+    {
+      "start_time": 113.4,
+      "duration": 0.7,
+      "name": "hands-up-and-down"
+    },
+    {
+      "start_time": 114.3,
+      "duration": 0.7,
+      "name": "hands-up-and-down"
+    },
+    {
+      "start_time": 115.3,
+      "duration": 0.7,
+      "name": "hands-up-and-down"
+    },
+    {
+      "start_time": 116.3,
+      "duration": 0.7,
+      "name": "hands-up-and-down"
+    },
+    {
+      "start_time": 117.0,
+      "duration": 1.4,
+      "name": "hands-up-down-sideways"
+    },
+    {
+      "start_time": 118.8,
+      "duration": 1.6,
+      "name": "side-hit"
+    },
+    {
+      "start_time": 120.7,
+      "duration": 1.6,
+      "name": "side-hit"
+    },
+    {
+      "start_time": 122.6,
+      "duration": 1.6,
+      "name": "side-hit"
+    },
+    {
+      "start_time": 124.6,
+      "duration": 1.4,
+      "name": "hands-up-down-sideways"
+    },
+    {
+      "start_time": 126.4,
+      "duration": 1.6,
+      "name": "side-hit"
+    },
+    {
+      "start_time": 128.2,
+      "duration": 1.6,
+      "name": "side-hit"
+    },
+    {
+      "start_time": 131.9,
+      "duration": 1.7,
+      "name": "down-from-the-middle-in-arc"
+    },
+    {
+      "start_time": 134.0,
+      "duration": 1.7,
+      "name": "down-from-the-middle-in-arc"
+    },
+    {
+      "start_time": 135.8,
+      "duration": 1.7,
+      "name": "down-from-the-middle-in-arc"
+    },
+    {
+      "start_time": 137.6,
+      "duration": 1.7,
+      "name": "down-from-the-middle-in-arc"
+    },
+    {
+      "start_time": 139.5,
+      "duration": 0.6,
+      "name": "draw-circle"
+    },
+    {
+      "start_time": 141.5,
+      "duration": 0.6,
+      "name": "draw-circle"
+    },
+    {
+      "start_time": 143.4,
+      "duration": 0.6,
+      "name": "draw-circle"
+    },
+    {
+      "start_time": 145.4,
+      "duration": 0.6,
+      "name": "draw-circle"
+    },
+    {
+      "start_time": 147.0,
+      "duration": 0.7,
+      "name": "collapsing-breeding-locks"
+    },
+    {
+      "start_time": 149.0,
+      "duration": 0.7,
+      "name": "collapsing-breeding-locks"
+    },
+    {
+      "start_time": 150.9,
+      "duration": 0.7,
+      "name": "collapsing-breeding-locks"
+    },
+    {
+      "start_time": 151.7,
+      "duration": 1.0,
+      "name": "gold-circle"
+    },
+    {
+      "start_time": 154.8,
+      "duration": 0.7,
+      "name": "hands-up-and-down"
+    },
+    {
+      "start_time": 156.4,
+      "duration": 0.7,
+      "name": "hands-up-and-down"
+    },
+    {
+      "start_time": 159.0,
+      "duration": 1.2,
+      "name": "hands-up-and-down"
+    },
+    {
+      "start_time": 162.5,
+      "duration": 0.8,
+      "name": "i-am-strong"
+    },
+    {
+      "start_time": 164.5,
+      "duration": 0.8,
+      "name": "i-am-strong"
+    },
+    {
+      "start_time": 164.5,
+      "duration": 0.8,
+      "name": "i-am-strong"
+    },
+    {
+      "start_time": 166.0,
+      "duration": 0.6,
+      "name": "up-down-hands"
+    },
+    {
+      "start_time": 166.8,
+      "duration": 0.6,
+      "name": "up-down-hands"
+    },
+    {
+      "start_time": 167.6,
+      "duration": 0.6,
+      "name": "up-down-hands"
+    },
+    {
+      "start_time": 168.6,
+      "duration": 0.6,
+      "name": "up-down-hands"
+    },
+    {
+      "start_time": 170.1,
+      "duration": 0.8,
+      "name": "i-am-strong"
+    },
+    {
+      "start_time": 171.1,
+      "duration": 0.8,
+      "name": "i-am-strong"
+    },
+    {
+      "start_time": 172.0,
+      "duration": 0.8,
+      "name": "i-am-strong"
+    },
+    {
+      "start_time": 172.9,
+      "duration": 0.8,
+      "name": "i-am-strong"
+    },
+    {
+      "start_time": 174.3,
+      "duration": 0.6,
+      "name": "up-down-hands"
+    },
+    {
+      "start_time": 175.2,
+      "duration": 0.6,
+      "name": "up-down-hands"
+    },
+    {
+      "start_time": 176.1,
+      "duration": 0.6,
+      "name": "up-down-hands"
+    },
+    {
+      "start_time": 177.4,
+      "duration": 0.6,
+      "name": "side-hit"
+    },
+    {
+      "start_time": 179.3,
+      "duration": 0.6,
+      "name": "side-hit"
+    },
+    {
+      "start_time": 181.1,
+      "duration": 0.6,
+      "name": "side-hit"
+    },
+    {
+      "start_time": 182.7,
+      "duration": 0.6,
+      "name": "broad-back"
+    },
+    {
+      "start_time": 183.8,
+      "duration": 0.6,
+      "name": "broad-back"
+    },
+    {
+      "start_time": 186.7,
+      "duration": 0.6,
+      "name": "side-hit"
+    },
+    {
+      "start_time": 188.5,
+      "duration": 0.6,
+      "name": "broad-back"
+    },
+    {
+      "start_time": 189.4,
+      "duration": 0.6,
+      "name": "broad-back"
+    },
+    {
+      "start_time": 190.0,
+      "duration": 2.0,
+      "name": "like-a-chicken"
+    },
+    {
+      "start_time": 192.4,
+      "duration": 1.7,
+      "name": "down-from-the-middle-in-arc"
+    },
+    {
+      "start_time": 194.3,
+      "duration": 1.7,
+      "name": "down-from-the-middle-in-arc"
+    },
+    {
+      "start_time": 196.0,
+      "duration": 1.7,
+      "name": "down-from-the-middle-in-arc"
+    },
+    {
+      "start_time": 197.9,
+      "duration": 1.7,
+      "name": "down-from-the-middle-in-arc"
+    },
+    {
+      "start_time": 199.9,
+      "duration": 0.6,
+      "name": "draw-circle"
+    },
+    {
+      "start_time": 201.6,
+      "duration": 0.6,
+      "name": "draw-circle"
+    },
+    {
+      "start_time": 203.6,
+      "duration": 0.6,
+      "name": "draw-circle"
+    },
+    {
+      "start_time": 205.6,
+      "duration": 0.6,
+      "name": "draw-circle"
+    },
+    {
+      "start_time": 207.3,
+      "duration": 0.7,
+      "name": "collapsing-breeding-locks"
+    },
+    {
+      "start_time": 209.3,
+      "duration": 0.7,
+      "name": "collapsing-breeding-locks"
+    },
+    {
+      "start_time": 211.2,
+      "duration": 0.7,
+      "name": "collapsing-breeding-locks"
+    },
+    {
+      "start_time": 212.4,
+      "duration": 1.0,
+      "name": "gold-circle"
+    },
+    {
+      "start_time": 214.9,
+      "duration": 0.7,
+      "name": "collapsing-breeding-locks"
+    },
+    {
+      "start_time": 216.7,
+      "duration": 0.7,
+      "name": "collapsing-breeding-locks"
+    },
+    {
+      "start_time": 218.6,
+      "duration": 0.7,
+      "name": "collapsing-breeding-locks"
+    },
+    {
+      "start_time": 220.5,
+      "duration": 0.7,
+      "name": "collapsing-breeding-locks"
+    },
+    {
+      "start_time": 221.2,
+      "duration": 1.8,
+      "name": "gold-turn"
+    }
+  ]
+}
