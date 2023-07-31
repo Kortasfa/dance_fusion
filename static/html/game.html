@@ -83,6 +83,15 @@
             </div>
         </div>
     </div>
+    <div class="boss-container boss hidden">
+        <div class="boss__name"></div>
+        <div class="boss__head">
+            <div class="boss__body"><img class="boss__body-img" alt=""></div>
+            <div class="boss__face"><img class="boss__face-img" alt=""></div>
+            <div class="boss__hat"><img class="boss__hat-img" alt=""></div>
+        </div>
+        <div class="boss__hp-bar"></div>
+    </div>
     <div class="dance-block__ratingScale"></div>
     <a class="btn-exit" href="/room">
         <img src="/static/img/log_out.svg" alt="">
@@ -433,9 +442,13 @@
                         addScore(userID.toString(), 0);
                     }
                     if (referenceUser === userID.toString()) {
+                        let botScore = 0;
                         for (userInfo of connectedUsers) {
+
                             if (parseInt(userInfo["userID"]) < 0) {
-                                addScore(userInfo["userID"], 20);
+                                botScore = (connectedBots[parseInt(userInfo["userID"]) * (-1) - 1].botScores["score"]);
+                                botScore = botScore + getRandomInt(-botScore * 0.3, botScore * 0.3);
+                                addScore(userInfo["userID"], botScore);
                             }
                         }
                     }
@@ -448,5 +461,10 @@
                 console.log("WebSocket connection closed.");
             };
         })();
+        function getRandomInt(min, max) {
+            min = Math.ceil(min);
+            max = Math.floor(max);
+            return Math.floor(Math.random() * (max - min)) + min; //Максимум не включается, минимум включается
+        }
     </script>
 </div>

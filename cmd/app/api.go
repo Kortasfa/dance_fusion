@@ -559,18 +559,19 @@ func getBotPath(db *sqlx.DB) func(w http.ResponseWriter, r *http.Request) {
 		}
 		botData, err := getBotInfo(db, botName)
 		if err != nil {
-			http.Error(w, "Error getting best player information", http.StatusInternalServerError)
+			http.Error(w, "Error getting bot information", http.StatusConflict)
 			log.Println(err.Error())
-			fmt.Println("Тут")
 			return
 		}
 		fmt.Println(botData)
 		response := struct {
+			BotId         string
 			BotScoresPath string
 			BotImgHat     string
 			BotImgBody    string
 			BotImgFace    string
 		}{
+			BotId:         botData.BotId,
 			BotScoresPath: botData.BotScoresPath,
 			BotImgHat:     botData.BotImgHat,
 			BotImgBody:    botData.BotImgBody,

@@ -58,6 +58,22 @@
 			</div>
 		{{ end }}
 	</div>
+	{{ range .Bots }}
+		<div onclick="addBot('{{ .BotName }}')">Добавить бота {{ .BotName }}</div>
+	{{ end }}
+	<div>
+	{{ range .Bosses }}
+		<div id="boss" onclick="bossGame(this)">
+			<div  class="boss__head user__head">
+				<div class="boss__body head__body"><img src="../{{ .BossImgBody }}" class="boss__body-img" alt=""></div>
+				<div class="boss__face head__face"><img src="../{{ .BossImgFace }}" class="boss__face-img" alt=""></div>
+				<div class="boss__hat head__hat"><img  src="../{{ .BossImgHat }}" class="boss__hat-img" alt=""></div>
+			</div>
+			<div class="boss__health-point" style="display:none">{{ .BossHealthPoint}}</div>
+			<div class="boss__name">{{ .BossName }}</div>
+		</div>
+	{{ end }}
+	</div>
 	<div class="game-menu">
 		<div class="game-menu__party">
 			<div id="needUser" class="party__message"></div>
@@ -99,6 +115,16 @@
 			<source controls="false" type="video/mp4">
 		</video>
 		<div class="game-menu__play-button"><a class="play-button" id="play">Play</a></div>
+	</div>
+	<div>
+		<div class="party__user none" id="user4">
+			<div  class="user__head">
+				<div class="head__body"><img src="" class="body" alt=""></div>
+				<div class="head__face"><img src="" class="face" alt=""></div>
+				<div class="head__hat"><img  src="" class="hat" alt=""></div>
+			</div>
+			<div class="user__name" id="userName4"></div>
+		</div>
 	</div>
 	<div class="page__info" id="guide" onclick="closeGuide()">
 		<h1 class="info__title">User Guide</h1>

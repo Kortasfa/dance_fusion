@@ -114,4 +114,22 @@ function addScore(userID, score, maxScore){
     if (valueScore >= 0.9 * maxScore) {
         megaStar.classList.remove("hidden");
     }
+    if (bossInfo) {
+        playerDamage(score);
+    }
+}
+
+function playerDamage(score) {
+    let bossHPCount = document.querySelector(".boss__hp-bar");
+    bossHPCount.innerText = (parseInt(bossHPCount.innerText) - score).toString();
+}
+
+if (bossInfo) {
+    console.log("zahar best");
+    document.querySelector(".boss-container").classList.remove("hidden");
+    document.querySelector(".boss__name").innerText = bossInfo.name;
+    document.querySelector(".boss__hp-bar").innerText = (parseInt(bossInfo.healthPoint) * connectedUsers.length).toString();
+    document.querySelector(".boss__body-img").src = bossInfo.bossBody;
+    document.querySelector(".boss__face-img").src = bossInfo.bossFace;
+    document.querySelector(".boss__hat-img").src = bossInfo.bossHat;
 }

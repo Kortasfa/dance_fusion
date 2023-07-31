@@ -339,6 +339,7 @@ func getBestPlayerInfo(db *sqlx.DB, songID int) (bestPlayerInfo, error) {
 func getBotInfo(db *sqlx.DB, botName string) (botInfo, error) {
 	const query = `
 		SELECT
+		    bot_id,
 		    bot_scores_path,
 		    img_hat,
 		    img_body,
@@ -348,7 +349,7 @@ func getBotInfo(db *sqlx.DB, botName string) (botInfo, error) {
 		WHERE
 		    bot_name = ?`
 	var botMainInfo botInfo
-	err := db.QueryRow(query, botName).Scan(&botMainInfo.BotScoresPath, &botMainInfo.BotImgHat, &botMainInfo.BotImgBody, &botMainInfo.BotImgFace)
+	err := db.QueryRow(query, botName).Scan(&botMainInfo.BotId, &botMainInfo.BotScoresPath, &botMainInfo.BotImgHat, &botMainInfo.BotImgBody, &botMainInfo.BotImgFace)
 	if err != nil {
 		return botInfo{}, err
 	}
@@ -398,4 +399,45 @@ func updateUserPassword(db *sqlx.DB, userID int, userPassword string) error {
 	}
 	_, err = db.Exec(query, string(hash), userID)
 	return err
+}
+
+func getBotNames(db *sqlx.DB) ([]botNameData, error) {
+	const query = `
+		SELECT
+			bot_name
+		FROM
+			bots
+	`
+	var data []botNameData
+
+	err := db.Select(&data, query)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return data, nil
+}
+
+func getBossInfo(db *sqlx.DB) ([]bossInfo, error) {
+	const query = `
+		SELECT
+		    boss_id,
+		    boss_name,
+		    boss_health_point,
+		    img_hat,
+		    img_body,
+		    img_face
+		FROM
+		    bosses
+		`
+	var data []bossInfo
+
+	err := db.Select(&data, query)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return data, nil
 }

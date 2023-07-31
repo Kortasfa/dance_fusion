@@ -8,6 +8,7 @@ const PlayBtn = document.getElementById('play');
 let readyGame = false;
 let readyPlayer = false;
 let connectedUsers = [];
+let connectedBots = [];
 
 btnOpenInfo.addEventListener('click', openGuide);
 
@@ -94,47 +95,42 @@ var classifier;
 
 $(document).ready(function() {
     const playButton = $('#play');
-    const contentContainer = $('#content');
-
-    playButton.on('click', function() {
-        if (readyGame) {
-            // Load the first script
-            numb = (Math.round(Math.random()*1000)).toString();
-            let firstComponent = '/static/test/edge-impulse-standalone.js?version=' + numb;
-            let secondComponent = '/static/test/run-impulse.js?version=' + numb;
-            let thirdComponent = '/static/html/game.html?version=' + numb;
-            checkForBots(songName);
-            $.getScript(firstComponent, function() {
-                // Once the first script is loaded, load the second script
-                $.getScript(secondComponent, function() {
-                    // After both scripts are loaded, load the page by AJAX
-                    (async () => {
-                        classifier = new EdgeImpulseClassifier();
-                        await classifier.init();
-                        let project = classifier.getProjectInfo();
-                        console.log(project.owner + ' / ' + project.name + ' (version ' + project.deploy_version + ')');
-
-                        contentContainer.load(thirdComponent, function() {
-                            const video = $('#video-dance')[0];
-                            const src = $('#video-src')[0];
-                            src.setAttribute('src', fullSongName);
-
-                            video.addEventListener('loadeddata', function() {
-                                video.play();
-                                socket.send(songName);
-                                console.log(songName);
-                                socket.close(); // Закрываем вебсокет mainRoom
-                            });
-                        });
-                    })();
-                });
-            });
-            return false;
-        }
-    });
+    playButton.on('click', gameStart());
 });
 
+function gameStart() {
+    const contentContainer = $('#content');
+    if (readyGame) {
+        numb = (Math.round(Math.random()*1000)).toString();
+        let firstComponent = '/static/test/edge-impulse-standalone.js?version=' + numb;
+        let secondComponent = '/static/test/run-impulse.js?version=' + numb;
+        let thirdComponent = '/static/html/game.html?version=' + numb;
+        $.getScript(firstComponent, function() {
+            $.getScript(secondComponent, function() {
+                (async () => {
+                    classifier = new EdgeImpulseClassifier();
+                    await classifier.init();
+                    let project = classifier.getProjectInfo();
+                    console.log(project.owner + ' / ' + project.name + ' (version ' + project.deploy_version + ')');
 
+                    contentContainer.load(thirdComponent, function() {
+                        const video = $('#video-dance')[0];
+                        const src = $('#video-src')[0];
+                        src.setAttribute('src', fullSongName);
+
+                        video.addEventListener('loadeddata', function() {
+                            video.play();
+                            socket.send(songName);
+                            console.log(songName);
+                            socket.close(); // Закрываем вебсокет mainRoom
+                        });
+                    });
+                })();
+            });
+        });
+    }
+    return readyGame;
+}
 
 function showVideo(videoID) {
     let videoSrcID = 'song' + videoID.id;
@@ -143,45 +139,80 @@ function showVideo(videoID) {
     videoPlayer.src = video.innerText;
 }
 
-function checkForBots(songName) {
+function addBot(botName) {
     let botInfo = {};
-    if (songName == "Forget You") {
-        fetch("../api/getBotPath", {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
-            },
-            body: `bot_name=${"bot_1"}`,
-        })
-            .then(response => {
-                if (!response.ok) {
+    fetch("../api/getBotPath", {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: `bot_name=${botName}`,
+    })
+        .then(response => {
+            if (!response.ok) {
+                if (response.status === 409) {
+                    throw new Error('No bot with such name');
+                }
+                else {
                     throw new Error('Server Error');
                 }
-                return response.json();
-            })
-            .then(data => {
-                if (data.BotScoresPath) {
-                    console.log('Bot Info:');
-                    console.log('Bot Scores Src:', data.BotScoresPath);
-                    console.log('Bot Hat Src:', data.BotImgHat);
-                    console.log('Bot Face Src:', data.BotImgFace);
-                    console.log('Bot Body Src:', data.BotImgBody);
-                    botInfo = data;
-                    addUser("-1","bot_1", "../" + data.BotImgHat, "../" + data.BotImgFace, "../" + data.BotImgBody);
-                    connectedBots.push({"botID": "-1", "userName": "bot_1", "BotBodyImgSrc": data.BotImgHat, "botFaceImgSrc": data.BotImgFace, "botHatImgSrc":  data.BotImgBody, "botScoresSrc":  data.BotScoresPath});
-
-
-
-                } else {
-                    console.log('Fail');
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.BotScoresPath) {
+                console.log('Bot Info:');
+                console.log('Bot Id: -', data.BotId);
+                console.log('Bot Scores Src:', data.BotScoresPath);
+                console.log('Bot Hat Src:', data.BotImgHat);
+                console.log('Bot Face Src:', data.BotImgFace);
+                console.log('Bot Body Src:', data.BotImgBody);
+                botInfo = data;
+                addUser( "-" + data.BotId, "bot_1", "../" + data.BotImgHat, "../" + data.BotImgFace, "../" + data.BotImgBody);
+                function readJSONFromURL(url) {
+                    fetch(url)
+                        .then(response => {
+                            if (!response.ok) {
+                                throw new Error('Ошибка при получении файла');
+                            }
+                            return response.json();
+                        })
+                        .then(jsonData => {
+                            connectedBots.push({"botID": "-1",  "botScores":  jsonData});
+                            console.log(connectedBots);
+                        })
+                        .catch(error => {
+                            console.error('Ошибка:', error);
+                        });
                 }
-            })
-            .catch(error => {
-                console.log('Error:', error);
-                return
-            });
-    }
+                readJSONFromURL("../" + data.BotScoresPath);
+            } else {
+                console.log('Fail');
+            }
+        })
+        .catch(error => {
+            console.log('Error:', error);
+            return
+        });
 }
+
+let bossInfo;
+
+function bossGame(bossBlock) {
+    let name = bossBlock.querySelector(".boss__name").innerText;
+    let healthPoint = bossBlock.querySelector(".boss__health-point").innerText;
+    let bossBody= bossBlock.querySelector(".boss__body-img").src;
+    let bossFace = bossBlock.querySelector(".boss__face-img").src;
+    let bossHat = bossBlock.querySelector(".boss__hat-img").src;
+    if (!gameStart()) {
+        console.log("Игра не готова")
+        return;
+    }
+
+    bossInfo = {"name": name, "healthPoint": healthPoint, "bossBody": bossBody, "bossFace": bossFace, "bossHat": bossHat};
+
+}
+
 
 const parent = document.querySelector('.songs');
 
@@ -244,7 +275,6 @@ function addUser(userID, userName, hatImgSrc, faceImgSrc, bodyImgSrc) {
     readyPlayer = true;
     changeButton();
 }
-
 
 function removeUser(userID) {
     console.log('Пользователь вышел: ' + userID);

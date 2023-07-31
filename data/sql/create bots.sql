@@ -1,6 +1,6 @@
 USE dance_fusion;
 CREATE TABLE bots(
-                     `id` INTEGER AUTO_INCREMENT PRIMARY KEY,
+                     `bot_id` INTEGER AUTO_INCREMENT PRIMARY KEY,
                      `bot_name` VARCHAR(255) NOT NULL,
                      `bot_scores_path` VARCHAR(255) NOT NULL,
                      `img_hat` VARCHAR(255) NOT NULL,

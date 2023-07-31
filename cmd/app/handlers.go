@@ -64,10 +64,24 @@ type bestPlayerInfo struct {
 }
 
 type botInfo struct {
+	BotId         string `db:"bot_id"`
 	BotScoresPath string `db:"bot_scores_path"`
 	BotImgHat     string `db:"img_hat"`
 	BotImgBody    string `db:"img_body"`
 	BotImgFace    string `db:"img_face"`
+}
+
+type botNameData struct {
+	BotName string `db:"bot_name"`
+}
+
+type bossInfo struct {
+	BossId          string `db:"boss_id"`
+	BossName        string `db:"boss_name"`
+	BossHealthPoint string `db:"boss_health_point"`
+	BossImgHat      string `db:"img_hat"`
+	BossImgBody     string `db:"img_body"`
+	BossImgFace     string `db:"img_face"`
 }
 
 type menuPageData struct {
@@ -75,6 +89,8 @@ type menuPageData struct {
 	Songs          []songsData
 	RoomKey        string
 	ConnectedUsers []userInfo
+	Bots           []botNameData
+	Bosses         []bossInfo
 	WssURL         string
 }
 
@@ -175,11 +191,27 @@ func handleRoom(db *sqlx.DB) func(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
+		bots, err := getBotNames(db)
+		if err != nil {
+			http.Error(w, "Internal Server Error", 500)
+			log.Println(err)
+			return
+		}
+
+		bosses, err := getBossInfo(db)
+		if err != nil {
+			http.Error(w, "Internal Server Error", 500)
+			log.Println(err)
+			return
+		}
+
 		data := menuPageData{
 			Styles:         styles,
 			Songs:          songs,
 			RoomKey:        roomID,
 			ConnectedUsers: users,
+			Bots:           bots,
+			Bosses:         bosses,
 			WssURL:         "wss://" + r.Host + "/roomWS/" + roomID,
 		}
 
