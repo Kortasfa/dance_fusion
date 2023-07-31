@@ -347,7 +347,7 @@ func sendPointToJoin(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(200)
 }
 
-func getMaxScore(w http.ResponseWriter, r *http.Request) {
+func getDataSongJson(w http.ResponseWriter, r *http.Request) {
 	reqData, err := io.ReadAll(r.Body)
 	if err != nil {
 		http.Error(w, "Parsing error", 500)
@@ -357,6 +357,7 @@ func getMaxScore(w http.ResponseWriter, r *http.Request) {
 	var data struct {
 		RoomID   string
 		MaxPoint int
+		ColorID  string
 	}
 	err = json.Unmarshal(reqData, &data)
 	if err != nil {
@@ -364,28 +365,9 @@ func getMaxScore(w http.ResponseWriter, r *http.Request) {
 		log.Println(err.Error())
 		return
 	}
-	fmt.Println(data.RoomID, data.MaxPoint)
-	broadcastJoinPageWSMessage <- []string{data.RoomID, string(reqData)}
+	fmt.Println(data.RoomID, data.MaxPoint, data.ColorID)
+	broadcastGameFieldWSMessage <- []string{data.RoomID, string(reqData)}
 	w.WriteHeader(200)
-}
-
-func danceInfoHandleMessages() {
-	for mesArr := range broadcastGameFieldWSMessage {
-		for conn, gameFieldID := range gameFieldWSDict {
-			roomID := mesArr[0]
-			data := mesArr[1]
-			if gameFieldID == roomID {
-				err := conn.WriteMessage(websocket.TextMessage, []byte(data))
-				if err != nil {
-					err := conn.Close()
-					delete(gameFieldWSDict, conn)
-					if err != nil {
-						return
-					}
-				}
-			}
-		}
-	}
 }
 
 func getBestPlayer(db *sqlx.DB) func(w http.ResponseWriter, r *http.Request) {

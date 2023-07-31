@@ -107,6 +107,16 @@
     align-items: center;
 }
 
+.color-flag {
+    position: absolute;
+    top: 120px;
+    right: 10px;
+    width: 50px;
+    height: 50px;
+    background-color: #BD63D4;
+    border-radius: 50px;
+}
+
 .entrance {
     display: flex;
     flex-direction: column;
@@ -207,7 +217,7 @@
     height: 50px;
 }
 
-.rating-stars__star_megaStar {
+.rating-stars__star_mega-star {
     width: 60px;
     height: 60px;
 }

@@ -189,3 +189,30 @@ func handleJoinPageWSMessages() { // broadcastJoinPageWSMessage <- []string{User
 		}
 	}
 }
+
+func danceInfoHandleMessages() {
+	for mesArr := range broadcastGameFieldWSMessage {
+		found := false
+		roomID := mesArr[0]
+		data := mesArr[1]
+		for {
+			for conn, gameFieldID := range gameFieldWSDict {
+				if gameFieldID == roomID {
+					err := conn.WriteMessage(websocket.TextMessage, []byte(data))
+					if err != nil {
+						err := conn.Close()
+						delete(gameFieldWSDict, conn)
+						if err != nil {
+							return
+						}
+					}
+					found = true
+				}
+			}
+			if found {
+				break
+			}
+		}
+
+	}
+}
