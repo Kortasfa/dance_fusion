@@ -58,6 +58,22 @@
 			</div>
 		{{ end }}
 	</div>
+	{{ range .Bots }}
+		<div onclick="addBot('{{ .BotName }}')">Добавить бота {{ .BotName }}. Сложность = {{ .Difficulty }}</div>
+	{{ end }}
+	<div>
+	{{ range .Bosses }}
+		<div id="boss" onclick="bossGame(this)">
+			<div  class="boss__head">
+				<div class="boss__body"><img src="../{{ .BossImgBody }}" class="boss__body-img" alt=""></div>
+				<div class="boss__face"><img src="../{{ .BossImgFace }}" class="boss__face-img" alt=""></div>
+				<div class="boss__hat"><img  src="../{{ .BossImgHat }}" class="boss__hat-img" alt=""></div>
+			</div>
+			<div class="boss__health-point" style="display:none">{{ .BossHealthPoint}}</div>
+			<div class="boss__name">{{ .BossName }}</div>
+		</div>
+	{{ end }}
+	</div>
 	<div class="game-menu">
 		<div class="game-menu__party">
 			<div id="needUser" class="party__message"></div>

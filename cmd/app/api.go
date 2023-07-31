@@ -530,3 +530,37 @@ func changeUserPassword(db *sqlx.DB) http.HandlerFunc {
 		w.WriteHeader(http.StatusOK)
 	}
 }
+
+func getBotPath(db *sqlx.DB) func(w http.ResponseWriter, r *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
+		botName := r.FormValue("bot_name")
+		if botName == "" {
+			// Обработка случая, когда поле "bot_name" не было отправлено в форме
+			http.Error(w, "Field 'bot_name' is missing or empty", http.StatusBadRequest)
+			return
+		}
+		botData, err := getBotInfo(db, botName)
+		if err != nil {
+			http.Error(w, "Error getting bot information", http.StatusConflict)
+			log.Println(err.Error())
+			return
+		}
+		fmt.Println(botData)
+		response := struct {
+			BotId         string
+			BotScoresPath string
+			BotImgHat     string
+			BotImgBody    string
+			BotImgFace    string
+		}{
+			BotId:         botData.BotId,
+			BotScoresPath: botData.BotScoresPath,
+			BotImgHat:     botData.BotImgHat,
+			BotImgBody:    botData.BotImgBody,
+			BotImgFace:    botData.BotImgFace,
+		}
+
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(response)
+	}
+}

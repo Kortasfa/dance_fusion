@@ -83,6 +83,15 @@
         </div>
     </div>
   </div>
+    <div class="boss-container boss hidden">
+        <div class="boss__name"></div>
+        <div class="boss__head">
+            <div class="boss__body"><img class="boss__body-img" alt=""></div>
+            <div class="boss__face"><img class="boss__face-img" alt=""></div>
+            <div class="boss__hat"><img class="boss__hat-img" alt=""></div>
+        </div>
+        <div class="boss__hp-bar"></div>
+    </div>
   <div class="rating-scales">
     <div class="rating-scales__user-scale rating-scales__user-scale_scale-1" id="scale-1"></div>
     <div class="rating-scales__user-scale rating-scales__user-scale_scale-2 hidden" id="scale-2"></div>
@@ -138,8 +147,24 @@
       </div>
   </div>
   <script>
+      function getReferenceUser() {
+          console.log(connectedUsers);
+          for (let userInfo of connectedUsers) {
+              console.log(userInfo["userID"]);
+              if (parseInt(userInfo["userID"]) > 0) {
+                  console.log("Новый эталон: ", userInfo["userID"]);
+                  return userInfo["userID"];
+              }
+          }
+      }
       function removeUser(userID) {
           console.log('Пользователь вышел: ' + userID);
+          for (let i = 0; i < connectedUsers.length; i++) {
+              if (connectedUsers[i]["userID"] === userID) {
+                  connectedUsers.splice(i, 1);
+                  break;
+              }
+          }
           const usersBlock = document.querySelector(".rank");
           let index = 0;
           for (const userBlock of usersBlock.children) {
@@ -152,6 +177,8 @@
                   break
               }
           }
+
+          referenceUser = getReferenceUser()
       }
 
       async function sendPoint(userID, point) {
@@ -210,32 +237,28 @@
               score: score
           };
 
-          fetch('/api/updateBestPlayer', {
-              method: 'POST',
-              headers: {
-                  'Content-Type': 'application/json'
-              },
-              body: JSON.stringify(data)
-          })
-              .then(response => {
-                  if (response.ok) {
-                      console.log('Best User Info updated successfully.');
-                  } else {
-                      console.error('Error updating Best User Info', response.statusText);
-                  }
-              })
-              .catch(error => {
-                  console.error('Error:', error);
-              });
-      }
+            fetch('/api/updateBestPlayer', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            })
+                .then(response => {
+                    if (response.ok) {
+                        console.log('Best User Info updated successfully.');
+                    } else {
+                        console.error('Error updating Best User Info', response.statusText);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+        }
+        let referenceUser = getReferenceUser();
 
-      (async () => {
-          let classifier = new EdgeImpulseClassifier();
-          await classifier.init();
-          let project = classifier.getProjectInfo();
-          console.log(project.owner + ' / ' + project.name + ' (version ' + project.deploy_version + ')');
-
-          let socket = new WebSocket("wss://" + window.location.hostname + "/neuralWS/" + WssURL.split("/").pop().trim());
+        (async () => {
+            let socket = new WebSocket("wss://" + window.location.hostname + "/neuralWS/" + WssURL.split("/").pop().trim());
 
           socket.onopen = function (event) {
               console.log("WebSocket connection established.");
@@ -442,32 +465,48 @@
                       if (score >= 0.2 && score < 0.3) {
                           point = Math.round(score * 100) + 5;
 
-                      }
-                      if (score > 0.1 && score < 0.2) {
-                          point = Math.round(score * 100) + 7;
-                      }
-                      if (score <= 0.1 && score > 0) {
-                          point = Math.round(score * 100) + 9;
-                      }
-                      if (score === 2) {
-                          point = 200;
-                      }
-                      console.log('Кол-во баллов', point);
-                      addScore(userID.toString(), point, maxPoint);
-                      sendPoint(userID, point).then(() => {
-                      })
-                  } else {
-                      console.log('Лежит', deviationCount);
-                      addScore(userID.toString(), 0, maxPoint);
-                  }
-              } catch (ex) {
-                  console.log(ex);
-              }
-          };
+                        }
+                        if (score > 0.1 && score < 0.2) {
+                            point = Math.round(score * 100) + 7;
+                        }
+                        if (score <= 0.1 && score > 0) {
+                            point = Math.round(score * 100) + 9;
+                        }
+                        if (score === 2) {
+                            point = 200;
+                        }
+                        console.log('Кол-во баллов', point);
+                        addScore(userID.toString(), point, maxPoint);
+                        sendPoint(userID, point).then(() => {
+                        })
+                    } else {
+                        console.log('Лежит', deviationCount);
+                        addScore(userID.toString(), 0, maxPoint);
+                    }
+                    if (referenceUser === userID.toString()) {
+                        let botScore = 0;
+                        for (userInfo of connectedUsers) {
 
-          socket.onclose = function (event) {
-              console.log("WebSocket connection closed.");
-          };
-      })();
-  </script>
+                            if (parseInt(userInfo["userID"]) < 0) {
+                                botScore = (connectedBots[parseInt(userInfo["userID"]) * (-1) - 1].botScores["score"]);
+                                botScore = botScore + getRandomInt(-botScore * 0.3, botScore * 0.3);
+                                addScore(userInfo["userID"], botScore, maxPoint);
+                            }
+                        }
+                    }
+                } catch (ex) {
+                    console.log(ex);
+                }
+            };
+
+            socket.onclose = function (event) {
+                console.log("WebSocket connection closed.");
+            };
+        })();
+        function getRandomInt(min, max) {
+            min = Math.ceil(min);
+            max = Math.floor(max);
+            return Math.floor(Math.random() * (max - min)) + min; //Максимум не включается, минимум включается
+        }
+    </script>
 </div>
