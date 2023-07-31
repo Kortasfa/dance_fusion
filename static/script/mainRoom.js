@@ -107,6 +107,8 @@ Array.from(test).forEach(function (element) {
     });
 });
 
+var numb;
+
 $(document).ready(function() {
     const playButton = $('#play');
     const contentContainer = $('#content');
@@ -114,11 +116,15 @@ $(document).ready(function() {
     playButton.on('click', function() {
         if (readyGame) {
             // Load the first script
-            $.getScript('/static/test/edge-impulse-standalone.js', function() {
+            numb = (Math.round(Math.random()*1000)).toString();
+            let firstComponent = '/static/test/edge-impulse-standalone.js?version=' + numb;
+            let secondComponent = '/static/test/run-impulse.js?version=' + numb;
+            let thirdComponent = '/static/html/game.html?version=' + numb;
+            $.getScript(firstComponent, function() {
                 // Once the first script is loaded, load the second script
-                $.getScript('/static/test/run-impulse.js', function() {
+                $.getScript(secondComponent, function() {
                     // After both scripts are loaded, load the page by AJAX
-                    contentContainer.load('/static/html/game.html', function() {
+                    contentContainer.load(thirdComponent, function() {
                         const video = $('#video-dance')[0];
                         const src = $('#video-src')[0];
                         src.setAttribute('src', fullSongName);
@@ -248,6 +254,6 @@ function removeUser(userID) {
 const domain = window.location.protocol + "//" + window.location.hostname + "/join";
 const qr = new QRCode(document.getElementById("qrcode"), {
     text: domain,
-    width: 125, // Увеличенная ширина
-    height: 125, // Увеличенная высота
+    width: 125,
+    height: 125,
 });

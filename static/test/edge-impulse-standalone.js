@@ -1511,7 +1511,7 @@ function createExportWrapper(name, fixedasm) {
 }
 
 var wasmBinaryFile;
-wasmBinaryFile = '/static/test/' + songNeuro + '.wasm';
+wasmBinaryFile = '/static/test/' + songNeuro + '.wasm?version=' + numb;
 if (!isDataURI(wasmBinaryFile)) {
   wasmBinaryFile = locateFile(wasmBinaryFile);
 }
