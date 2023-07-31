@@ -47,9 +47,16 @@ func main() {
 	r.HandleFunc("/api/exitFromGame", exitFromGameAPI)
 	r.HandleFunc("/api/exitFromAccount", exitFromAccount)
 	r.HandleFunc("/api/custom", getUserAvatar(dbx)).Methods("POST")
+	r.HandleFunc("/api/sendPoint", sendPointToJoin).Methods("POST")
+	r.HandleFunc("/api/sendMaxPoint", getMaxScore).Methods("POST")
+	r.HandleFunc("/api/getBestPlayer", getBestPlayer(dbx)).Methods("POST")
+	r.HandleFunc("/api/updateBestPlayer", updateBestPlayer(dbx)).Methods("POST")
+	r.HandleFunc("/api/changeUserName", changeUserName(dbx)).Methods("POST")
+	r.HandleFunc("/api/changeUserPassword", changeUserPassword(dbx)).Methods("POST")
 
 	go handleRoomWSMessages()
 	go handleJoinPageWSMessages()
+	go danceInfoHandleMessages()
 
 	r.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir("./static"))))
 
@@ -58,10 +65,9 @@ func main() {
 		Handler: r,
 		Addr:    port,
 	}
-
 	log.Fatal(srv.ListenAndServe())
 }
 
 func openDB() (*sql.DB, error) {
-	return sql.Open(dbDriverName, "root:P@ssw0rd@tcp(localhost:3306)/dance_fusion?charset=utf8mb4&collation=utf8mb4_unicode_ci&parseTime=true")
+	return sql.Open(dbDriverName, "root:root@tcp(localhost:3306)/dance_fusion?charset=utf8mb4&collation=utf8mb4_unicode_ci&parseTime=true")
 }

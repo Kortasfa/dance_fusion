@@ -36,27 +36,33 @@ func roomWSHandler(db *sqlx.DB) func(w http.ResponseWriter, r *http.Request) {
 		}
 		fmt.Println("Надо отправить название: ", string(message))
 
-		motionListPath, err := getMotionListPath(db, string(message))
+		motionListPaths, err := getMotionListPath(db, string(message))
 		if err != nil {
-			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+			http.Error(w, "Внутренняя ошибка сервера", http.StatusInternalServerError)
 			log.Println(err.Error())
-			delete(roomWSDict, conn)
-			return
-		}
-
-		fileContent, err := ioutil.ReadFile(motionListPath)
-		if err != nil {
-			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-			log.Println("Ошибка при открытии файла:", err)
 			delete(roomWSDict, conn)
 			return
 		}
 		for roomID, userSlice := range roomIDDict {
 			if roomID == websocketID {
-				for _, userID := range userSlice {
+				i := 0
+				for {
+					if i >= len(userSlice) {
+						break
+					}
+					userID := userSlice[i]
+					motionListPath := motionListPaths[i]
 					fmt.Println("Надо отправить JSON этому", userID)
+					fmt.Println("Надо отправить motionListPath этому", userID, "вот json", motionListPath)
+					fileContent, err := ioutil.ReadFile(motionListPath)
+					if err != nil {
+						http.Error(w, "Внутренняя ошибка сервера", http.StatusInternalServerError)
+						log.Println("Ошибка при открытии файла для игрока", userID, ":", err)
+						delete(roomWSDict, conn)
+						return
+					}
 					broadcastJoinPageWSMessage <- []string{userID, string(fileContent)}
-					err = conn.Close() // Пока закрываем вебсокет, потому что дальше он не испоьлзуется
+					i++
 				}
 				break
 			}
@@ -124,6 +130,7 @@ func neuralWSHandler(w http.ResponseWriter, r *http.Request) {
 		}
 	}(conn)
 	gameFieldWSDict[conn] = gameFieldID
+	fmt.Println(len(gameFieldWSDict))
 	for {
 		_, _, err := conn.ReadMessage()
 		if err != nil {
@@ -143,20 +150,21 @@ func handleRoomWSMessages() {
 			message := ""
 			if action == "add" {
 				userName := mesArr[3]
-				imgSrc := mesArr[4]
-				message = action + "|" + userID + "|" + userName + "|" + imgSrc
+				hatSrc := mesArr[4]
+				faceSrc := mesArr[5]
+				bodySrc := mesArr[6]
+				message = action + "|" + userID + "|" + userName + "|" + hatSrc + "|" + faceSrc + "|" + bodySrc
 			} else {
 				message = action + "|" + userID
 			}
-
 			if roomWSDict[wsConnect] == roomID {
 				err := wsConnect.WriteMessage(websocket.TextMessage, []byte(message))
 				if err != nil {
 					err := wsConnect.Close()
+					delete(roomWSDict, wsConnect)
 					if err != nil {
 						return
 					}
-					delete(roomWSDict, wsConnect)
 				}
 			}
 		}
@@ -172,10 +180,10 @@ func handleJoinPageWSMessages() { // broadcastJoinPageWSMessage <- []string{User
 				err := wsConnect.WriteMessage(websocket.TextMessage, []byte(data))
 				if err != nil {
 					err := wsConnect.Close()
+					delete(joinPageWSDict, wsConnect)
 					if err != nil {
 						return
 					}
-					delete(joinPageWSDict, wsConnect)
 				}
 			}
 		}
