@@ -37,17 +37,18 @@ function getUsersByCookie() {
         indexUserFaceImg.src = faceImgSrc;
         indexUserHatImg.src = hatImgSrc;
         indexUserName.innerText = userName;
-        let megaStar = document.querySelectorAll(".score__star")[5];
+        let heroStars = document.getElementById("hero-score-" + (i + 1));
+        let megaStar = heroStars.querySelectorAll(".score__star")[5];
         megaStar.id = "mega-star-" + userID;
-        let starOne = document.querySelectorAll(".score__star")[0];
+        let starOne = heroStars.querySelectorAll(".score__star")[0];
         starOne.id = "star-1-" + userID;
-        let starTwo = document.querySelectorAll(".score__star")[1];
+        let starTwo = heroStars.querySelectorAll(".score__star")[1];
         starTwo.id = "star-2-" + userID;
-        let starThree = document.querySelectorAll(".score__star")[2];
+        let starThree = heroStars.querySelectorAll(".score__star")[2];
         starThree.id = "star-3-" + userID;
-        let starFour = document.querySelectorAll(".score__star")[3];
+        let starFour = heroStars.querySelectorAll(".score__star")[3];
         starFour.id = "star-4-" + userID;
-        let starFive = document.querySelectorAll(".score__star")[4];
+        let starFive = heroStars.querySelectorAll(".score__star")[4];
         starFive.id = "star-5-" + userID;
     }
 }
@@ -73,8 +74,8 @@ btnContinue.addEventListener("click", function () {
     window.location.href = "/room";
 })
 
-let valueScore= 0;
 function addScore(userID, score, maxScore) {
+    let valueScore;
     let starComplete = 0;
     let user = document.getElementById(userID);
     let scale = document.getElementById("scale-" + userID + "-for-user")
@@ -85,7 +86,19 @@ function addScore(userID, score, maxScore) {
     let starFour = document.getElementById("star-4-" + userID);
     let starFive = document.getElementById("star-5-" + userID);
     let megaStar = document.getElementById("mega-star" + userID);
-    if (valueScore > 5600) return
+
+    let userIndex;
+    for (userIndex = 0; userIndex < connectedUsers.length; userIndex++) {
+        let userInfo = connectedUsers[userIndex];
+        if (userInfo["userID"] === userID) {
+            valueScore = userInfo["valueScore"];
+            break;
+        }
+    }
+    if (valueScore === undefined) {
+        console.log("пользователь не найден с таким id")
+        return;
+    }
     valueScore += score;
     console.log("valueScore: " + valueScore);
     if (valueScore <= maxScore) {
@@ -96,7 +109,7 @@ function addScore(userID, score, maxScore) {
         console.log("pix: " + pix);
     }
     if (valueScore > maxScore) {
-        percentage = (valueScore / maxTheory);
+        percentage = (valueScore / maxScore);
         console.log("percentage: " + percentage);
         pix = 50 * percentage;
         console.log("pix: " + pix);
@@ -180,4 +193,6 @@ function addScore(userID, score, maxScore) {
             megaStarScale.classList.remove("hidden");
             break;
     }
+
+    connectedUsers[userIndex]["valueScore"] = valueScore;
 }
