@@ -74,6 +74,8 @@ btnContinue.addEventListener("click", function () {
     window.location.href = "/room";
 })
 
+let pix;
+
 function addScore(userID, score, maxScore) {
     let valueScore;
     let starComplete = 0;
@@ -195,6 +197,14 @@ function addScore(userID, score, maxScore) {
     }
 
     connectedUsers[userIndex]["valueScore"] = valueScore;
+    if (bossInfo) {
+        playerDamage(score);
+    }
+}
+
+function playerDamage(score) {
+    let bossHPCount = document.querySelector(".boss__hp-bar");
+    bossHPCount.innerText = (parseInt(bossHPCount.innerText) - score).toString();
 }
 
 window.onbeforeunload = function() {
