@@ -48,7 +48,7 @@ func main() {
 	r.HandleFunc("/api/exitFromAccount", exitFromAccount)
 	r.HandleFunc("/api/custom", getUserAvatar(dbx)).Methods("POST")
 	r.HandleFunc("/api/sendPoint", sendPointToJoin).Methods("POST")
-	r.HandleFunc("/api/sendMaxPoint", getMaxScore).Methods("POST")
+	r.HandleFunc("/api/sendDataSongJson", getDataSongJson).Methods("POST")
 	r.HandleFunc("/api/getBestPlayer", getBestPlayer(dbx)).Methods("POST")
 	r.HandleFunc("/api/updateBestPlayer", updateBestPlayer(dbx)).Methods("POST")
 	r.HandleFunc("/api/changeUserName", changeUserName(dbx)).Methods("POST")

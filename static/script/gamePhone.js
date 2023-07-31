@@ -9,7 +9,8 @@ const btnLogOut = document.getElementById("logout");
 const user = document.querySelector(".users");
 const menu = document.querySelector(".menu");
 const custom = document.getElementById("custom");
-const btnLeaveRoom = document.querySelector(".btn-leave-room")
+const btnLeaveRoom = document.querySelector(".btn-leave-room");
+const colorFlag = document.querySelector(".color-flag");
 
 function setJsonCookie(name, value, expirationDays) {
     const jsonValue = JSON.stringify(value);
@@ -71,6 +72,7 @@ function sendMessage() {
                 fullID.classList.add("hidden");
                 warningID.classList.add("hidden");
                 btnLeaveRoom.classList.remove("hidden");
+                colorFlag.classList.remove("hidden");
                 console.log("Connected to the room!");
                 joinRoom(userInfo.UserID)
             } else if (XHR.status === 404) {
@@ -98,6 +100,7 @@ let value;
 let pix;
 let percentage;
 let maxTheory;
+let colorID;
 let scale = document.querySelector(".dance-block__rating-scale");
 const starOne = document.getElementById("star-1");
 const starTwo = document.getElementById("star-2");
@@ -105,7 +108,7 @@ const starThree = document.getElementById("star-3");
 const starFour = document.getElementById("star-4");
 const starFive = document.getElementById("star-5");
 const megaStar = document.getElementById("mega-star");
-const stars = document.querySelectorAll(".rating-stars__star")
+const stars = document.querySelectorAll(".rating-stars__star");
 function joinRoom(userID) {
     socket = new WebSocket("wss://" + window.location.hostname + "/ws/joinToRoom/" + userID);
     socket.onopen = function(event) {
@@ -116,6 +119,7 @@ function joinRoom(userID) {
         let maxPractice = maxTheory - maxTheory * 0.2; //4480
         let receivedData = event.data;
         let receivedJSON = JSON.parse(receivedData);
+        console.log(receivedJSON);
         if ("point" in receivedJSON) {
             let score = receivedJSON["point"];
             console.log("score: " + score);
@@ -162,7 +166,9 @@ function joinRoom(userID) {
             pix = 0;
             percentage = 0;
             maxTheory = receivedJSON["maxPoint"];
-            sendMaxPoint(enterInRoom.value, maxTheory).then(() => {})
+            colorID = receivedJSON["color"];
+            colorFlag.style.backgroundColor = colorID;
+            sendSongJson(enterInRoom.value, maxTheory, colorID).then(() => {})
             scale.style.height = 0 + 'px';
             megaStar.classList.add("hidden");
             stars.forEach(element => element.src = "/static/img/star_white.svg");
@@ -176,8 +182,8 @@ function joinRoom(userID) {
     };
 }
 
-async function sendMaxPoint(roomID, maxTheory) {
-    const response = await fetch("/api/sendMaxPoint", {
+async function sendSongJson(roomID, maxTheory, colorID) {
+    const response = await fetch("/api/sendDataSongJson", {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -185,6 +191,7 @@ async function sendMaxPoint(roomID, maxTheory) {
         body: JSON.stringify({
             "roomID": roomID,
             "maxPoint": maxTheory,
+            "colorID": colorID
         }),
     });
     if (response.ok) {
@@ -199,6 +206,7 @@ btnLeaveRoom.addEventListener("click", exitFromGame);
 window.onbeforeunload = exitFromGame;
 async function exitFromGame() {
     btnLeaveRoom.classList.add("hidden");
+    colorFlag.classList.add("hidden");
     const response = await fetch("/api/exitFromGame", {
         method: 'POST',
         headers: {

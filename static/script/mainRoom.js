@@ -194,7 +194,7 @@ socket.onclose = function (event) {
 
 function addUser(userID, userName, hatImgSrc, faceImgSrc, bodyImgSrc) {
     console.log('Пользователь присоединился: ' + userID);
-    connectedUsers.push({"userID": userID, "userName": userName, "bodyImgSrc": bodyImgSrc, "faceImgSrc": faceImgSrc, "hatImgSrc": hatImgSrc});
+    connectedUsers.push({"userID": userID, "userName": userName, "valueScore": 0, "bodyImgSrc": bodyImgSrc, "faceImgSrc": faceImgSrc, "hatImgSrc": hatImgSrc});
 
     let userMessage = document.getElementById('needUser');
     userMessage.classList.add('none');
