@@ -8,12 +8,12 @@ CHARACTER SET = utf8mb4
 COLLATE utf8mb4_unicode_ci;
 
 INSERT INTO faces (id, recommended_level, face_src) VALUES
-(1, 0, 'static/img/face/7.png'),
+(1, 0, 'static/img/face/2.png'),
 (2, 0, 'static/img/face/6.png'),
 (3, 1, 'static/img/face/5.png'),
 (4, 2, 'static/img/face/4.png'),
 (5, 3, 'static/img/face/3.png'),
-(6, 4, 'static/img/face/2.png'),
+(6, 4, 'static/img/face/7.png'),
 (7, 4, 'static/img/face/1.png'),
 (8, 11, 'static/img/face/smileFace.png'),
 (9, 13, 'static/img/face/simpleFace.png'),
@@ -24,7 +24,7 @@ INSERT INTO faces (id, recommended_level, face_src) VALUES
 (14, 14, 'static/img/face/deadInsideFace.png'),
 (15, 14, 'static/img/face/pickUpFace.png'),
 (16, 14, 'static/img/face/scaredFace.png'),
-(17, 14, 'static/img/face/smileFace.png'),
+(17, 14, 'static/img/face/angriestFace.png'),
 (18, 14, 'static/img/face/stupidFace.png'),
 (19, 14, 'static/img/face/unhappyFace.png'),
 (20, 14, 'static/img/face/wFace.png'),

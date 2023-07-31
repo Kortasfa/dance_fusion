@@ -1,4 +1,4 @@
-<div class="main">
+<div>
     <link rel="stylesheet" href="/static/css/gameField.css"/>
     <script src="/static/script/gameField.js" defer></script>
     <div class="rank">
@@ -19,7 +19,7 @@
                 <img class="score__star" src="/static/img/star_white.svg">
                 <img class="score__star" src="/static/img/star_white.svg">
                 <img class="score__star" src="/static/img/star_white.svg">
-                <img class="score__star score__star_mega  hidden" src="/static/img/mega_star.svg">
+                <img class="score__star score__star_mega hidden" src="/static/img/mega_star.svg">
             </div>
         </div>
         <div class="rank__hero hidden" id="hero2">
@@ -91,12 +91,36 @@
         <source id="video-src" src="../video/previews/americanGirl.mp4">
     </video>
     <div class="pop-up hidden" id="pop-up">
-        <div class="pop-up__pop-up-box">
-            <span class="pop-up-box__question">Total score</span>
-            <span id="user-score1" class="pop-up-box__user-score hidden">User 1: 0</span>
-            <span id="user-score2" class="pop-up-box__user-score hidden">User 2: 0</span>
-            <span id="user-score3" class="pop-up-box__user-score hidden">User 3: 0</span>
-            <span id="user-score4" class="pop-up-box__user-score hidden">User 4: 0</span>
+        <div class="rating">
+            <div class="rating__title">
+                <div class="title__item">Total Score</div>
+            </div>
+            <div class="rating__list">
+                <div class="best-player">
+                    <img class="best-player__crown" src="../static/img/crown.png" alt="">
+                    <div class="best-player__score">Kirill: 1000</div>
+                </div>
+                <div class="list">
+                    <ol class="list__players">
+                        <li id="player-result1" class="player hidden">
+                            <div class="player__place">1</div>
+                            <span id="user-score1" class="player-score">User 1: 0</span>
+                        </li>
+                        <li id="player-result2" class="player hidden">
+                            <div class="player__place">2</div>
+                            <span id="user-score2" class="player-score">User 2: 0</span>
+                        </li>
+                        <li  id="player-result3" class="player hidden">
+                            <div class="player__place">3</div>
+                            <span id="user-score3" class="player-score">User 3: 0</span>
+                        </li>
+                        <li id="player-result4" class="player hidden">
+                            <div class="player__place">4</div>
+                            <span id="user-score4" class="player-score">User 4: 0</span>
+                        </li>
+                    </ol>
+                </div>
+            </div>
             <button id="btn-continue" class="pop-up-box__start-btn" type="button">Continue</button>
         </div>
     </div>

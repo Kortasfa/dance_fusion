@@ -58,6 +58,8 @@ function closeGuide() {
 let songName = '';
 let songNeuro = '';
 let fullSongName = '';
+let songId = 0;
+let difficulty = 3;
 let readySong = false;
 
 function onImageClick(element) {
@@ -65,6 +67,21 @@ function onImageClick(element) {
     const video = document.getElementById(videoSrcID);
     const fullVideo = document.getElementById('full' + videoSrcID);
     const videoPlayer = document.getElementById('videoPlayer');
+    let difficultyList = document.querySelector('.game-menu__difficulty');
+    let difficultySegment = difficultyList.querySelectorAll('.segment')
+
+//    difficulty = document.getElementById('difficulty' + videoSrcID);
+ //   <a className="none" id="difficulty{{ .SongID }}">{{.Difficulty}}</a>
+    difficultyList.classList.remove('none')
+    for (let i = 0; i < 4; i++) {
+        if (i < difficulty) {
+            difficultySegment[i].classList.add('segment_on')
+        } else {
+            difficultySegment[i].classList.remove('segment_on')
+        }
+    }
+
+    songId = element.id;
 
     songName = document.querySelector('.song' + element.id).innerHTML;
 

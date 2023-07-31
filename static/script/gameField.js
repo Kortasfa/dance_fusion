@@ -19,13 +19,13 @@ function getUsersByCookie() {
         let bodyImgSrc = connectedUsers[i]["bodyImgSrc"];
         let faceImgSrc = connectedUsers[i]["faceImgSrc"];
         let hatImgSrc = connectedUsers[i]["hatImgSrc"];
-        let userScore = document.getElementById('user-score' + (i + 1));
+        let userScore = document.getElementById('player-result' + (i + 1));
         let indexUser = document.getElementById('hero' + (i + 1));
         let indexUserName = indexUser.querySelector(".hero__name");
         let indexUserBodyImg = indexUser.querySelector(".body");
         let indexUserFaceImg = indexUser.querySelector(".face");
         let indexUserHatImg = indexUser.querySelector(".hat");
-        userScore.innerText = userName + ":";
+        userScore.querySelector('.player-score').innerText = userName + ":";
         userScore.classList.remove('hidden');
         indexUser.classList.remove('hidden');
         indexUser.id = userID;
@@ -44,8 +44,8 @@ function showStats() {
 }
 
 function addStats(){
-    // let score = document.querySelectorAll('.hero__score');
-    let info = document.querySelectorAll('.pop-up-box__user-score');
+    let score = document.querySelectorAll('.hero__score');
+    let info = document.querySelectorAll('.player-score');
     for (let i = 0; i < 4; i++){
         info[i].innerText = info[i].innerText + ' ' + score[i].innerText;
     }
