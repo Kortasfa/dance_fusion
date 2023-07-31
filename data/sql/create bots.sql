@@ -14,4 +14,3 @@ INSERT INTO bots(bot_name, bot_scores_path, img_hat, img_body, img_face)
 VALUES
     ("bot_1", "static/bots_list/bot_1.json", "static/img/hat/robinHoodHat.png", "static/img/body/fff76e.png", "static/img/face/7.png"),
     ("bot_2", "static/bots_list/bot_2.json", "static/img/hat/robinHoodHat.png", "static/img/body/fff76e.png", "static/img/face/7.png");
-SELECT * FROM bots;
