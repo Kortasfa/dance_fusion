@@ -343,13 +343,14 @@ func getBotInfo(db *sqlx.DB, botName string) (botInfo, error) {
 		    bot_scores_path,
 		    img_hat,
 		    img_body,
-		    img_face
+		    img_face,
+		    difficulty
 		FROM
 		    bots
 		WHERE
 		    bot_name = ?`
 	var botMainInfo botInfo
-	err := db.QueryRow(query, botName).Scan(&botMainInfo.BotId, &botMainInfo.BotScoresPath, &botMainInfo.BotImgHat, &botMainInfo.BotImgBody, &botMainInfo.BotImgFace)
+	err := db.QueryRow(query, botName).Scan(&botMainInfo.BotId, &botMainInfo.BotScoresPath, &botMainInfo.BotImgHat, &botMainInfo.BotImgBody, &botMainInfo.BotImgFace, &botMainInfo.Difficulty)
 	if err != nil {
 		return botInfo{}, err
 	}
@@ -404,7 +405,8 @@ func updateUserPassword(db *sqlx.DB, userID int, userPassword string) error {
 func getBotNames(db *sqlx.DB) ([]botNameData, error) {
 	const query = `
 		SELECT
-			bot_name
+			bot_name,
+			difficulty
 		FROM
 			bots
 	`

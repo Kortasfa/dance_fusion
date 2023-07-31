@@ -69,10 +69,12 @@ type botInfo struct {
 	BotImgHat     string `db:"img_hat"`
 	BotImgBody    string `db:"img_body"`
 	BotImgFace    string `db:"img_face"`
+	Difficulty    int    `db:"difficulty"`
 }
 
 type botNameData struct {
-	BotName string `db:"bot_name"`
+	BotName    string `db:"bot_name"`
+	Difficulty int    `db:"difficulty"`
 }
 
 type bossInfo struct {

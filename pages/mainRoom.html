@@ -59,7 +59,7 @@
 		{{ end }}
 	</div>
 	{{ range .Bots }}
-		<div onclick="addBot('{{ .BotName }}')">Добавить бота {{ .BotName }}</div>
+		<div onclick="addBot('{{ .BotName }}')">Добавить бота {{ .BotName }}. Сложность = {{ .Difficulty }}</div>
 	{{ end }}
 	<div>
 	{{ range .Bosses }}
