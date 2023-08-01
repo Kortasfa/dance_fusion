@@ -4,10 +4,13 @@ const btnOpenInfo = document.getElementById('openGuide');
 const guide = document.getElementById('guide');
 const returnBtn = document.getElementById('returnButton');
 const PlayBtn = document.getElementById('play');
-const songs = document.querySelector('.songs')
+const songs = document.querySelector('.songs');
+const gameMode = document.getElementById('gameMode');
+const bots = document.getElementById('bots')
 
 let readyGame = false;
 let readyPlayer = false;
+let mode = ''
 let connectedUsers = [];
 let connectedBots = [];
 
@@ -21,7 +24,6 @@ function changeButton() {
 }
 
 function openSong(styleButtonBlock) {
-    returnBtn.classList.toggle('hide');
     listGenre.classList.add('none');
     songs.classList.remove('none');
     const songBlocks = document.getElementsByClassName('song__section');
@@ -32,18 +34,50 @@ function openSong(styleButtonBlock) {
     }
 }
 
-returnBtn.addEventListener('click', closeSong);
-
-function closeSong() {
-    returnBtn.classList.toggle('hide');
-    const songBlocks = document.getElementsByClassName('song__section');
-    for (let i = 0; i < songBlocks.length; i++) {
-        if (!songBlocks[i].classList.contains('none')) {
-            songBlocks[i].classList.add('none');
-        }
-    }
-    listSong.classList.add('none');
+function openStyles(regime) {
     listGenre.classList.remove('none');
+    returnBtn.classList.toggle('hide');
+    gameMode.classList.add('none');
+    mode = regime.getAttribute('mode');
+    if (mode == 'Boss'){
+    } else if (mode == 'Bots'){
+        bots.classList.remove('none');
+    }
+}
+
+returnBtn.addEventListener('click', closeList);
+
+function toggleBots(){
+    let botsMenu = document.getElementById('botMenu');
+    if (botsMenu.classList.contains('bots_open')){
+        botsMenu.classList.add('bots_close');
+        botsMenu.classList.remove('bots_open');
+    }else{
+        botsMenu.classList.add('bots_open');
+        botsMenu.classList.remove('bots_close');
+    }
+}
+function closeList() {
+    if (listSong.classList.contains('none')){
+        returnBtn.classList.toggle('hide');
+        listGenre.classList.add('none');
+        gameMode.classList.remove('none');
+        bots.classList.add('none');
+        for (let i = 0; i < connectedUsers.length; i++) {
+            if (parseInt(connectedUsers[i]["userID"]) < 0 ) {
+                removeUser(connectedUsers[i]["userID"]);
+            }
+        }
+    } else {
+        const songBlocks = document.getElementsByClassName('song__section');
+        for (let i = 0; i < songBlocks.length; i++) {
+            if (!songBlocks[i].classList.contains('none')) {
+                songBlocks[i].classList.add('none');
+            }
+        }
+        listSong.classList.add('none');
+        listGenre.classList.remove('none');
+    }
 }
 
 function openGuide() {
@@ -112,8 +146,6 @@ var classifier;
 
 $(document).ready(function() {
     const playButton = $('#play');
-    console.log('faf')
-    playButton.addEventListener('click', gameStart);
 });
 let playButton = document.getElementById('play');
 playButton.addEventListener('click', gameStart);
@@ -233,8 +265,6 @@ function bossGame(bossBlock) {
 }
 
 
-const parent = document.querySelector('.songs');
-
 function changeColor(song) {
     song.classList.add('button_yellow');
 }
@@ -340,7 +370,7 @@ const qr = new QRCode(document.getElementById("qrcode"), {
 });
 
 window.addEventListener('load', () => {
-    let difficulty = songs.querySelectorAll('.song__difficulty');
+    let difficulty = document.querySelectorAll('.difficulty');
 
     for (let i = 0; i < difficulty.length; i++) {
         let difficultySegment = difficulty[i].querySelectorAll('.piece')

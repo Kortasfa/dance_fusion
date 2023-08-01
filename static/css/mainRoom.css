@@ -85,6 +85,22 @@
     align-items: center;
 }
 
+.bot__difficulty{
+    margin: 0 auto;
+    display: flex;
+    height: 26px;
+    width: 68px;
+    border-radius: 10px;
+    background-color: #BD63D4;
+    justify-content: space-evenly;
+    align-items: center;
+}
+
+.bot{
+    margin: 5px;
+    padding: 10px;
+}
+
 .piece{
     width: 7px;
     height: 19px;
@@ -165,6 +181,61 @@
 
 .game-mode__button{
     margin: 24px;
+}
+
+.party__bots{
+    position: absolute;
+    margin: 56px 0 0 522px;
+    display: flex;
+}
+
+.bots__button{
+    font: normal 400 20px/1.54 'Roboto';
+    color: #1E1C1C;
+    writing-mode: vertical-rl;
+    width: 30px;
+    height: 60px;
+    text-align: center;
+    background-color: #BD63D4;
+    border-left: 1px dashed #670080;
+    border-radius: 0 10px 10px 0;
+}
+
+.bots{
+    border-radius: 10px 0 10px 10px;
+    background-color: #BD63D4;
+    z-index: -1;
+    width: 120px;
+}
+
+.bots_open{
+    animation-duration: 1s;
+    animation-name: openBotsAnimation;
+    z-index: 1;
+    margin-left: 140px
+}
+
+@keyframes openBotsAnimation {
+    0% {z-index: -1; margin-left: 0;}
+    100% {z-index: -1;margin-left: 140px;}
+}
+
+.bots_close{
+    animation-duration: 1s;
+    animation-name: closeBotsAnimation;
+    z-index: -1;
+}
+
+@keyframes closeBotsAnimation {
+    0% { z-index: -1;
+        margin-left: 140px;}
+    100% { margin-left: 0px;}
+}
+
+.bot__name{
+    font: normal 400 20px 'Roboto';
+    color: #1E1C1C;
+    text-align: center;
 }
 
 .button__text{
@@ -561,7 +632,7 @@
     }
 
     .head__hat{
-        margin: -47px 0px;
+        margin: -47px 0;
     }
 
     .hat{

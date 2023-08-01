@@ -228,6 +228,7 @@
                         let I = 0;
                         for (let i = 0; i < connectedUsers.length; i++){
                             info[i].innerText = info[i].innerText + ' ' + connectedUsers[i]["valueScore"];
+                            addUserScore(parseInt(users[i].id), parseInt(connectedUsers[i]["valueScore"]));
                             if ((connectedUsers[i]["valueScore"] > bestPlayerScore) && (bestPlayerId > 0)){
                                 bestPlayerId = users[i].id;
                                 bestPlayerScore = connectedUsers[i]["valueScore"];
