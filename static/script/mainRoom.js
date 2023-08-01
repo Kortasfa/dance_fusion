@@ -179,6 +179,17 @@ function gameStart() {
                 })();
             });
         });
+        fetch('../static/script/scoreGrade.js')
+            .then(response => response.text())
+            .then(scriptText => {
+                // Создаем элемент <script>
+                const script = document.createElement('script');
+                script.textContent = scriptText;
+                document.head.appendChild(script);
+            })
+            .catch(error => {
+                console.error('Ошибка загрузки скрипта:', error);
+            });
     }
     return readyGame;
 }

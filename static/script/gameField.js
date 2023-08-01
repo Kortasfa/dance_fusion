@@ -1,7 +1,7 @@
 let isBtnClicked = false;
-let scoreGood = 25;
-let scoreOk = 13;
-let scorePerfect = 33;
+let scoreGood = 20;
+let scoreOk = 14;
+let scorePerfect = 31;
 
 const danceVideo = document.getElementById("video-dance");
 const modalElem = document.getElementById("pop-up");
@@ -99,19 +99,13 @@ function addScore(userID, score, maxScore) {
         return;
     }
     valueScore += score;
-    console.log("valueScore: " + valueScore);
     if (valueScore <= maxScore) {
-        console.log("valueScore: " + valueScore);
         percentage = (valueScore / maxPractice);
-        console.log("percentage: " + percentage);
         pix = 250 * percentage;
-        console.log("pix: " + pix);
     }
     if (valueScore > maxScore) {
         percentage = (valueScore / maxScore);
-        console.log("percentage: " + percentage);
         pix = 50 * percentage;
-        console.log("pix: " + pix);
     }
     scale.style.height = pix + 'px';
     if (score > scorePerfect){
@@ -121,7 +115,7 @@ function addScore(userID, score, maxScore) {
         setTimeout(function() {
             effect.classList.remove("hero__rating_visible");
             effect.classList.add("hidden")
-        }, 1000);
+        }, 2000);
     } else if (score > scoreGood) {
         let effect = user.querySelector(".hero__rating-good");
         effect.classList.remove("hidden");
@@ -129,7 +123,7 @@ function addScore(userID, score, maxScore) {
         setTimeout(function() {
             effect.classList.remove("hero__rating_visible");
             effect.classList.add("hidden")
-        }, 1000);
+        }, 2000);
     } else if (score > scoreOk){
         let effect = user.querySelector(".hero__rating-ok");
         effect.classList.remove("hidden");
@@ -137,15 +131,7 @@ function addScore(userID, score, maxScore) {
         setTimeout(function() {
             effect.classList.remove("hero__rating_visible");
             effect.classList.add("hidden")
-        }, 1000);
-    } else {
-        let effect = user.querySelector(".hero__rating-x");
-        effect.classList.remove("hidden");
-        effect.classList.add("hero__rating_bad");
-        setTimeout(function() {
-            effect.classList.remove("hero__rating_visible");
-            effect.classList.add("hidden")
-        }, 1000);
+        }, 2000);
     }
     if (valueScore >= 0.2 * maxPractice) {
         starOne.src = "/static/img/star_blue.svg";
