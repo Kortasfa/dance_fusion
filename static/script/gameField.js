@@ -239,21 +239,6 @@ if (bossInfo) {
 }
 
 async function expelUser(userID) {
-    // let response = await fetch("/api/exitFromGame", {
-    //     method: 'POST',
-    //     headers: {
-    //         'Content-Type': 'application/json',
-    //     },
-    //     body: JSON.stringify({"userID": userID}),
-    // });
-    // if (response.ok) {
-    //     console.log('Выгнал', userID);
-    // } else {
-    //     console.log('Не получилось выгнать', userID);
-    // }
-    // if (socket) {
-    //     socket.close();
-    // }
     let response = await fetch("/api/deletePlayerFromGame", {
         method: 'POST',
         headers: {
