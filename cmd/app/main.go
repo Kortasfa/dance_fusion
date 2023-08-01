@@ -47,9 +47,18 @@ func main() {
 	r.HandleFunc("/api/exitFromGame", exitFromGameAPI)
 	r.HandleFunc("/api/exitFromAccount", exitFromAccount)
 	r.HandleFunc("/api/custom", getUserAvatar(dbx)).Methods("POST")
+	r.HandleFunc("/api/sendPoint", sendPointToJoin).Methods("POST")
+	r.HandleFunc("/api/sendDataSongJson", getDataSongJson).Methods("POST")
+	r.HandleFunc("/api/getBestPlayer", getBestPlayer(dbx)).Methods("POST")
+	r.HandleFunc("/api/updateBestPlayer", updateBestPlayer(dbx)).Methods("POST")
+	r.HandleFunc("/api/changeUserName", changeUserName(dbx)).Methods("POST")
+	r.HandleFunc("/api/changeUserPassword", changeUserPassword(dbx)).Methods("POST")
+	r.HandleFunc("/api/getBotPath", getBotPath(dbx)).Methods("POST")
+	r.HandleFunc("/api/deletePlayerFromGame", deletePlayerFromGame).Methods("POST")
 
 	go handleRoomWSMessages()
 	go handleJoinPageWSMessages()
+	go danceInfoHandleMessages()
 
 	r.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir("./static"))))
 
@@ -58,7 +67,6 @@ func main() {
 		Handler: r,
 		Addr:    port,
 	}
-
 	log.Fatal(srv.ListenAndServe())
 }
 

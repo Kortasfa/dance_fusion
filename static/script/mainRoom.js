@@ -6,9 +6,9 @@ const returnBtn = document.getElementById('returnButton');
 const PlayBtn = document.getElementById('play');
 
 let readyGame = false;
-let numberOfUser = 0;
 let readyPlayer = false;
 let connectedUsers = [];
+let connectedBots = [];
 
 btnOpenInfo.addEventListener('click', openGuide);
 
@@ -56,7 +56,10 @@ function closeGuide() {
 }
 
 let songName = '';
+let songNeuro = '';
 let fullSongName = '';
+let songId = 0;
+let difficulty = 3;
 let readySong = false;
 
 function onImageClick(element) {
@@ -64,8 +67,31 @@ function onImageClick(element) {
     const video = document.getElementById(videoSrcID);
     const fullVideo = document.getElementById('full' + videoSrcID);
     const videoPlayer = document.getElementById('videoPlayer');
+    let difficultyList = document.querySelector('.game-menu__difficulty');
+    let difficultySegment = difficultyList.querySelectorAll('.segment')
+
+//    difficulty = document.getElementById('difficulty' + videoSrcID);
+ //   <a className="none" id="difficulty{{ .SongID }}">{{.Difficulty}}</a>
+    difficultyList.classList.remove('none')
+    for (let i = 0; i < 4; i++) {
+        if (i < difficulty) {
+            difficultySegment[i].classList.add('segment_on')
+        } else {
+            difficultySegment[i].classList.remove('segment_on')
+        }
+    }
+
+    songId = element.id;
 
     songName = document.querySelector('.song' + element.id).innerHTML;
+
+    songNeuro = camelCase(songName);
+
+    function camelCase(value) {
+        return value.toLowerCase().replace(/\s+(.)/g, function(match, group1) {
+            return group1.toUpperCase();
+        });
+    }
     readySong = true;
     changeButton();
 
@@ -81,30 +107,47 @@ Array.from(test).forEach(function (element) {
     });
 });
 
-$(document).ready(function () {
+var numb;
+var classifier;
+
+$(document).ready(function() {
     const playButton = $('#play');
-    const contentContainer = $('#content');
-
-    playButton.on('click', function () {
-        if (readyGame) {
-            socket.send(songName);
-            socket.close() // Закрываем вебсокет mainRoom
-
-            contentContainer.load("/static/html/game.html", function () {
-                const video = $('#video-dance')[0];
-                const src = $('#video-src')[0];
-                src.setAttribute('src', fullSongName);
-
-                video.addEventListener('loadeddata', function () {
-                    video.play();
-                });
-            });
-
-            return false;
-        }
-    });
+    playButton.on('click', gameStart());
 });
 
+function gameStart() {
+    const contentContainer = $('#content');
+    if (readyGame) {
+        numb = (Math.round(Math.random()*1000)).toString();
+        let firstComponent = '/static/test/edge-impulse-standalone.js?version=' + numb;
+        let secondComponent = '/static/test/run-impulse.js?version=' + numb;
+        let thirdComponent = '/static/html/game.html?version=' + numb;
+        $.getScript(firstComponent, function() {
+            $.getScript(secondComponent, function() {
+                (async () => {
+                    classifier = new EdgeImpulseClassifier();
+                    await classifier.init();
+                    let project = classifier.getProjectInfo();
+                    console.log(project.owner + ' / ' + project.name + ' (version ' + project.deploy_version + ')');
+
+                    contentContainer.load(thirdComponent, function() {
+                        const video = $('#video-dance')[0];
+                        const src = $('#video-src')[0];
+                        src.setAttribute('src', fullSongName);
+
+                        video.addEventListener('loadeddata', function() {
+                            video.play();
+                            socket.send(songName);
+                            console.log(songName);
+                            socket.close(); // Закрываем вебсокет mainRoom
+                        });
+                    });
+                })();
+            });
+        });
+    }
+    return readyGame;
+}
 
 function showVideo(videoID) {
     let videoSrcID = 'song' + videoID.id;
@@ -112,6 +155,81 @@ function showVideo(videoID) {
     let videoPlayer = document.getElementById('videoPlayer');
     videoPlayer.src = video.innerText;
 }
+
+function addBot(botName) {
+    let botInfo = {};
+    fetch("../api/getBotPath", {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: `bot_name=${botName}`,
+    })
+        .then(response => {
+            if (!response.ok) {
+                if (response.status === 409) {
+                    throw new Error('No bot with such name');
+                }
+                else {
+                    throw new Error('Server Error');
+                }
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.BotScoresPath) {
+                console.log('Bot Info:');
+                console.log('Bot Id: -', data.BotId);
+                console.log('Bot Scores Src:', data.BotScoresPath);
+                console.log('Bot Hat Src:', data.BotImgHat);
+                console.log('Bot Face Src:', data.BotImgFace);
+                console.log('Bot Body Src:', data.BotImgBody);
+                botInfo = data;
+                addUser( "-" + data.BotId, "bot_1", "../" + data.BotImgHat, "../" + data.BotImgFace, "../" + data.BotImgBody);
+                function readJSONFromURL(url) {
+                    fetch(url)
+                        .then(response => {
+                            if (!response.ok) {
+                                throw new Error('Ошибка при получении файла');
+                            }
+                            return response.json();
+                        })
+                        .then(jsonData => {
+                            connectedBots.push({"botID": "-1",  "botScores":  jsonData});
+                            console.log(connectedBots);
+                        })
+                        .catch(error => {
+                            console.error('Ошибка:', error);
+                        });
+                }
+                readJSONFromURL("../" + data.BotScoresPath);
+            } else {
+                console.log('Fail');
+            }
+        })
+        .catch(error => {
+            console.log('Error:', error);
+            return
+        });
+}
+
+let bossInfo;
+
+function bossGame(bossBlock) {
+    let name = bossBlock.querySelector(".boss__name").innerText;
+    let healthPoint = bossBlock.querySelector(".boss__health-point").innerText;
+    let bossBody= bossBlock.querySelector(".boss__body-img").src;
+    let bossFace = bossBlock.querySelector(".boss__face-img").src;
+    let bossHat = bossBlock.querySelector(".boss__hat-img").src;
+    if (!gameStart()) {
+        console.log("Игра не готова")
+        return;
+    }
+
+    bossInfo = {"name": name, "healthPoint": healthPoint, "bossBody": bossBody, "bossFace": bossFace, "bossHat": bossHat};
+
+}
+
 
 const parent = document.querySelector('.songs');
 
@@ -140,8 +258,10 @@ socket.onmessage = function (event) {
     let userID = parts[1];
     if (action === "add") {
         let userName = parts[2];
-        let imgSrc = parts[3];
-        addUser(userID, userName, imgSrc);
+        let hatImgSrc = "../" + parts[3];
+        let faceImgSrc = "../" + parts[4];
+        let bodyImgSrc = "../" + parts[5];
+        addUser(userID, userName, hatImgSrc, faceImgSrc, bodyImgSrc);
     } else if (action === "remove") {
         removeUser(userID)
     }
@@ -152,23 +272,26 @@ socket.onclose = function (event) {
     console.log("WebSocket mainRoom connection closed.");
 };
 
-function addUser(userID, userName, imgSrc) {
+function addUser(userID, userName, hatImgSrc, faceImgSrc, bodyImgSrc) {
     console.log('Пользователь присоединился: ' + userID);
-    connectedUsers.push({"userID": userID, "userName": userName, "imgSrc": imgSrc});
+    connectedUsers.push({"userID": userID, "userName": userName, "valueScore": 0, "bodyImgSrc": bodyImgSrc, "faceImgSrc": faceImgSrc, "hatImgSrc": hatImgSrc});
 
     let userMessage = document.getElementById('needUser');
     userMessage.classList.add('none');
     let indexUser = document.getElementById('user' + connectedUsers.length);
     let indexUserName = document.getElementById('userName' + connectedUsers.length);
-    let indexUserImg = indexUser.querySelector(".user__avatar");
+    let indexUserBodyImg = indexUser.querySelector(".body");
+    let indexUserFaceImg = indexUser.querySelector(".face");
+    let indexUserHatImg = indexUser.querySelector(".hat");
     indexUser.classList.remove('none');
-    indexUserImg.src = '../' + imgSrc;
+    indexUserBodyImg.src = bodyImgSrc;
+    indexUserFaceImg.src = faceImgSrc;
+    indexUserHatImg.src = hatImgSrc;
     indexUserName.innerText = userName;
 
     readyPlayer = true;
     changeButton();
 }
-
 
 function removeUser(userID) {
     console.log('Пользователь вышел: ' + userID);
@@ -205,3 +328,11 @@ function removeUser(userID) {
         indexUserName.id = 'userName' + (i - 1);
     }
 }
+
+
+const domain = window.location.protocol + "//" + window.location.hostname + "/join";
+const qr = new QRCode(document.getElementById("qrcode"), {
+    text: domain,
+    width: 125,
+    height: 125,
+});

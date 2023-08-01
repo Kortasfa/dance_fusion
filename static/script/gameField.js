@@ -6,21 +6,50 @@ let scorePerfect = 33;
 const danceVideo = document.getElementById("video-dance");
 const modalElem = document.getElementById("pop-up");
 const btnContinue = document.getElementById("btn-continue");
+const starOneScale = document.getElementById("star-1");
+const starTwoScale = document.getElementById("star-2");
+const starThreeScale = document.getElementById("star-3");
+const starFourScale = document.getElementById("star-4");
+const starFiveScale = document.getElementById("star-5");
+const megaStarScale = document.getElementById("mega-star");
+
 function getUsersByCookie() {
     for (let i = 0; i < connectedUsers.length; i++) {
         let userID = connectedUsers[i]["userID"];
         let userName = connectedUsers[i]["userName"];
-        let imgSrc = connectedUsers[i]["imgSrc"];
-        let userScore = document.getElementById('user-score' + (i + 1));
+        let bodyImgSrc = connectedUsers[i]["bodyImgSrc"];
+        let faceImgSrc = connectedUsers[i]["faceImgSrc"];
+        let hatImgSrc = connectedUsers[i]["hatImgSrc"];
+        let userScore = document.getElementById('player-result' + (i + 1));
         let indexUser = document.getElementById('hero' + (i + 1));
-        let indexUserName = document.getElementById('heroName' + (i + 1));
-        let indexUserImg = document.getElementById('heroImg' + (i + 1));
-        userScore.innerText = userName + ":";
+        let indexUserName = indexUser.querySelector(".hero__name");
+        let indexUserBodyImg = indexUser.querySelector(".body");
+        let indexUserFaceImg = indexUser.querySelector(".face");
+        let indexUserHatImg = indexUser.querySelector(".hat");
+        userScore.querySelector('.player-score').innerText = userName + ":";
         userScore.classList.remove('hidden');
         indexUser.classList.remove('hidden');
         indexUser.id = userID;
-        indexUserImg.src =  '../' + imgSrc;
+        let indexUserScale = document.getElementById("scale-" + (i + 1));
+        indexUserScale.id = "scale-" + userID + "-for-user";
+        indexUserScale.classList.remove("hidden");
+        indexUserBodyImg.src = bodyImgSrc;
+        indexUserFaceImg.src = faceImgSrc;
+        indexUserHatImg.src = hatImgSrc;
         indexUserName.innerText = userName;
+        let heroStars = document.getElementById("hero-score-" + (i + 1));
+        let megaStar = heroStars.querySelectorAll(".score__star")[5];
+        megaStar.id = "mega-star-" + userID;
+        let starOne = heroStars.querySelectorAll(".score__star")[0];
+        starOne.id = "star-1-" + userID;
+        let starTwo = heroStars.querySelectorAll(".score__star")[1];
+        starTwo.id = "star-2-" + userID;
+        let starThree = heroStars.querySelectorAll(".score__star")[2];
+        starThree.id = "star-3-" + userID;
+        let starFour = heroStars.querySelectorAll(".score__star")[3];
+        starFour.id = "star-4-" + userID;
+        let starFive = heroStars.querySelectorAll(".score__star")[4];
+        starFive.id = "star-5-" + userID;
     }
 }
 
@@ -33,7 +62,7 @@ function showStats() {
 
 function addStats(){
     let score = document.querySelectorAll('.hero__score');
-    let info = document.querySelectorAll('.pop-up-box__user-score');
+    let info = document.querySelectorAll('.player-score');
     for (let i = 0; i < 4; i++){
         info[i].innerText = info[i].innerText + ' ' + score[i].innerText;
     }
@@ -45,11 +74,50 @@ btnContinue.addEventListener("click", function () {
     window.location.href = "/room";
 })
 
-function AddScore(userID, Score){
+let pix;
+
+function addScore(userID, score, maxScore) {
+    let valueScore;
+    let starComplete = 0;
     let user = document.getElementById(userID);
-    let userScore = user.querySelector(".hero__score");
-    userScore.innerText = parseInt(userScore.innerText) + Score;
-    if (Score > scorePerfect){
+    let scale = document.getElementById("scale-" + userID + "-for-user")
+    let maxPractice = 0.8 * maxScore;
+    let starOne = document.getElementById("star-1-" + userID);
+    let starTwo = document.getElementById("star-2-" + userID);
+    let starThree= document.getElementById("star-3-" + userID);
+    let starFour = document.getElementById("star-4-" + userID);
+    let starFive = document.getElementById("star-5-" + userID);
+    let megaStar = document.getElementById("mega-star" + userID);
+
+    let userIndex;
+    for (userIndex = 0; userIndex < connectedUsers.length; userIndex++) {
+        let userInfo = connectedUsers[userIndex];
+        if (userInfo["userID"] === userID) {
+            valueScore = userInfo["valueScore"];
+            break;
+        }
+    }
+    if (valueScore === undefined) {
+        console.log("пользователь не найден с таким id")
+        return;
+    }
+    valueScore += score;
+    console.log("valueScore: " + valueScore);
+    if (valueScore <= maxScore) {
+        console.log("valueScore: " + valueScore);
+        percentage = (valueScore / maxPractice);
+        console.log("percentage: " + percentage);
+        pix = 250 * percentage;
+        console.log("pix: " + pix);
+    }
+    if (valueScore > maxScore) {
+        percentage = (valueScore / maxScore);
+        console.log("percentage: " + percentage);
+        pix = 50 * percentage;
+        console.log("pix: " + pix);
+    }
+    scale.style.height = pix + 'px';
+    if (score > scorePerfect){
         let effect = user.querySelector(".hero__rating-perfect");
         effect.classList.remove("hidden");
         effect.classList.add("hero__rating_visible");
@@ -57,7 +125,7 @@ function AddScore(userID, Score){
             effect.classList.remove("hero__rating_visible");
             effect.classList.add("hidden")
         }, 1000);
-    } else if (Score > scoreGood) {
+    } else if (score > scoreGood) {
         let effect = user.querySelector(".hero__rating-good");
         effect.classList.remove("hidden");
         effect.classList.add("hero__rating_visible");
@@ -65,7 +133,7 @@ function AddScore(userID, Score){
             effect.classList.remove("hero__rating_visible");
             effect.classList.add("hidden")
         }, 1000);
-    } else if (Score > scoreOk){
+    } else if (score > scoreOk){
         let effect = user.querySelector(".hero__rating-ok");
         effect.classList.remove("hidden");
         effect.classList.add("hero__rating_visible");
@@ -81,5 +149,124 @@ function AddScore(userID, Score){
             effect.classList.remove("hero__rating_visible");
             effect.classList.add("hidden")
         }, 1000);
+    }
+    if (valueScore >= 0.2 * maxPractice) {
+        starOne.src = "/static/img/star_blue.svg";
+        starComplete = 1;
+        console.log("ПОЯВИЛАСЬ ЗВЕЗДА ", starComplete)
+    }
+    if (valueScore >= 0.4 * maxPractice) {
+        starTwo.src = "/static/img/star_blue.svg"
+        starComplete = 2;
+    }
+    if (valueScore >= 0.6 * maxPractice) {
+        starThree.src = "/static/img/star_blue.svg"
+        starComplete = 3;
+    }
+    if (valueScore >= 0.8 * maxPractice) {
+        starFour.src = "/static/img/star_blue.svg"
+        starComplete = 4;
+    }
+    if (valueScore >= maxPractice) {
+        starFive.src = "/static/img/star_blue.svg"
+        starComplete = 5;
+    }
+    if (valueScore >= 0.9 * maxScore) {
+        megaStar.classList.remove("hidden");
+        starComplete = 6;
+    }
+    switch(starComplete) {
+        case 1:
+            starOneScale.src = "/static/img/star_blue.svg"
+            break;
+        case 2:
+            starTwoScale.src = "/static/img/star_blue.svg"
+            break;
+        case 3:
+            starThreeScale.src = "/static/img/star_blue.svg"
+            break;
+        case 4:
+            starFourScale.src = "/static/img/star_blue.svg"
+            break;
+        case 5:
+            starFiveScale.src = "/static/img/star_blue.svg"
+            break;
+        case 6:
+            megaStarScale.classList.remove("hidden");
+            break;
+    }
+
+    connectedUsers[userIndex]["valueScore"] = valueScore;
+    if (bossInfo) {
+        playerDamage(score);
+    }
+}
+
+function playerDamage(score) {
+    let bossHPCount = document.querySelector(".boss__hp-bar");
+    bossHPCount.innerText = (parseInt(bossHPCount.innerText) - score).toString();
+}
+
+let btnExit = document.querySelector(".btn-exit");
+btnExit.addEventListener("click", expelUsers)
+window.onbeforeunload = expelUsers
+
+function expelUsers() {
+    console.log('Выгоняем всех челов из игры');
+    for (let user of connectedUsers) {
+        if (parseInt(user["userID"]) > 0) {
+            expelUser(user["userID"]).then(() => {});
+        }
+    }
+    if (bossInfo) {
+        playerDamage(score);
+    }
+}
+
+function playerDamage(score) {
+    let bossHPCount = document.querySelector(".boss__hp-bar");
+    bossHPCount.innerText = (parseInt(bossHPCount.innerText) - score).toString();
+}
+
+if (bossInfo) {
+    console.log("zahar best");
+    document.querySelector(".boss-container").classList.remove("hidden");
+    document.querySelector(".boss__name").innerText = bossInfo.name;
+    document.querySelector(".boss__hp-bar").innerText = (parseInt(bossInfo.healthPoint) * connectedUsers.length).toString();
+    document.querySelector(".boss__body-img").src = bossInfo.bossBody;
+    document.querySelector(".boss__face-img").src = bossInfo.bossFace;
+    document.querySelector(".boss__hat-img").src = bossInfo.bossHat;
+}
+
+async function expelUser(userID) {
+    // let response = await fetch("/api/exitFromGame", {
+    //     method: 'POST',
+    //     headers: {
+    //         'Content-Type': 'application/json',
+    //     },
+    //     body: JSON.stringify({"userID": userID}),
+    // });
+    // if (response.ok) {
+    //     console.log('Выгнал', userID);
+    // } else {
+    //     console.log('Не получилось выгнать', userID);
+    // }
+    // if (socket) {
+    //     socket.close();
+    // }
+    let response = await fetch("/api/deletePlayerFromGame", {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: `user_id=${userID}`,
+    });
+    if (response.ok) {
+        console.log('Отправил сообщение о выходе', userID);
+    } else {
+        console.log('Не получилось отправить сообзение о выходе ', userID);
+    }
+    if (socket) {
+        socket.close();
     }
 }

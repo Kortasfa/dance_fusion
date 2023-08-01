@@ -51,13 +51,13 @@ func getJoinedUserData(db *sqlx.DB) func(w http.ResponseWriter, r *http.Request)
 			}
 		}
 		roomIDDict[data.RoomID] = append(roomIDDict[data.RoomID], fmt.Sprintf("%d", data.UserID)) //////////// Мы добавляем туда ID пользователя
-		userName, imgSrc, err := getUserInfo(db, fmt.Sprintf("%d", data.UserID))
+		user, err := getUserInfo(db, data.UserID)
 		if err != nil {
 			http.Error(w, "Internal server error", 500)
 			log.Println(err.Error())
 			return
 		}
-		broadcastJoiningUserID <- []string{"add", data.RoomID, fmt.Sprintf("%d", data.UserID), userName, imgSrc}
+		broadcastJoiningUserID <- []string{"add", data.RoomID, fmt.Sprintf("%d", data.UserID), user.UserName, user.HatSrc, user.FaceSrc, user.BodySrc}
 		w.WriteHeader(200)
 	}
 }
@@ -81,7 +81,7 @@ func getRegisteredUserData(db *sqlx.DB) func(w http.ResponseWriter, r *http.Requ
 			return
 		}
 		userName := data.UserName
-		exists, err := userExists(db, data.UserName)
+		_, exists, err := userExists(db, data.UserName)
 		if err != nil {
 			http.Error(w, "Internal Server Error", 500)
 			log.Println(err.Error())
@@ -98,16 +98,11 @@ func getRegisteredUserData(db *sqlx.DB) func(w http.ResponseWriter, r *http.Requ
 			return
 		}
 
-		_, imgSrc, err := getUserInfo(db, fmt.Sprintf("%d", userID))
+		user, err := getUserInfo(db, userID)
 		if err != nil {
 			http.Error(w, "Internal Server Error", 500)
 			log.Println(err.Error())
 			return
-		}
-		user := userInfo{
-			UserID:   userID,
-			UserName: userName,
-			ImgSrc:   imgSrc,
 		}
 		err = setJsonCookie(w, "userInfoCookie", user, 24*time.Hour)
 		if err != nil {
@@ -144,16 +139,11 @@ func getLoginUserData(db *sqlx.DB) func(w http.ResponseWriter, r *http.Request) 
 			return
 		}
 		if exists {
-			_, imgSrc, err := getUserInfo(db, fmt.Sprintf("%d", userID))
+			user, err := getUserInfo(db, userID)
 			if err != nil {
 				http.Error(w, "Internal Server Error", 500)
 				log.Println(err.Error())
 				return
-			}
-			user := userInfo{
-				UserID:   userID,
-				UserName: data.UserName,
-				ImgSrc:   imgSrc,
 			}
 			err = setJsonCookie(w, "userInfoCookie", user, 24*time.Hour)
 			if err != nil {
@@ -197,11 +187,11 @@ func getMotion(w http.ResponseWriter, r *http.Request) {
 			err := conn.WriteMessage(websocket.TextMessage, reqData)
 			if err != nil {
 				err := conn.Close()
+				delete(gameFieldWSDict, conn)
 				if err != nil {
 					w.WriteHeader(409)
 					return
 				}
-				delete(roomWSDict, conn)
 			}
 			w.WriteHeader(200)
 			return
@@ -247,19 +237,7 @@ func exitFromGame(r *http.Request) (int, string, error) {
 	if err != nil {
 		return 0, "", err
 	}
-	for conn, gameFieldID := range gameFieldWSDict {
-		if gameFieldID == selectedRoomID {
-			err := conn.WriteMessage(websocket.TextMessage, messageData)
-			if err != nil {
-				err := conn.Close()
-				if err != nil {
-					return 0, "", err
-				}
-				delete(roomWSDict, conn)
-			}
-			break
-		}
-	}
+	broadcastGameFieldWSMessage <- []string{selectedRoomID, string(messageData)}
 	return user.UserID, selectedRoomID, nil
 }
 
@@ -308,5 +286,308 @@ func getUserAvatar(db *sqlx.DB) func(w http.ResponseWriter, r *http.Request) {
 			log.Println(err.Error())
 			return
 		}
+		user.HatSrc = userAvatar.HatSrc
+		user.FaceSrc = userAvatar.FaceSrc
+		user.BodySrc = userAvatar.BodySrc
+		err = setJsonCookie(w, "userInfoCookie", user, 24*time.Hour)
+		if err != nil {
+			http.Error(w, "Internal Server Error", 500)
+			log.Println(err.Error())
+			return
+		}
 	}
+}
+
+func sendPointToJoin(w http.ResponseWriter, r *http.Request) {
+	reqData, err := io.ReadAll(r.Body)
+	if err != nil {
+		http.Error(w, "Internal Server Error", 500)
+		log.Println(err)
+		return
+	}
+
+	var data struct {
+		UserID int
+		Point  int
+	}
+
+	err = json.Unmarshal(reqData, &data)
+	if err != nil {
+		http.Error(w, "Internal Server Error Unmarshall", 500)
+		log.Println(err.Error())
+		return
+	}
+	for conn, userID := range joinPageWSDict {
+		if strconv.Itoa(data.UserID) == userID {
+			err := conn.WriteMessage(websocket.TextMessage, reqData)
+			if err != nil {
+				err := conn.Close()
+				delete(joinPageWSDict, conn)
+				if err != nil {
+					w.WriteHeader(409)
+					log.Println(err.Error())
+					return
+				}
+			}
+			break
+		}
+	}
+	w.WriteHeader(200)
+}
+
+func getDataSongJson(w http.ResponseWriter, r *http.Request) {
+	reqData, err := io.ReadAll(r.Body)
+	if err != nil {
+		http.Error(w, "Parsing error", 500)
+		log.Println(err.Error())
+		return
+	}
+	var data struct {
+		RoomID   string
+		MaxPoint int
+		ColorID  string
+	}
+	err = json.Unmarshal(reqData, &data)
+	if err != nil {
+		http.Error(w, "JSON parsing error", 500)
+		log.Println(err.Error())
+		return
+	}
+	fmt.Println(data.RoomID, data.MaxPoint, data.ColorID)
+	broadcastGameFieldWSMessage <- []string{data.RoomID, string(reqData)}
+	w.WriteHeader(200)
+}
+
+func getBestPlayer(db *sqlx.DB) func(w http.ResponseWriter, r *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
+		songID, err := strconv.Atoi(r.FormValue("song_id"))
+		if err != nil {
+			http.Error(w, "Invalid song ID", http.StatusBadRequest)
+			log.Println(err.Error())
+			return
+		}
+
+		bestPlayerData, err := getBestPlayerInfo(db, songID)
+		if err != nil {
+			http.Error(w, "Error getting best player information", http.StatusInternalServerError)
+			log.Println(err.Error())
+			return
+		}
+
+		if bestPlayerData.UserID == 0 {
+			w.Header().Set("Content-Type", "application/json")
+			_, err = w.Write([]byte("{}"))
+			if err != nil {
+				http.Error(w, "Json send error", http.StatusInternalServerError)
+				log.Println(err.Error())
+				return
+			}
+			return
+		}
+		fmt.Println(bestPlayerData.UserID)
+		userData, err := getUserInfo(db, bestPlayerData.UserID)
+		if err != nil {
+			http.Error(w, "Error getting user information", http.StatusInternalServerError)
+			log.Println(err.Error())
+			return
+		}
+
+		response := struct {
+			UserInfo  userInfo
+			BestScore int
+		}{
+			UserInfo:  userData,
+			BestScore: bestPlayerData.Score,
+		}
+
+		w.Header().Set("Content-Type", "application/json")
+		err = json.NewEncoder(w).Encode(response)
+		if err != nil {
+			http.Error(w, "Json send error", http.StatusInternalServerError)
+			log.Println(err.Error())
+			return
+		}
+	}
+}
+
+func updateBestPlayer(db *sqlx.DB) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		reqData, err := io.ReadAll(r.Body)
+		if err != nil {
+			http.Error(w, "Parsing error", 500)
+			log.Println(err.Error())
+			return
+		}
+		var data struct {
+			SongID int `json:"song_id"`
+			UserID int `json:"user_id"`
+			Score  int `json:"score"`
+		}
+		err = json.Unmarshal(reqData, &data)
+		if err != nil {
+			http.Error(w, "JSON parsing error", 500)
+			log.Println(err.Error())
+			return
+		}
+		err = updateBestPlayerSQL(db, data.SongID, data.UserID, data.Score)
+		if err != nil {
+			http.Error(w, "Error updating best player info", http.StatusInternalServerError)
+			log.Println(err.Error())
+			return
+		}
+		w.WriteHeader(http.StatusOK)
+	}
+}
+
+func changeUserName(db *sqlx.DB) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		reqData, err := io.ReadAll(r.Body)
+		if err != nil {
+			http.Error(w, "Parsing error", 500)
+			log.Println(err.Error())
+			return
+		}
+		var data struct {
+			UserID      int    `json:"user_id"`
+			NewUserName string `json:"new_user_name"`
+		}
+		err = json.Unmarshal(reqData, &data)
+		if err != nil {
+			http.Error(w, "JSON parsing error", 500)
+			log.Println(err.Error())
+			return
+		}
+		userID, exists, err := userExists(db, data.NewUserName)
+		if err != nil {
+			http.Error(w, "SQL request error", 500)
+			log.Println(err.Error())
+			return
+		}
+		if userID != data.UserID && exists {
+			w.WriteHeader(http.StatusConflict)
+			return
+		}
+		err = updateUserName(db, data.UserID, data.NewUserName)
+		if err != nil {
+			http.Error(w, "Error updating user name", 500)
+			log.Println(err.Error())
+			return
+		}
+		var user userInfo
+		err = getJsonCookie(r, "userInfoCookie", &user)
+		if err != nil {
+			http.Error(w, "Error getting cookie", 500)
+			log.Println(err.Error())
+			return
+		}
+		user.UserName = data.NewUserName
+		err = setJsonCookie(w, "userInfoCookie", user, 24*time.Hour)
+		if err != nil {
+			http.Error(w, "Error setting cookie", 500)
+			log.Println(err.Error())
+			return
+		}
+		w.WriteHeader(http.StatusOK)
+	}
+}
+
+func changeUserPassword(db *sqlx.DB) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		reqData, err := io.ReadAll(r.Body)
+		if err != nil {
+			http.Error(w, "Parsing error", 500)
+			log.Println(err.Error())
+			return
+		}
+		var data struct {
+			UserID          int    `json:"user_id"`
+			NewUserPassword string `json:"new_user_password"`
+		}
+		err = json.Unmarshal(reqData, &data)
+		if err != nil {
+			http.Error(w, "JSON parsing error", 500)
+			log.Println(err.Error())
+			return
+		}
+		err = updateUserPassword(db, data.UserID, data.NewUserPassword)
+		if err != nil {
+			http.Error(w, "Error updating user password", 500)
+			log.Println(err.Error())
+			return
+		}
+		w.WriteHeader(http.StatusOK)
+	}
+}
+
+func getBotPath(db *sqlx.DB) func(w http.ResponseWriter, r *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
+		botName := r.FormValue("bot_name")
+		if botName == "" {
+			// Обработка случая, когда поле "bot_name" не было отправлено в форме
+			http.Error(w, "Field 'bot_name' is missing or empty", http.StatusBadRequest)
+			return
+		}
+		botData, err := getBotInfo(db, botName)
+		if err != nil {
+			http.Error(w, "Error getting bot information", http.StatusConflict)
+			log.Println(err.Error())
+			return
+		}
+		fmt.Println(botData)
+		response := struct {
+			BotId         string
+			BotScoresPath string
+			BotImgHat     string
+			BotImgBody    string
+			BotImgFace    string
+		}{
+			BotId:         botData.BotId,
+			BotScoresPath: botData.BotScoresPath,
+			BotImgHat:     botData.BotImgHat,
+			BotImgBody:    botData.BotImgBody,
+			BotImgFace:    botData.BotImgFace,
+		}
+
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(response)
+	}
+}
+
+func deletePlayerFromGame(w http.ResponseWriter, r *http.Request) {
+	userID := r.FormValue("user_id")
+	selectedRoomID, found := retrieveUserRoom(userID)
+	if found {
+		data := struct {
+			Exit bool
+		}{
+			Exit: true,
+		}
+		messageData, err := json.Marshal(data)
+		if err != nil {
+			http.Error(w, "Error marshal struct", http.StatusInternalServerError)
+			log.Println(err.Error())
+			return
+		}
+		broadcastJoinPageWSMessage <- []string{userID, string(messageData)}
+
+		//Выход из команты
+		roomIDDict[selectedRoomID] = removeValueFromSlice(roomIDDict[selectedRoomID], userID)
+		broadcastJoiningUserID <- []string{"remove", selectedRoomID, userID}
+
+		//Выход из игры
+		message := struct {
+			ExitingUser string
+		}{
+			ExitingUser: userID,
+		}
+		messageData, err = json.Marshal(message)
+		if err != nil {
+			http.Error(w, "Error marshal struct", http.StatusInternalServerError)
+			log.Println(err.Error())
+			return
+		}
+		broadcastGameFieldWSMessage <- []string{selectedRoomID, string(messageData)}
+		w.WriteHeader(http.StatusOK)
+	}
+	w.WriteHeader(http.StatusNotFound)
 }
