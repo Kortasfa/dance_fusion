@@ -83,15 +83,15 @@
         </div>
     </div>
   </div>
-    <div class="boss-container boss hidden">
-        <div class="boss__name"></div>
-        <div class="boss__head">
-            <div class="boss__body"><img class="boss__body-img" alt=""></div>
-            <div class="boss__face"><img class="boss__face-img" alt=""></div>
-            <div class="boss__hat"><img class="boss__hat-img" alt=""></div>
-        </div>
-        <div class="boss__hp-bar"></div>
-    </div>
+  <div class="boss-container boss hidden">
+      <div class="boss__name"></div>
+      <div class="boss__head">
+          <div class="boss__body"><img class="boss__body-img" alt=""></div>
+          <div class="boss__face"><img class="boss__face-img" alt=""></div>
+          <div class="boss__hat"><img class="boss__hat-img" alt=""></div>
+      </div>
+      <div class="boss__hp-bar"></div>
+  </div>
   <div class="rating-scales">
     <div class="rating-scales__user-scale rating-scales__user-scale_scale-1" id="scale-1"></div>
     <div class="rating-scales__user-scale rating-scales__user-scale_scale-2 hidden" id="scale-2"></div>
@@ -143,10 +143,28 @@
                   </ol>
               </div>
           </div>
-          <button id="btn-continue" class="pop-up-box__start-btn"> type="button">Continue</button>
+          <button id="btn-continue" class="pop-up-box__start-btn" type="button">Continue</button>
       </div>
   </div>
   <script>
+      async function addUserScore(userID, userScore) {
+          const response = await fetch("/api/addUserScore", {
+              method: 'POST',
+              headers: {
+                  'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                  "user_id": userID, // Integer
+                  "score": userScore // Integer
+              }),
+          });
+          if (response.ok) {
+              console.log('Score пользователя обновлен');
+          } else {
+              console.log('Не удалось обновить score пользователя');
+          }
+      }
+
       function getReferenceUser() {
           console.log(connectedUsers);
           for (let userInfo of connectedUsers) {
@@ -159,9 +177,17 @@
       }
       function removeUser(userID) {
           console.log('Пользователь вышел: ' + userID);
-          for (let i = 0; i < connectedUsers.length; i++) {
+          let i;
+          for (i = 0; i < connectedUsers.length; i++) {
               if (connectedUsers[i]["userID"] === userID) {
                   connectedUsers.splice(i, 1);
+                  break;
+              }
+          }
+          let lastUser = true;
+          for (i; i < connectedUsers.length; i++) {
+              if (parseInt(connectedUsers[i]["userID"]) > 0) {
+                  lastUser = false
                   break;
               }
           }
@@ -178,7 +204,11 @@
               }
           }
 
-          referenceUser = getReferenceUser()
+          if (lastUser) {
+              window.location.href = "/room";
+          } else {
+              referenceUser = getReferenceUser();
+          }
       }
 
       async function sendPoint(userID, point) {
@@ -199,46 +229,62 @@
           }
       }
 
-      function getBestPlayer(songID) {
-          fetch("api/getBestPlayer", {
-              method: 'POST',
-              headers: {
-                  'Content-Type': 'application/x-www-form-urlencoded',
-              },
-              body: `song_id=${songID}`,
-          })
-              .then(response => {
-                  if (!response.ok) {
-                      throw new Error('Server Error');
-                  }
-                  return response.json();
-              })
-              .then(data => {
-                  if (data.UserInfo) {
-                      console.log('Best Player Info:');
-                      console.log('User ID:', data.UserInfo.UserID);
-                      console.log('User Name:', data.UserInfo.UserName);
-                      console.log('Hat Src:', data.UserInfo.HatSrc);
-                      console.log('Face Src:', data.UserInfo.FaceSrc);
-                      console.log('Body Src:', data.UserInfo.BodySrc);
-                      console.log('Best Score:', data.BestScore);
-                  } else {
-                      console.log('Best Player Info not available for this song.');
-                  }
-              })
-              .catch(error => {
-                  console.log('Error:', error);
-              });
-      }
-      function updateBestUserInfo(songID, userID, score) {
-          const data = {
-              song_id: songID,
-              user_id: userID,
-              score: score
-          };
+        function getBestPlayer(songID) {
+            fetch("../api/getBestPlayer", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: `song_id=${songID}`,
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Server Error');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.UserInfo) {
+                        console.log('Best Player Info:');
+                        console.log('User ID:', data.UserInfo.UserID);
+                        console.log('User Name:', data.UserInfo.UserName);
+                        console.log('Best Score:', data.BestScore);
+                        let bestUserScore = document.querySelector('.best-player__score');
+                        bestUserScore.innerText = data.UserInfo.UserName + ': ' + data.BestScore;
+                        let info = document.querySelectorAll('.player-score');
+                        let users = document.querySelectorAll('.rank__hero');
+                        let bestPlayerScore = connectedUsers[0]["valueScore"];
+                        let bestPlayerId = users[0].id;
+                        let I = 0;
+                        for (let i = 0; i < connectedUsers.length; i++){
+                            info[i].innerText = info[i].innerText + ' ' + connectedUsers[i]["valueScore"];
+                            addUserScore(parseInt(users[i].id), parseInt(connectedUsers[i]["valueScore"]));
+                            if ((connectedUsers[i]["valueScore"] > bestPlayerScore) && (bestPlayerId > 0)){
+                                bestPlayerId = users[i].id;
+                                bestPlayerScore = connectedUsers[i]["valueScore"];
+                                I = i;
+                            }
+                        }
+                        if ((bestPlayerScore > data.BestScore) && (bestPlayerId > 0)){
+                            bestUserScore.innerText = info[I].innerText;
+                            updateBestUserInfo(parseInt(songId), parseInt(bestPlayerId), parseInt(bestPlayerScore));
+                        }
+                    } else {
+                        console.log('Best Player Info not available for this song.');
+                    }
+                })
+                .catch(error => {
+                    console.log('Error:', error);
+                });
+        }
+        function updateBestUserInfo(songID, userID, score) {
+            const data = {
+                song_id: songID,
+                user_id: userID,
+                score: score
+            };
 
-
-            fetch('/api/updateBestPlayer', {
+            fetch('../api/updateBestPlayer', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'

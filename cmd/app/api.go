@@ -237,19 +237,7 @@ func exitFromGame(r *http.Request) (int, string, error) {
 	if err != nil {
 		return 0, "", err
 	}
-	for conn, gameFieldID := range gameFieldWSDict {
-		if gameFieldID == selectedRoomID {
-			err := conn.WriteMessage(websocket.TextMessage, messageData)
-			if err != nil {
-				err := conn.Close()
-				delete(gameFieldWSDict, conn)
-				if err != nil {
-					return 0, "", err
-				}
-			}
-			break
-		}
-	}
+	broadcastGameFieldWSMessage <- []string{selectedRoomID, string(messageData)}
 	return user.UserID, selectedRoomID, nil
 }
 
@@ -563,4 +551,125 @@ func getBotPath(db *sqlx.DB) func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 		json.NewEncoder(w).Encode(response)
 	}
+}
+
+func deletePlayerFromGame(w http.ResponseWriter, r *http.Request) {
+	userID := r.FormValue("user_id")
+	selectedRoomID, found := retrieveUserRoom(userID)
+	if found {
+		data := struct {
+			Exit bool
+		}{
+			Exit: true,
+		}
+		messageData, err := json.Marshal(data)
+		if err != nil {
+			http.Error(w, "Error marshal struct", http.StatusInternalServerError)
+			log.Println(err.Error())
+			return
+		}
+		broadcastJoinPageWSMessage <- []string{userID, string(messageData)}
+
+		//Выход из команты
+		roomIDDict[selectedRoomID] = removeValueFromSlice(roomIDDict[selectedRoomID], userID)
+		broadcastJoiningUserID <- []string{"remove", selectedRoomID, userID}
+
+		//Выход из игры
+		message := struct {
+			ExitingUser string
+		}{
+			ExitingUser: userID,
+		}
+		messageData, err = json.Marshal(message)
+		if err != nil {
+			http.Error(w, "Error marshal struct", http.StatusInternalServerError)
+			log.Println(err.Error())
+			return
+		}
+		broadcastGameFieldWSMessage <- []string{selectedRoomID, string(messageData)}
+		w.WriteHeader(http.StatusOK)
+	}
+	w.WriteHeader(http.StatusNotFound)
+}
+
+func addUserScore(db *sqlx.DB) func(w http.ResponseWriter, r *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
+		reqData, err := io.ReadAll(r.Body)
+		if err != nil {
+			http.Error(w, "Parsing error", 500)
+			log.Println(err.Error())
+			return
+		}
+		var data struct {
+			UserID    int `json:"user_id"`
+			UserScore int `json:"score"`
+		}
+		err = json.Unmarshal(reqData, &data)
+		if err != nil {
+			http.Error(w, "JSON parsing error", 500)
+			log.Println(err.Error())
+			return
+		}
+		err = addUserScoreSQL(db, data.UserID, data.UserScore)
+		if err != nil {
+			http.Error(w, "JSON parsing error", 500)
+			log.Println(err.Error())
+			return
+		}
+		w.WriteHeader(http.StatusOK)
+	}
+}
+
+func addBot(w http.ResponseWriter, r *http.Request) {
+	reqData, err := io.ReadAll(r.Body)
+	if err != nil {
+		http.Error(w, "Parsing error", 500)
+		log.Println(err.Error())
+		return
+	}
+	var data struct {
+		RoomID string `json:"room_id"`
+		BotID  string `json:"bot_id"`
+	}
+	err = json.Unmarshal(reqData, &data)
+	if err != nil {
+		http.Error(w, "JSON parsing error", 500)
+		log.Println(err.Error())
+		return
+	}
+	_, exists := roomIDDict[data.RoomID]
+	if !exists {
+		http.Error(w, "Room dont exist", 404)
+		log.Println(err.Error())
+		return
+	}
+	roomIDDict[data.RoomID] = append(roomIDDict[data.RoomID], data.BotID)
+	w.WriteHeader(http.StatusOK)
+}
+
+func removeBot(w http.ResponseWriter, r *http.Request) {
+	reqData, err := io.ReadAll(r.Body)
+	if err != nil {
+		http.Error(w, "Parsing error", 500)
+		log.Println(err.Error())
+		return
+	}
+	var data struct {
+		RoomID string `json:"room_id"`
+		BotID  string `json:"bot_id"`
+	}
+	err = json.Unmarshal(reqData, &data)
+	if err != nil {
+		http.Error(w, "JSON parsing error", 500)
+		log.Println(err.Error())
+		return
+	}
+	_, exists := roomIDDict[data.RoomID]
+	if !exists {
+		http.Error(w, "Room dont exist", 404)
+		log.Println(err.Error())
+		return
+	}
+	roomIDDict[data.RoomID] = removeValueFromSlice(roomIDDict[data.RoomID], data.BotID)
+	w.WriteHeader(http.StatusOK)
 }

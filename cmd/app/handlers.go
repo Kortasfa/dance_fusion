@@ -9,6 +9,7 @@ import (
 	"log"
 	"math/rand"
 	"net/http"
+	"strconv"
 	"time"
 )
 
@@ -166,6 +167,14 @@ func handleRoom(db *sqlx.DB) func(w http.ResponseWriter, r *http.Request) {
 			w.WriteHeader(404)
 			return
 		}
+
+		for _, userID := range roomIDDict[roomID] { // Удаляем ботов из комнаты
+			userIDInt, err := strconv.Atoi(userID)
+			if err == nil && userIDInt < 0 {
+				roomIDDict[roomID] = removeValueFromSlice(roomIDDict[roomID], userID)
+			}
+		}
+
 		tmpl, err := template.ParseFiles("pages/mainRoom.html")
 		if err != nil {
 			http.Error(w, "Internal Server Error", 500)
@@ -233,7 +242,7 @@ func handleCreateRoom(w http.ResponseWriter, r *http.Request) {
 		rand.Seed(time.Now().UnixNano())
 		var roomID int
 		for {
-			roomID = rand.Intn(100)
+			roomID = rand.Intn(100-10-1) + 10
 			_, exists := roomIDDict[fmt.Sprintf("%d", roomID)]
 			if !exists {
 				break
