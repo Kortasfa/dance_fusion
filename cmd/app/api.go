@@ -237,19 +237,7 @@ func exitFromGame(r *http.Request) (int, string, error) {
 	if err != nil {
 		return 0, "", err
 	}
-	for conn, gameFieldID := range gameFieldWSDict {
-		if gameFieldID == selectedRoomID {
-			err := conn.WriteMessage(websocket.TextMessage, messageData)
-			if err != nil {
-				err := conn.Close()
-				delete(gameFieldWSDict, conn)
-				if err != nil {
-					return 0, "", err
-				}
-			}
-			break
-		}
-	}
+	broadcastGameFieldWSMessage <- []string{selectedRoomID, string(messageData)}
 	return user.UserID, selectedRoomID, nil
 }
 
@@ -567,7 +555,7 @@ func getBotPath(db *sqlx.DB) func(w http.ResponseWriter, r *http.Request) {
 
 func deletePlayerFromGame(w http.ResponseWriter, r *http.Request) {
 	userID := r.FormValue("user_id")
-	_, found := retrieveUserRoom(userID)
+	selectedRoomID, found := retrieveUserRoom(userID)
 	if found {
 		data := struct {
 			Exit bool
@@ -576,11 +564,29 @@ func deletePlayerFromGame(w http.ResponseWriter, r *http.Request) {
 		}
 		messageData, err := json.Marshal(data)
 		if err != nil {
-			http.Error(w, "Error marshal struct", 500)
+			http.Error(w, "Error marshal struct", http.StatusInternalServerError)
 			log.Println(err.Error())
 			return
 		}
 		broadcastJoinPageWSMessage <- []string{userID, string(messageData)}
+
+		//Выход из команты
+		roomIDDict[selectedRoomID] = removeValueFromSlice(roomIDDict[selectedRoomID], userID)
+		broadcastJoiningUserID <- []string{"remove", selectedRoomID, userID}
+
+		//Выход из игры
+		message := struct {
+			ExitingUser string
+		}{
+			ExitingUser: userID,
+		}
+		messageData, err = json.Marshal(message)
+		if err != nil {
+			http.Error(w, "Error marshal struct", http.StatusInternalServerError)
+			log.Println(err.Error())
+			return
+		}
+		broadcastGameFieldWSMessage <- []string{selectedRoomID, string(messageData)}
 		w.WriteHeader(http.StatusOK)
 	}
 	w.WriteHeader(http.StatusNotFound)

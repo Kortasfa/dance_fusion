@@ -233,7 +233,7 @@ func handleCreateRoom(w http.ResponseWriter, r *http.Request) {
 		rand.Seed(time.Now().UnixNano())
 		var roomID int
 		for {
-			roomID = rand.Intn(1000-1-100) + 100
+			roomID = rand.Intn(100-10-1) + 10
 			_, exists := roomIDDict[fmt.Sprintf("%d", roomID)]
 			if !exists {
 				break
