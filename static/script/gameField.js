@@ -61,11 +61,8 @@ function showStats() {
 }
 
 function addStats(){
-    let score = document.querySelectorAll('.hero__score');
-    let info = document.querySelectorAll('.player-score');
-    for (let i = 0; i < 4; i++){
-        info[i].innerText = info[i].innerText + ' ' + score[i].innerText;
-    }
+    getBestPlayer(songId);
+
 }
 getUsersByCookie();
 
@@ -239,21 +236,6 @@ if (bossInfo) {
 }
 
 async function expelUser(userID) {
-    // let response = await fetch("/api/exitFromGame", {
-    //     method: 'POST',
-    //     headers: {
-    //         'Content-Type': 'application/json',
-    //     },
-    //     body: JSON.stringify({"userID": userID}),
-    // });
-    // if (response.ok) {
-    //     console.log('Выгнал', userID);
-    // } else {
-    //     console.log('Не получилось выгнать', userID);
-    // }
-    // if (socket) {
-    //     socket.close();
-    // }
     let response = await fetch("/api/deletePlayerFromGame", {
         method: 'POST',
         headers: {
