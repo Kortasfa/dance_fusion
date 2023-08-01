@@ -6,12 +6,13 @@ let scorePerfect = 33;
 const danceVideo = document.getElementById("video-dance");
 const modalElem = document.getElementById("pop-up");
 const btnContinue = document.getElementById("btn-continue");
-const megaStar = document.querySelectorAll(".score__star")[5];
-const starOne = document.querySelectorAll(".score__star")[0];
-const starTwo = document.querySelectorAll(".score__star")[1];
-const starThree = document.querySelectorAll(".score__star")[2];
-const starFour = document.querySelectorAll(".score__star")[3];
-const starFive = document.querySelectorAll(".score__star")[4];
+const starOneScale = document.getElementById("star-1");
+const starTwoScale = document.getElementById("star-2");
+const starThreeScale = document.getElementById("star-3");
+const starFourScale = document.getElementById("star-4");
+const starFiveScale = document.getElementById("star-5");
+const megaStarScale = document.getElementById("mega-star");
+
 function getUsersByCookie() {
     for (let i = 0; i < connectedUsers.length; i++) {
         let userID = connectedUsers[i]["userID"];
@@ -29,10 +30,26 @@ function getUsersByCookie() {
         userScore.classList.remove('hidden');
         indexUser.classList.remove('hidden');
         indexUser.id = userID;
+        let indexUserScale = document.getElementById("scale-" + (i + 1));
+        indexUserScale.id = "scale-" + userID + "-for-user";
+        indexUserScale.classList.remove("hidden");
         indexUserBodyImg.src = bodyImgSrc;
         indexUserFaceImg.src = faceImgSrc;
         indexUserHatImg.src = hatImgSrc;
         indexUserName.innerText = userName;
+        let heroStars = document.getElementById("hero-score-" + (i + 1));
+        let megaStar = heroStars.querySelectorAll(".score__star")[5];
+        megaStar.id = "mega-star-" + userID;
+        let starOne = heroStars.querySelectorAll(".score__star")[0];
+        starOne.id = "star-1-" + userID;
+        let starTwo = heroStars.querySelectorAll(".score__star")[1];
+        starTwo.id = "star-2-" + userID;
+        let starThree = heroStars.querySelectorAll(".score__star")[2];
+        starThree.id = "star-3-" + userID;
+        let starFour = heroStars.querySelectorAll(".score__star")[3];
+        starFour.id = "star-4-" + userID;
+        let starFive = heroStars.querySelectorAll(".score__star")[4];
+        starFive.id = "star-5-" + userID;
     }
 }
 
@@ -57,12 +74,49 @@ btnContinue.addEventListener("click", function () {
     window.location.href = "/room";
 })
 
-let valueScore= 0;
-function addScore(userID, score, maxScore){
+let pix;
+
+function addScore(userID, score, maxScore) {
+    let valueScore;
+    let starComplete = 0;
     let user = document.getElementById(userID);
-    let maxPractice = maxScore - 0.2 * maxScore;
+    let scale = document.getElementById("scale-" + userID + "-for-user")
+    let maxPractice = 0.8 * maxScore;
+    let starOne = document.getElementById("star-1-" + userID);
+    let starTwo = document.getElementById("star-2-" + userID);
+    let starThree= document.getElementById("star-3-" + userID);
+    let starFour = document.getElementById("star-4-" + userID);
+    let starFive = document.getElementById("star-5-" + userID);
+    let megaStar = document.getElementById("mega-star" + userID);
+
+    let userIndex;
+    for (userIndex = 0; userIndex < connectedUsers.length; userIndex++) {
+        let userInfo = connectedUsers[userIndex];
+        if (userInfo["userID"] === userID) {
+            valueScore = userInfo["valueScore"];
+            break;
+        }
+    }
+    if (valueScore === undefined) {
+        console.log("пользователь не найден с таким id")
+        return;
+    }
     valueScore += score;
-    console.log("valueScore: ", valueScore);
+    console.log("valueScore: " + valueScore);
+    if (valueScore <= maxScore) {
+        console.log("valueScore: " + valueScore);
+        percentage = (valueScore / maxPractice);
+        console.log("percentage: " + percentage);
+        pix = 250 * percentage;
+        console.log("pix: " + pix);
+    }
+    if (valueScore > maxScore) {
+        percentage = (valueScore / maxScore);
+        console.log("percentage: " + percentage);
+        pix = 50 * percentage;
+        console.log("pix: " + pix);
+    }
+    scale.style.height = pix + 'px';
     if (score > scorePerfect){
         let effect = user.querySelector(".hero__rating-perfect");
         effect.classList.remove("hidden");
@@ -97,23 +151,60 @@ function addScore(userID, score, maxScore){
         }, 1000);
     }
     if (valueScore >= 0.2 * maxPractice) {
-        starOne.src = "/static/img/star_blue.svg"
+        starOne.src = "/static/img/star_blue.svg";
+        starComplete = 1;
+        console.log("ПОЯВИЛАСЬ ЗВЕЗДА ", starComplete)
     }
     if (valueScore >= 0.4 * maxPractice) {
         starTwo.src = "/static/img/star_blue.svg"
+        starComplete = 2;
     }
     if (valueScore >= 0.6 * maxPractice) {
         starThree.src = "/static/img/star_blue.svg"
+        starComplete = 3;
     }
     if (valueScore >= 0.8 * maxPractice) {
         starFour.src = "/static/img/star_blue.svg"
+        starComplete = 4;
     }
     if (valueScore >= maxPractice) {
         starFive.src = "/static/img/star_blue.svg"
+        starComplete = 5;
     }
     if (valueScore >= 0.9 * maxScore) {
         megaStar.classList.remove("hidden");
+        starComplete = 6;
     }
+    switch(starComplete) {
+        case 1:
+            starOneScale.src = "/static/img/star_blue.svg"
+            break;
+        case 2:
+            starTwoScale.src = "/static/img/star_blue.svg"
+            break;
+        case 3:
+            starThreeScale.src = "/static/img/star_blue.svg"
+            break;
+        case 4:
+            starFourScale.src = "/static/img/star_blue.svg"
+            break;
+        case 5:
+            starFiveScale.src = "/static/img/star_blue.svg"
+            break;
+        case 6:
+            megaStarScale.classList.remove("hidden");
+            break;
+    }
+
+    connectedUsers[userIndex]["valueScore"] = valueScore;
+    if (bossInfo) {
+        playerDamage(score);
+    }
+}
+
+function playerDamage(score) {
+    let bossHPCount = document.querySelector(".boss__hp-bar");
+    bossHPCount.innerText = (parseInt(bossHPCount.innerText) - score).toString();
 }
 
 let btnExit = document.querySelector(".btn-exit");
@@ -127,6 +218,24 @@ function expelUsers() {
             expelUser(user["userID"]).then(() => {});
         }
     }
+    if (bossInfo) {
+        playerDamage(score);
+    }
+}
+
+function playerDamage(score) {
+    let bossHPCount = document.querySelector(".boss__hp-bar");
+    bossHPCount.innerText = (parseInt(bossHPCount.innerText) - score).toString();
+}
+
+if (bossInfo) {
+    console.log("zahar best");
+    document.querySelector(".boss-container").classList.remove("hidden");
+    document.querySelector(".boss__name").innerText = bossInfo.name;
+    document.querySelector(".boss__hp-bar").innerText = (parseInt(bossInfo.healthPoint) * connectedUsers.length).toString();
+    document.querySelector(".boss__body-img").src = bossInfo.bossBody;
+    document.querySelector(".boss__face-img").src = bossInfo.bossFace;
+    document.querySelector(".boss__hat-img").src = bossInfo.bossHat;
 }
 
 async function expelUser(userID) {
