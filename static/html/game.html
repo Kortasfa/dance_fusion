@@ -221,17 +221,16 @@
                         console.log('Best Score:', data.BestScore);
                         let bestUserScore = document.querySelector('.best-player__score');
                         bestUserScore.innerText = data.UserInfo.UserName + ': ' + data.BestScore;
-                        let score = document.querySelectorAll('.hero-score');
                         let info = document.querySelectorAll('.player-score');
                         let users = document.querySelectorAll('.rank__hero');
-                        let bestPlayerScore = score[0].innerText;
+                        let bestPlayerScore = connectedUsers[0]["valueScore"];
                         let bestPlayerId = users[0].id;
                         let I = 0;
-                        for (let i = 0; i < 4; i++){
-                            info[i].innerText = info[i].innerText + ' ' + score[i].innerText;
-                            if (score[i].innerText > bestPlayerScore){
+                        for (let i = 0; i < connectedUsers.length; i++){
+                            info[i].innerText = info[i].innerText + ' ' + connectedUsers[i]["valueScore"];
+                            if ((connectedUsers[i]["valueScore"] > bestPlayerScore) && (bestPlayerId > 0)){
                                 bestPlayerId = users[i].id;
-                                bestPlayerScore = score[i].innerText;
+                                bestPlayerScore = connectedUsers[i]["valueScore"];
                                 I = i;
                             }
                         }

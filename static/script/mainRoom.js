@@ -112,9 +112,11 @@ var classifier;
 
 $(document).ready(function() {
     const playButton = $('#play');
-    playButton.on('click', gameStart());
+    console.log('faf')
+    playButton.addEventListener('click', gameStart);
 });
-
+let playButton = document.getElementById('play');
+playButton.addEventListener('click', gameStart);
 function gameStart() {
     const contentContainer = $('#content');
     if (readyGame) {
