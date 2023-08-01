@@ -7,9 +7,9 @@ const PlayBtn = document.getElementById('play');
 const songs = document.querySelector('.songs')
 
 let readyGame = false;
-let numberOfUser = 0;
 let readyPlayer = false;
 let connectedUsers = [];
+let connectedBots = [];
 
 btnOpenInfo.addEventListener('click', openGuide);
 
@@ -71,8 +71,7 @@ function onImageClick(element) {
     let difficultyList = document.querySelector('.game-menu__difficulty');
     let difficultySegment = difficultyList.querySelectorAll('.segment')
 
-    difficulty =    document.getElementById('difficulty' + videoSrcID).innerText;
- //   <a className="none" id="difficulty{{ .SongID }}">{{.Difficulty}}</a>
+    difficulty  =  document.getElementById('difficulty' + videoSrcID).innerText;
     difficultyList.classList.remove('none')
     for (let i = 0; i < 4; i++) {
         if (i < difficulty) {
@@ -109,22 +108,30 @@ Array.from(test).forEach(function (element) {
 });
 
 var numb;
+var classifier;
 
 $(document).ready(function() {
     const playButton = $('#play');
+    console.log('faf')
+    playButton.addEventListener('click', gameStart);
+});
+let playButton = document.getElementById('play');
+playButton.addEventListener('click', gameStart);
+function gameStart() {
     const contentContainer = $('#content');
+    if (readyGame) {
+        numb = (Math.round(Math.random()*1000)).toString();
+        let firstComponent = '/static/test/edge-impulse-standalone.js?version=' + numb;
+        let secondComponent = '/static/test/run-impulse.js?version=' + numb;
+        let thirdComponent = '/static/html/game.html?version=' + numb;
+        $.getScript(firstComponent, function() {
+            $.getScript(secondComponent, function() {
+                (async () => {
+                    classifier = new EdgeImpulseClassifier();
+                    await classifier.init();
+                    let project = classifier.getProjectInfo();
+                    console.log(project.owner + ' / ' + project.name + ' (version ' + project.deploy_version + ')');
 
-    playButton.on('click', function() {
-        if (readyGame) {
-            // Load the first script
-            numb = (Math.round(Math.random()*1000)).toString();
-            let firstComponent = '/static/test/edge-impulse-standalone.js?version=' + numb;
-            let secondComponent = '/static/test/run-impulse.js?version=' + numb;
-            let thirdComponent = '/static/html/game.html?version=' + numb;
-            $.getScript(firstComponent, function() {
-                // Once the first script is loaded, load the second script
-                $.getScript(secondComponent, function() {
-                    // After both scripts are loaded, load the page by AJAX
                     contentContainer.load(thirdComponent, function() {
                         const video = $('#video-dance')[0];
                         const src = $('#video-src')[0];
@@ -133,17 +140,16 @@ $(document).ready(function() {
                         video.addEventListener('loadeddata', function() {
                             video.play();
                             socket.send(songName);
+                            console.log(songName);
                             socket.close(); // Закрываем вебсокет mainRoom
                         });
                     });
-                });
+                })();
             });
-            return false;
-        }
-    });
-});
-
-
+        });
+    }
+    return readyGame;
+}
 
 function showVideo(videoID) {
     let videoSrcID = 'song' + videoID.id;
@@ -151,6 +157,83 @@ function showVideo(videoID) {
     let videoPlayer = document.getElementById('videoPlayer');
     videoPlayer.src = video.innerText;
 }
+
+function addBot(botName) {
+    let botInfo = {};
+    fetch("../api/getBotPath", {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: `bot_name=${botName}`,
+    })
+        .then(response => {
+            if (!response.ok) {
+                if (response.status === 409) {
+                    throw new Error('No bot with such name');
+                }
+                else {
+                    throw new Error('Server Error');
+                }
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.BotScoresPath) {
+                console.log('Bot Info:');
+                console.log('Bot Id: -', data.BotId);
+                console.log('Bot Scores Src:', data.BotScoresPath);
+                console.log('Bot Hat Src:', data.BotImgHat);
+                console.log('Bot Face Src:', data.BotImgFace);
+                console.log('Bot Body Src:', data.BotImgBody);
+                botInfo = data;
+                addUser( "-" + data.BotId, "bot_1", "../" + data.BotImgHat, "../" + data.BotImgFace, "../" + data.BotImgBody);
+                function readJSONFromURL(url) {
+                    fetch(url)
+                        .then(response => {
+                            if (!response.ok) {
+                                throw new Error('Ошибка при получении файла');
+                            }
+                            return response.json();
+                        })
+                        .then(jsonData => {
+                            connectedBots.push({"botID": "-1",  "botScores":  jsonData});
+                            console.log(connectedBots);
+                        })
+                        .catch(error => {
+                            console.error('Ошибка:', error);
+                        });
+                }
+                readJSONFromURL("../" + data.BotScoresPath);
+            } else {
+                console.log('Fail');
+            }
+        })
+        .catch(error => {
+            console.log('Error:', error);
+            return
+        });
+}
+
+let bossInfo;
+
+function bossGame(bossBlock) {
+    let name = bossBlock.querySelector(".boss__name").innerText;
+    let healthPoint = bossBlock.querySelector(".boss__health-point").innerText;
+    let bossBody= bossBlock.querySelector(".boss__body-img").src;
+    let bossFace = bossBlock.querySelector(".boss__face-img").src;
+    let bossHat = bossBlock.querySelector(".boss__hat-img").src;
+    if (!gameStart()) {
+        console.log("Игра не готова")
+        return;
+    }
+
+    bossInfo = {"name": name, "healthPoint": healthPoint, "bossBody": bossBody, "bossFace": bossFace, "bossHat": bossHat};
+
+}
+
+
+const parent = document.querySelector('.songs');
 
 function changeColor(song) {
     song.classList.add('button_yellow');
@@ -193,7 +276,7 @@ socket.onclose = function (event) {
 
 function addUser(userID, userName, hatImgSrc, faceImgSrc, bodyImgSrc) {
     console.log('Пользователь присоединился: ' + userID);
-    connectedUsers.push({"userID": userID, "userName": userName, "bodyImgSrc": bodyImgSrc, "faceImgSrc": faceImgSrc, "hatImgSrc": hatImgSrc});
+    connectedUsers.push({"userID": userID, "userName": userName, "valueScore": 0, "bodyImgSrc": bodyImgSrc, "faceImgSrc": faceImgSrc, "hatImgSrc": hatImgSrc});
 
     let userMessage = document.getElementById('needUser');
     userMessage.classList.add('none');
@@ -211,7 +294,6 @@ function addUser(userID, userName, hatImgSrc, faceImgSrc, bodyImgSrc) {
     readyPlayer = true;
     changeButton();
 }
-
 
 function removeUser(userID) {
     console.log('Пользователь вышел: ' + userID);

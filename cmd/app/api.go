@@ -347,7 +347,7 @@ func sendPointToJoin(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(200)
 }
 
-func getMaxScore(w http.ResponseWriter, r *http.Request) {
+func getDataSongJson(w http.ResponseWriter, r *http.Request) {
 	reqData, err := io.ReadAll(r.Body)
 	if err != nil {
 		http.Error(w, "Parsing error", 500)
@@ -357,6 +357,7 @@ func getMaxScore(w http.ResponseWriter, r *http.Request) {
 	var data struct {
 		RoomID   string
 		MaxPoint int
+		ColorID  string
 	}
 	err = json.Unmarshal(reqData, &data)
 	if err != nil {
@@ -364,28 +365,9 @@ func getMaxScore(w http.ResponseWriter, r *http.Request) {
 		log.Println(err.Error())
 		return
 	}
-	fmt.Println(data.RoomID, data.MaxPoint)
-	broadcastJoinPageWSMessage <- []string{data.RoomID, string(reqData)}
+	fmt.Println(data.RoomID, data.MaxPoint, data.ColorID)
+	broadcastGameFieldWSMessage <- []string{data.RoomID, string(reqData)}
 	w.WriteHeader(200)
-}
-
-func danceInfoHandleMessages() {
-	for mesArr := range broadcastGameFieldWSMessage {
-		for conn, gameFieldID := range gameFieldWSDict {
-			roomID := mesArr[0]
-			data := mesArr[1]
-			if gameFieldID == roomID {
-				err := conn.WriteMessage(websocket.TextMessage, []byte(data))
-				if err != nil {
-					err := conn.Close()
-					delete(gameFieldWSDict, conn)
-					if err != nil {
-						return
-					}
-				}
-			}
-		}
-	}
 }
 
 func getBestPlayer(db *sqlx.DB) func(w http.ResponseWriter, r *http.Request) {
@@ -547,4 +529,59 @@ func changeUserPassword(db *sqlx.DB) http.HandlerFunc {
 		}
 		w.WriteHeader(http.StatusOK)
 	}
+}
+
+func getBotPath(db *sqlx.DB) func(w http.ResponseWriter, r *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
+		botName := r.FormValue("bot_name")
+		if botName == "" {
+			// Обработка случая, когда поле "bot_name" не было отправлено в форме
+			http.Error(w, "Field 'bot_name' is missing or empty", http.StatusBadRequest)
+			return
+		}
+		botData, err := getBotInfo(db, botName)
+		if err != nil {
+			http.Error(w, "Error getting bot information", http.StatusConflict)
+			log.Println(err.Error())
+			return
+		}
+		fmt.Println(botData)
+		response := struct {
+			BotId         string
+			BotScoresPath string
+			BotImgHat     string
+			BotImgBody    string
+			BotImgFace    string
+		}{
+			BotId:         botData.BotId,
+			BotScoresPath: botData.BotScoresPath,
+			BotImgHat:     botData.BotImgHat,
+			BotImgBody:    botData.BotImgBody,
+			BotImgFace:    botData.BotImgFace,
+		}
+
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(response)
+	}
+}
+
+func deletePlayerFromGame(w http.ResponseWriter, r *http.Request) {
+	userID := r.FormValue("user_id")
+	_, found := retrieveUserRoom(userID)
+	if found {
+		data := struct {
+			Exit bool
+		}{
+			Exit: true,
+		}
+		messageData, err := json.Marshal(data)
+		if err != nil {
+			http.Error(w, "Error marshal struct", 500)
+			log.Println(err.Error())
+			return
+		}
+		broadcastJoinPageWSMessage <- []string{userID, string(messageData)}
+		w.WriteHeader(http.StatusOK)
+	}
+	w.WriteHeader(http.StatusNotFound)
 }
