@@ -4,6 +4,7 @@ const btnOpenInfo = document.getElementById('openGuide');
 const guide = document.getElementById('guide');
 const returnBtn = document.getElementById('returnButton');
 const PlayBtn = document.getElementById('play');
+const songs = document.querySelector('.songs')
 
 let readyGame = false;
 let numberOfUser = 0;
@@ -22,7 +23,7 @@ function changeButton() {
 function openSong(styleButtonBlock) {
     returnBtn.classList.toggle('hide');
     listGenre.classList.add('none');
-    document.querySelector('.songs').classList.remove('none');
+    songs.classList.remove('none');
     const songBlocks = document.getElementsByClassName('song__section');
     for (let i = 0; i < songBlocks.length; i++) {
         if (songBlocks[i].id === styleButtonBlock.id && songBlocks[i].classList.contains('none')) {
@@ -59,7 +60,7 @@ let songName = '';
 let songNeuro = '';
 let fullSongName = '';
 let songId = 0;
-let difficulty = 3;
+let difficulty = 0;
 let readySong = false;
 
 function onImageClick(element) {
@@ -70,7 +71,7 @@ function onImageClick(element) {
     let difficultyList = document.querySelector('.game-menu__difficulty');
     let difficultySegment = difficultyList.querySelectorAll('.segment')
 
-//    difficulty = document.getElementById('difficulty' + videoSrcID);
+    difficulty =    document.getElementById('difficulty' + videoSrcID).innerText;
  //   <a className="none" id="difficulty{{ .SongID }}">{{.Difficulty}}</a>
     difficultyList.classList.remove('none')
     for (let i = 0; i < 4; i++) {
@@ -151,14 +152,12 @@ function showVideo(videoID) {
     videoPlayer.src = video.innerText;
 }
 
-const parent = document.querySelector('.songs');
-
 function changeColor(song) {
     song.classList.add('button_yellow');
 }
 
 function addColor(song) {
-    const menuItem = parent.querySelectorAll('.button_yellow');
+    const menuItem = songs.querySelectorAll('.button_yellow');
     for (let i = 0; i < menuItem.length; i++) {
         menuItem[i].classList.remove('button_yellow');
     }
@@ -256,4 +255,21 @@ const qr = new QRCode(document.getElementById("qrcode"), {
     text: domain,
     width: 125,
     height: 125,
+});
+
+window.addEventListener('load', () => {
+    let difficulty = songs.querySelectorAll('.song__difficulty');
+
+    for (let i = 0; i < difficulty.length; i++) {
+        let difficultySegment = difficulty[i].querySelectorAll('.piece')
+        let complexity = difficulty[i].getAttribute('difficulty');
+
+        for (let i = 0; i < 4; i++) {
+            if (i < complexity) {
+                difficultySegment[i].classList.add('segment_on')
+            } else {
+                difficultySegment[i].classList.remove('segment_on')
+            }
+        }
+    }
 });

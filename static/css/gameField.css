@@ -270,9 +270,15 @@
 }
 
 .best-player__score{
+     font:  400 30px Roboto, sans-serif;
+     color: #1E1C1C;
+     margin-top: 11px;
+ }
+
+.best-player__name{
     font:  400 30px Roboto, sans-serif;
     color: #1E1C1C;
-    margin: 11px;
+    margin-top: 11px;
 }
 
 .list__players{

@@ -66,17 +66,36 @@
     display: flex;
     height: 42px;
     width: 120px;
-    margin: 205px 0 0 468px;
-    border-radius: 10px 0 0 10px;
+    margin: 185px 0 0 460px;
+    border-radius: 10px;
     background-color: #BD63D4;
     justify-content: space-evenly;
     align-items: center;
 }
 
+.song__difficulty{
+    position: absolute;
+    display: flex;
+    height: 26px;
+    width: 68px;
+    margin: 10px 0 0 280px;
+    border-radius: 10px;
+    background-color: #BD63D4;
+    justify-content: space-evenly;
+    align-items: center;
+}
+
+.piece{
+    width: 7px;
+    height: 19px;
+    background-color: #e88eff;
+    border-radius: 10px;
+}
+
 .segment{
     width: 13px;
     height: 35px;
-    background-color: #b4a44f;
+    background-color: #e88eff;
     border-radius: 10px;
 }
 
@@ -141,7 +160,10 @@
 }
 
 .dance-style__button{
+    margin: 24px;
+}
 
+.game-mode__button{
     margin: 24px;
 }
 
@@ -465,6 +487,19 @@
         width: 355px;
     }
 
+    .segment {
+        width: 9px;
+        height: 20px;
+    }
+
+    .game-menu__difficulty {
+        position: absolute;
+        display: flex;
+        height: 27px;
+        width: 88px;
+        margin: 110px 0 0 250px;
+    }
+
     .game-menu__party {
         height: 90px;
     }
@@ -537,4 +572,12 @@
         margin: 15px;
         width: 60px;
     }
+}
+
+.none{
+    display: none;
+}
+
+.hide{
+    visibility: hidden;
 }

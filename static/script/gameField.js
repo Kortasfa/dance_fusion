@@ -44,11 +44,8 @@ function showStats() {
 }
 
 function addStats(){
-    let score = document.querySelectorAll('.hero__score');
-    let info = document.querySelectorAll('.player-score');
-    for (let i = 0; i < 4; i++){
-        info[i].innerText = info[i].innerText + ' ' + score[i].innerText;
-    }
+    getBestPlayer(songId);
+
 }
 getUsersByCookie();
 
@@ -61,6 +58,8 @@ let valueScore= 0;
 function addScore(userID, score, maxScore){
     let user = document.getElementById(userID);
     let maxPractice = maxScore - 0.2 * maxScore;
+    let userScore = user.querySelector('.hero-score');
+    userScore.innerText = score + parseInt(userScore.innerText);
     valueScore += score;
     console.log("valueScore: ", valueScore);
     if (score > scorePerfect){
