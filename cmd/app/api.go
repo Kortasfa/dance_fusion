@@ -548,3 +548,24 @@ func changeUserPassword(db *sqlx.DB) http.HandlerFunc {
 		w.WriteHeader(http.StatusOK)
 	}
 }
+
+func deletePlayerFromGame(w http.ResponseWriter, r *http.Request) {
+	userID := r.FormValue("user_id")
+	_, found := retrieveUserRoom(userID)
+	if found {
+		data := struct {
+			Exit bool
+		}{
+			Exit: true,
+		}
+		messageData, err := json.Marshal(data)
+		if err != nil {
+			http.Error(w, "Error marshal struct", 500)
+			log.Println(err.Error())
+			return
+		}
+		broadcastJoinPageWSMessage <- []string{userID, string(messageData)}
+		w.WriteHeader(http.StatusOK)
+	}
+	w.WriteHeader(http.StatusNotFound)
+}
