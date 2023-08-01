@@ -207,10 +207,16 @@ function playerDamage(score) {
     bossHPCount.innerText = (parseInt(bossHPCount.innerText) - score).toString();
 }
 
-window.onbeforeunload = function() {
+let btnExit = document.querySelector(".btn-exit");
+btnExit.addEventListener("click", expelUsers)
+window.onbeforeunload = expelUsers
+
+function expelUsers() {
     console.log('Выгоняем всех челов из игры');
     for (let user of connectedUsers) {
-        expelUser(user["userID"]).then(() => {});
+        if (parseInt(user["userID"]) > 0) {
+            expelUser(user["userID"]).then(() => {});
+        }
     }
     if (bossInfo) {
         playerDamage(score);
@@ -231,18 +237,34 @@ if (bossInfo) {
     document.querySelector(".boss__face-img").src = bossInfo.bossFace;
     document.querySelector(".boss__hat-img").src = bossInfo.bossHat;
 }
+
 async function expelUser(userID) {
-    const response = await fetch("/api/exitFromGame", {
+    // let response = await fetch("/api/exitFromGame", {
+    //     method: 'POST',
+    //     headers: {
+    //         'Content-Type': 'application/json',
+    //     },
+    //     body: JSON.stringify({"userID": userID}),
+    // });
+    // if (response.ok) {
+    //     console.log('Выгнал', userID);
+    // } else {
+    //     console.log('Не получилось выгнать', userID);
+    // }
+    // if (socket) {
+    //     socket.close();
+    // }
+    let response = await fetch("/api/deletePlayerFromGame", {
         method: 'POST',
         headers: {
-            'Content-Type': 'application/json',
+            'Content-Type': 'application/x-www-form-urlencoded',
         },
-        body: JSON.stringify({"userID": userID}),
+        body: `user_id=${userID}`,
     });
     if (response.ok) {
-        console.log('Выгнал', userID);
+        console.log('Отправил сообщение о выходе', userID);
     } else {
-        console.log('Не получилось выгнать', userID);
+        console.log('Не получилось отправить сообзение о выходе ', userID);
     }
     if (socket) {
         socket.close();

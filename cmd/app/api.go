@@ -564,3 +564,24 @@ func getBotPath(db *sqlx.DB) func(w http.ResponseWriter, r *http.Request) {
 		json.NewEncoder(w).Encode(response)
 	}
 }
+
+func deletePlayerFromGame(w http.ResponseWriter, r *http.Request) {
+	userID := r.FormValue("user_id")
+	_, found := retrieveUserRoom(userID)
+	if found {
+		data := struct {
+			Exit bool
+		}{
+			Exit: true,
+		}
+		messageData, err := json.Marshal(data)
+		if err != nil {
+			http.Error(w, "Error marshal struct", 500)
+			log.Println(err.Error())
+			return
+		}
+		broadcastJoinPageWSMessage <- []string{userID, string(messageData)}
+		w.WriteHeader(http.StatusOK)
+	}
+	w.WriteHeader(http.StatusNotFound)
+}
