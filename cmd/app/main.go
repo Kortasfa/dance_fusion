@@ -56,6 +56,8 @@ func main() {
 	r.HandleFunc("/api/getBotPath", getBotPath(dbx)).Methods("POST")
 	r.HandleFunc("/api/deletePlayerFromGame", deletePlayerFromGame).Methods("POST")
 	r.HandleFunc("/api/addUserScore", addUserScore(dbx)).Methods("POST")
+	r.HandleFunc("/api/addBot", addBot).Methods("POST")
+	r.HandleFunc("/api/removeBot", removeBot).Methods("POST")
 
 	go handleRoomWSMessages()
 	go handleJoinPageWSMessages()

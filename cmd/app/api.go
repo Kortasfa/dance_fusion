@@ -619,3 +619,57 @@ func addUserScore(db *sqlx.DB) func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
 	}
 }
+
+func addBot(w http.ResponseWriter, r *http.Request) {
+	reqData, err := io.ReadAll(r.Body)
+	if err != nil {
+		http.Error(w, "Parsing error", 500)
+		log.Println(err.Error())
+		return
+	}
+	var data struct {
+		RoomID string `json:"room_id"`
+		BotID  string `json:"bot_id"`
+	}
+	err = json.Unmarshal(reqData, &data)
+	if err != nil {
+		http.Error(w, "JSON parsing error", 500)
+		log.Println(err.Error())
+		return
+	}
+	_, exists := roomIDDict[data.RoomID]
+	if !exists {
+		http.Error(w, "Room dont exist", 404)
+		log.Println(err.Error())
+		return
+	}
+	roomIDDict[data.RoomID] = append(roomIDDict[data.RoomID], data.BotID)
+	w.WriteHeader(http.StatusOK)
+}
+
+func removeBot(w http.ResponseWriter, r *http.Request) {
+	reqData, err := io.ReadAll(r.Body)
+	if err != nil {
+		http.Error(w, "Parsing error", 500)
+		log.Println(err.Error())
+		return
+	}
+	var data struct {
+		RoomID string `json:"room_id"`
+		BotID  string `json:"bot_id"`
+	}
+	err = json.Unmarshal(reqData, &data)
+	if err != nil {
+		http.Error(w, "JSON parsing error", 500)
+		log.Println(err.Error())
+		return
+	}
+	_, exists := roomIDDict[data.RoomID]
+	if !exists {
+		http.Error(w, "Room dont exist", 404)
+		log.Println(err.Error())
+		return
+	}
+	roomIDDict[data.RoomID] = removeValueFromSlice(roomIDDict[data.RoomID], data.BotID)
+	w.WriteHeader(http.StatusOK)
+}
