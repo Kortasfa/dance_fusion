@@ -147,6 +147,24 @@
       </div>
   </div>
   <script>
+      async function addUserScore(userID, userScore) {
+          const response = await fetch("/api/addUserScore", {
+              method: 'POST',
+              headers: {
+                  'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                  "user_id": userID, // Integer
+                  "score": userScore // Integer
+              }),
+          });
+          if (response.ok) {
+              console.log('Score пользователя обновлен');
+          } else {
+              console.log('Не удалось обновить score пользователя');
+          }
+      }
+
       function getReferenceUser() {
           console.log(connectedUsers);
           for (let userInfo of connectedUsers) {
