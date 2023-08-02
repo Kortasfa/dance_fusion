@@ -443,3 +443,21 @@ func getBossInfo(db *sqlx.DB) ([]bossInfo, error) {
 
 	return data, nil
 }
+
+func addUserScoreSQL(db *sqlx.DB, userID int, score int) error {
+	totalScore, err := getScoreByUserID(db, userID)
+	if err != nil {
+		return err
+	}
+	const query = `
+			UPDATE
+				users
+			SET
+				total_score = ?
+			WHERE
+			    id = ?
+		`
+
+	_, err = db.Exec(query, totalScore+score, userID)
+	return err
+}

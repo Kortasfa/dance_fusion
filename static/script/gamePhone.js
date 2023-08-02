@@ -159,7 +159,7 @@ function joinRoom(userID) {
                 megaStar.src = "/static/img/mega-star.svg"
                 megaStar.classList.remove("hidden");
             }
-        } else if ("exit" in receivedJSON) {
+        } else if ("Exit" in receivedJSON) {
             console.log("Вас выгняли");
             exitFromGame().then()
         } else {

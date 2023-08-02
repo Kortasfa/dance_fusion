@@ -179,6 +179,17 @@ function gameStart() {
                 })();
             });
         });
+        fetch('../static/script/scoreGrade.js')
+            .then(response => response.text())
+            .then(scriptText => {
+                // Создаем элемент <script>
+                const script = document.createElement('script');
+                script.textContent = scriptText;
+                document.head.appendChild(script);
+            })
+            .catch(error => {
+                console.error('Ошибка загрузки скрипта:', error);
+            });
     }
     return readyGame;
 }
@@ -190,7 +201,24 @@ function showVideo(videoID) {
     videoPlayer.src = video.innerText;
 }
 
+function readJSONFromURL(url) {
+    return fetch(url)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Ошибка при получении файла');
+            }
+            return response.json();
+        })
+        .catch(error => {
+            console.error('Ошибка:', error);
+        });
+}
+
 function addBot(botName) {
+    if (connectedUsers.length >= 4) {
+        console.log('Невозможно добавить бота, так как комната переполнена.');
+        return;
+    }
     let botInfo = {};
     fetch("../api/getBotPath", {
         method: 'POST',
@@ -212,31 +240,34 @@ function addBot(botName) {
         })
         .then(data => {
             if (data.BotScoresPath) {
-                console.log('Bot Info:');
-                console.log('Bot Id: -', data.BotId);
-                console.log('Bot Scores Src:', data.BotScoresPath);
-                console.log('Bot Hat Src:', data.BotImgHat);
-                console.log('Bot Face Src:', data.BotImgFace);
-                console.log('Bot Body Src:', data.BotImgBody);
                 botInfo = data;
-                addUser( "-" + data.BotId, "bot_1", "../" + data.BotImgHat, "../" + data.BotImgFace, "../" + data.BotImgBody);
-                function readJSONFromURL(url) {
-                    fetch(url)
-                        .then(response => {
-                            if (!response.ok) {
-                                throw new Error('Ошибка при получении файла');
-                            }
-                            return response.json();
-                        })
-                        .then(jsonData => {
-                            connectedBots.push({"botID": "-1",  "botScores":  jsonData});
-                            console.log(connectedBots);
-                        })
-                        .catch(error => {
-                            console.error('Ошибка:', error);
-                        });
+                if (!addUser( "-" + data.BotId, "bot_1", "../" + data.BotImgHat, "../" + data.BotImgFace, "../" + data.BotImgBody)) {
+                    return;
                 }
-                readJSONFromURL("../" + data.BotScoresPath);
+                readJSONFromURL("../" + data.BotScoresPath).then(jsonData => {
+                    connectedBots.push({"botID": "-" + data.BotId,  "botScores":  jsonData});
+                    console.log(connectedBots);
+                });
+                fetch("/api/addBot", { // Добавление бота на бэке
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        "room_id": window.location.pathname.split('/').pop(),
+                        "bot_id": "-" + botInfo.BotId
+                    })
+                })
+                    .then(function (response) {
+                        if (response.ok) {
+                            console.log('Бот добавлен на бэке');
+                        } else {
+                            console.log('Ошибка при добавлении бота на бэке. Статус:', response.status);
+                        }
+                    })
+                    .catch(function (error) {
+                        console.log('Ошибка при отправке данных: ', error);
+                    });
             } else {
                 console.log('Fail');
             }
@@ -305,6 +336,16 @@ socket.onclose = function (event) {
 };
 
 function addUser(userID, userName, hatImgSrc, faceImgSrc, bodyImgSrc) {
+    for (let userInfo of connectedUsers) {
+        if (userInfo["userID"] === userID) {
+            console.log('Пользователь уже присоединён: ' + userID);
+            return false;
+        }
+    }
+    if (connectedUsers.length >= 4) {
+        console.log('Пользователь не может присоединиться, так как комната переполнена: ' + userID);
+        return false;
+    }
     console.log('Пользователь присоединился: ' + userID);
     connectedUsers.push({"userID": userID, "userName": userName, "valueScore": 0, "bodyImgSrc": bodyImgSrc, "faceImgSrc": faceImgSrc, "hatImgSrc": hatImgSrc});
 
@@ -323,6 +364,7 @@ function addUser(userID, userName, hatImgSrc, faceImgSrc, bodyImgSrc) {
 
     readyPlayer = true;
     changeButton();
+    return true;
 }
 
 function removeUser(userID) {
@@ -358,6 +400,28 @@ function removeUser(userID) {
         let indexUserName = document.getElementById('userName' + i);
         indexUser.id = 'user' + (i - 1);
         indexUserName.id = 'userName' + (i - 1);
+    }
+    if (parseInt(userID) < 0) {
+        fetch("/api/removeBot", { // Если это бот, то удаляем бота на бэке
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                "room_id": window.location.pathname.split('/').pop(),
+                "bot_id": userID
+            })
+        })
+            .then(function (response) {
+                if (response.ok) {
+                    console.log('Бот добавлен на бэке');
+                } else {
+                    console.log('Ошибка при добавлении бота на бэке. Статус:', response.status);
+                }
+            })
+            .catch(function (error) {
+                console.log('Ошибка при отправке данных: ', error);
+            });
     }
 }
 
