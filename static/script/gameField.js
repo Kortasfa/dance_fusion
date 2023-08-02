@@ -26,7 +26,6 @@ function getUsersByCookie() {
         let indexUserBodyImg = indexUser.querySelector(".body");
         let indexUserFaceImg = indexUser.querySelector(".face");
         let indexUserHatImg = indexUser.querySelector(".hat");
-        userScore.querySelector('.player-score').innerText = userName + ":";
         userScore.classList.remove('hidden');
         indexUser.classList.remove('hidden');
         indexUser.id = userID;

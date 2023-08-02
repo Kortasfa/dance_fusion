@@ -6,7 +6,9 @@ const returnBtn = document.getElementById('returnButton');
 const PlayBtn = document.getElementById('play');
 const songs = document.querySelector('.songs');
 const gameMode = document.getElementById('gameMode');
-const bots = document.getElementById('bots')
+const bots = document.getElementById('bots');
+const botsMenu = document.getElementById('botMenu');
+const boss = document.getElementById('boss');
 
 let readyGame = false;
 let numberOfUser = 0;
@@ -35,7 +37,6 @@ function changeButton() {
 }
 
 function openSong(styleButtonBlock) {
-    returnBtn.classList.toggle('hide');
     listGenre.classList.add('none');
     songs.classList.remove('none');
     const songBlocks = document.getElementsByClassName('song__section');
@@ -52,6 +53,7 @@ function openStyles(regime) {
     gameMode.classList.add('none');
     mode = regime.getAttribute('mode');
     if (mode == 'Boss'){
+        boss.classList.remove('none');
     } else if (mode == 'Bots'){
         bots.classList.remove('none');
     }
@@ -60,7 +62,6 @@ function openStyles(regime) {
 returnBtn.addEventListener('click', closeList);
 
 function toggleBots(){
-    let botsMenu = document.getElementById('botMenu');
     if (botsMenu.classList.contains('bots_open')){
         botsMenu.classList.add('bots_close');
         botsMenu.classList.remove('bots_open');
@@ -76,9 +77,21 @@ function closeList() {
         listGenre.classList.add('none');
         gameMode.classList.remove('none');
         bots.classList.add('none');
+        botsMenu.classList.add('bots_open');
+        botsMenu.classList.remove('bots_close');
+        boss.classList.add('none');
         for (let i = 0; i < connectedUsers.length; i++) {
             if (parseInt(connectedUsers[i]["userID"]) < 0 ) {
                 removeUser(connectedUsers[i]["userID"]);
+                if (parseInt(connectedUsers[i]["userID"]) < 0 ) {
+                    removeUser(connectedUsers[i]["userID"]);
+                }
+                if (parseInt(connectedUsers[i]["userID"]) < 0 ) {
+                    removeUser(connectedUsers[i]["userID"]);
+                }
+                if (parseInt(connectedUsers[i]["userID"]) < 0 ) {
+                    removeUser(connectedUsers[i]["userID"]);
+                }
             }
         }
     } else {
@@ -173,6 +186,7 @@ function gameStart() {
         $.getScript(firstComponent, function() {
             $.getScript(secondComponent, function() {
                 (async () => {
+                    document.getElementsByClassName('loading')[0].style.display= 'flex';
                     classifier = new EdgeImpulseClassifier();
                     await classifier.init();
                     let project = classifier.getProjectInfo();
@@ -229,10 +243,6 @@ function readJSONFromURL(url) {
 }
 
 function addBot(botName) {
-    if (connectedUsers.length >= 4) {
-        console.log('Невозможно добавить бота, так как комната переполнена.');
-        return;
-    }
     let botInfo = {};
     fetch("../api/getBotPath", {
         method: 'POST',
@@ -352,7 +362,12 @@ socket.onclose = function (event) {
 function addUser(userID, userName, hatImgSrc, faceImgSrc, bodyImgSrc) {
     for (let userInfo of connectedUsers) {
         if (userInfo["userID"] === userID) {
-            console.log('Пользователь уже присоединён: ' + userID);
+            if(userID > 0){
+                console.log('Пользователь уже присоединён: ' + userID);
+            } else {
+                removeUser(userID);
+                console.log('Бот удалён: ' + userID);
+            }
             return false;
         }
     }
@@ -361,7 +376,7 @@ function addUser(userID, userName, hatImgSrc, faceImgSrc, bodyImgSrc) {
         return false;
     }
     console.log('Пользователь присоединился: ' + userID);
-    connectedUsers.push({"userID": userID, "userName": userName, "bodyImgSrc": bodyImgSrc, "faceImgSrc": faceImgSrc, "hatImgSrc": hatImgSrc});
+    connectedUsers.push({"userID": userID, "userName": userName, "valueScore": 0, "bodyImgSrc": bodyImgSrc, "faceImgSrc": faceImgSrc, "hatImgSrc": hatImgSrc});
 
     let userMessage = document.getElementById('needUser');
     userMessage.classList.add('none');
@@ -429,9 +444,9 @@ function removeUser(userID) {
         })
             .then(function (response) {
                 if (response.ok) {
-                    console.log('Бот добавлен на бэке');
+                    console.log('Бот удалён на бэке');
                 } else {
-                    console.log('Ошибка при добавлении бота на бэке. Статус:', response.status);
+                    console.log('Ошибка при удалении бота на бэке. Статус:', response.status);
                 }
             })
             .catch(function (error) {
