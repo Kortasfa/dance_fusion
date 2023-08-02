@@ -11,12 +11,23 @@ const botsMenu = document.getElementById('botMenu');
 const boss = document.getElementById('boss');
 
 let readyGame = false;
+let numberOfUser = 0;
 let readyPlayer = false;
 let mode = ''
 let connectedUsers = [];
 let connectedBots = [];
 
 btnOpenInfo.addEventListener('click', openGuide);
+
+const audio = document.querySelector("audio");
+audio.volume = 0.5;
+let notClicked = 1;
+window.addEventListener("click", event => {
+    if (notClicked){
+        audio.play();
+        notClicked = 0;
+    }
+});
 
 function changeButton() {
     readyGame = readyPlayer && readySong;
@@ -61,6 +72,7 @@ function toggleBots(){
 }
 function closeList() {
     if (listSong.classList.contains('none')){
+        audio.play();
         returnBtn.classList.toggle('hide');
         listGenre.classList.add('none');
         gameMode.classList.remove('none');
@@ -116,6 +128,7 @@ function onImageClick(element) {
     const video = document.getElementById(videoSrcID);
     const fullVideo = document.getElementById('full' + videoSrcID);
     const videoPlayer = document.getElementById('videoPlayer');
+    audio.pause();
     let difficultyList = document.querySelector('.game-menu__difficulty');
     let difficultySegment = difficultyList.querySelectorAll('.segment')
 
@@ -173,6 +186,7 @@ function gameStart() {
         $.getScript(firstComponent, function() {
             $.getScript(secondComponent, function() {
                 (async () => {
+                    document.getElementsByClassName('loading')[0].style.display= 'flex';
                     classifier = new EdgeImpulseClassifier();
                     await classifier.init();
                     let project = classifier.getProjectInfo();
@@ -251,7 +265,7 @@ function addBot(botName) {
         .then(data => {
             if (data.BotScoresPath) {
                 botInfo = data;
-                if (!addUser( "-" + data.BotId, "bot_1", "../" + data.BotImgHat, "../" + data.BotImgFace, "../" + data.BotImgBody)) {
+                if (!addUser( "-" + data.BotId,  "" + botName, "../" + data.BotImgHat, "../" + data.BotImgFace, "../" + data.BotImgBody)) {
                     return;
                 }
                 readJSONFromURL("../" + data.BotScoresPath).then(jsonData => {
@@ -382,6 +396,7 @@ function addUser(userID, userName, hatImgSrc, faceImgSrc, bodyImgSrc) {
     return true;
 }
 
+
 function removeUser(userID) {
     console.log('Пользователь вышел: ' + userID);
 
@@ -431,7 +446,7 @@ function removeUser(userID) {
                 if (response.ok) {
                     console.log('Бот удалён на бэке');
                 } else {
-                    console.log('Ошибка при добавлении бота на бэке. Статус:', response.status);
+                    console.log('Ошибка при удалении бота на бэке. Статус:', response.status);
                 }
             })
             .catch(function (error) {

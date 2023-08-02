@@ -128,6 +128,17 @@ type customPageData struct {
 	UserScore int
 }
 
+type userAchievement struct {
+	UserAchievementID int    `db:"user_achievement_id"`
+	UserID            int    `db:"user_id"`
+	AchievementID     int    `db:"achievement_id"`
+	AchievementName   string `db:"achievement_name"`
+	Progress          int    `db:"progress"`
+	MaxProgress       int    `db:"max_progress"`
+	Completed         int    `db:"completed"`
+	Level             int    `db:"level"`
+}
+
 func homePageHandler(w http.ResponseWriter, r *http.Request) {
 	tmpl, err := template.ParseFiles("pages/homePage.html")
 	if err != nil {
@@ -392,6 +403,42 @@ func customPageHandler(db *sqlx.DB) func(w http.ResponseWriter, r *http.Request)
 			Bodies:    bodies,
 			Hats:      hats,
 			UserScore: userScore,
+		}
+
+		err = tmpl.Execute(w, data)
+		if err != nil {
+			http.Error(w, "Internal Server Error", 500)
+			log.Println(err.Error())
+			return
+		}
+	}
+}
+
+func achievementsPageHandler(db *sqlx.DB) func(w http.ResponseWriter, r *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
+		var user userInfo
+		err := getJsonCookie(r, "userInfoCookie", &user)
+		if err != nil {
+			http.Redirect(w, r, "/logIn", http.StatusFound)
+			return
+		}
+		tmpl, err := template.ParseFiles("pages/achievements.html")
+		if err != nil {
+			http.Error(w, "Internal Server Error", 500)
+			log.Println(err.Error())
+			return
+		}
+		achievements, err := getUserAchievements(db, user.UserID)
+		if err != nil {
+			http.Error(w, "Internal Server Error", 500)
+			log.Println(err)
+			return
+		}
+
+		data := struct {
+			Achievements []userAchievement
+		}{
+			Achievements: achievements,
 		}
 
 		err = tmpl.Execute(w, data)

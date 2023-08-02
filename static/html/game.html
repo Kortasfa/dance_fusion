@@ -225,7 +225,7 @@
           if (response.ok) {
               console.log('Балл отправлен');
           } else {
-              console.log('Не удалось отправить балл');
+              console.log('Не удалось отправить балл:', response.status);
           }
       }
 
@@ -367,21 +367,21 @@
                       console.log("Наименование движения ", moveName, ". Очки за движение", score);
                       let point = 0;
                       if (score >= 0.4 && score <= 1) {
-                          point = 40;
+                          point = 50;
                       }
                       if (score >= 0.3 && score < 0.4) {
-                          point = Math.round(score * 400 / 4);
+                          point = Math.round(score * 400 / 4 * 1.3);
 
                       }
                       if (score >= 0.2 && score < 0.3) {
-                          point = Math.round(score * 100) + 9;
+                          point = Math.round(score * 100 * 1.5) ;
 
                         }
                         if (score > 0.1 && score < 0.2) {
-                            point = Math.round(score * 100) + 10;
+                            point = Math.round(score * 100) * 2 + 5;
                         }
                         if (score <= 0.1 && score > 0) {
-                            point = Math.round(score * 100) + 14;
+                            point = Math.round(score * 100) * 3 + 7;
                         }
                         if (score === 2) {
                             point = 200;
@@ -398,14 +398,18 @@
                         let maxScore = 0;
                         let chanceZero = 0;
                         for (userInfo of connectedUsers) {
-
                             if (parseInt(userInfo["userID"]) < 0) {
-                                minScore = connectedBots[parseInt(userInfo["userID"]) * (-1) - 1].botScores["minScore"];
-                                maxScore = connectedBots[parseInt(userInfo["userID"]) * (-1) - 1].botScores["maxScore"];
-                                chanceZero = connectedBots[parseInt(userInfo["userID"]) * (-1) - 1].botScores["chanceZero"];
-                                botScore = Math.floor(getRandomNumber(minScore, maxScore, chanceZero));
-                                console.log(botScore);
-                                addScore(userInfo["userID"], botScore, maxPoint);
+                                for (let bot of connectedBots) {
+                                    if (bot.botID === userInfo["userID"]) {
+                                        minScore = bot.botScores["minScore"];
+                                        maxScore = bot.botScores["maxScore"];
+                                        chanceZero = bot.botScores["chanceZero"];
+                                        botScore = Math.floor(getRandomNumber(minScore, maxScore, chanceZero));
+                                        console.log(botScore);
+                                        addScore(userInfo["userID"], botScore, maxPoint);
+                                        break;
+                                    }
+                                }
                             }
                         }
                     }
