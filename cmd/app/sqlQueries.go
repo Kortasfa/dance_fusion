@@ -463,9 +463,6 @@ func addUserScoreSQL(db *sqlx.DB, userID int, score int) error {
 }
 
 func getUserAchievements(db *sqlx.DB, userID int) ([]userAchievement, error) {
-<<<<<<< HEAD
-	return []userAchievement{}, nil
-=======
 	const query = `
 		SELECT
 			user_achievement_id,
@@ -490,5 +487,4 @@ func getUserAchievements(db *sqlx.DB, userID int) ([]userAchievement, error) {
 	}
 
 	return data, nil
->>>>>>> origin/main_test_0208
 }

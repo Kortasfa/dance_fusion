@@ -27,19 +27,6 @@ CREATE TABLE user_achievements (
 
 DELIMITER //
 CREATE TRIGGER add_new_achievement_to_user_achievements
-    AFTER INSERT ON achievements
-    FOR EACH ROW
-CREATE TABLE achievements(
-                      `achievement_id` INTEGER AUTO_INCREMENT PRIMARY KEY,
-                      `achievement_name` VARCHAR(255) NOT NULL,
-                      `level` INTEGER NOT NULL,
-                      `max_progress` INTEGER NOT NULL
-) ENGINE = InnoDB
-  CHARACTER SET = utf8mb4
-  COLLATE utf8mb4_unicode_ci;
-
-DELIMITER //
-CREATE TRIGGER add_new_achievement_to_user_achievements
 AFTER INSERT ON achievements
 FOR EACH ROW
 BEGIN
@@ -82,12 +69,5 @@ INSERT INTO achievements(achievement_name, level, max_progress)
 VALUES
     ("Debil", 2, 5);
 
-SELECT * FROM user_achievements;
-
-
-INSERT INTO achievements(achievement_name, level, max_progress)
-VALUES
-    ("Debil", 2, 5);
-    
 SELECT * FROM user_achievements;
 

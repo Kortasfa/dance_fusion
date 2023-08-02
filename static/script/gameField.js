@@ -72,10 +72,7 @@ btnContinue.addEventListener("click", function () {
 })
 
 let pix;
-<<<<<<< HEAD
 let percentage;
-=======
->>>>>>> origin/main_test_0208
 
 function addScore(userID, score, maxScore) {
     let valueScore;
