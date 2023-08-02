@@ -92,11 +92,6 @@
     height: 50px;
 }
 
-.rating-stars__star_mega-star {
-    width: 60px;
-    height: 60px;
-}
-
 .hero__score {
     width: fit-content;
     display: flex;
@@ -105,11 +100,6 @@
 .score__star {
     width: 25px;
     height: 25px;
-}
-
-.score__star_mega {
-    width: 30px;
-    height: 30px;
 }
 
 .btn-exit {

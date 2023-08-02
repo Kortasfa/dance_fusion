@@ -74,6 +74,9 @@ btnContinue.addEventListener("click", function () {
     window.location.href = "/room";
 })
 
+let pix;
+let percentage;
+
 function addScore(userID, score, maxScore) {
     let valueScore;
     let starComplete = 0;
@@ -85,13 +88,14 @@ function addScore(userID, score, maxScore) {
     let starThree= document.getElementById("star-3-" + userID);
     let starFour = document.getElementById("star-4-" + userID);
     let starFive = document.getElementById("star-5-" + userID);
-    let megaStar = document.getElementById("mega-star" + userID);
+    let megaStar = document.getElementById("mega-star-" + userID);
 
     let userIndex;
     for (userIndex = 0; userIndex < connectedUsers.length; userIndex++) {
         let userInfo = connectedUsers[userIndex];
         if (userInfo["userID"] === userID) {
             valueScore = userInfo["valueScore"];
+            console.log("test valueScore", valueScore)
             break;
         }
     }
@@ -151,7 +155,6 @@ function addScore(userID, score, maxScore) {
     if (valueScore >= 0.2 * maxPractice) {
         starOne.src = "/static/img/star_blue.svg";
         starComplete = 1;
-        console.log("ПОЯВИЛАСЬ ЗВЕЗДА ", starComplete)
     }
     if (valueScore >= 0.4 * maxPractice) {
         starTwo.src = "/static/img/star_blue.svg"

@@ -102,6 +102,13 @@ type customPageData struct {
 	UserScore int
 }
 
+type achievePageData struct {
+	Name          string `db:"name"`
+	MaxComplete   int    `db:"maxComplete"`
+	CountComplete int    `db:"countComplete"`
+	ScoreComplete int    `db:"scoreComplete"`
+}
+
 func homePageHandler(w http.ResponseWriter, r *http.Request) {
 	tmpl, err := template.ParseFiles("pages/homePage.html")
 	if err != nil {
@@ -296,6 +303,64 @@ func logIn(w http.ResponseWriter, r *http.Request) {
 }
 
 func customPageHandler(db *sqlx.DB) func(w http.ResponseWriter, r *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
+		var user userInfo
+		err := getJsonCookie(r, "userInfoCookie", &user)
+		if err != nil {
+			http.Redirect(w, r, "/logIn", http.StatusFound)
+			return
+		}
+		tmpl, err := template.ParseFiles("pages/userAccount.html")
+		if err != nil {
+			http.Error(w, "Internal Server Error", 500)
+			log.Println(err.Error())
+			return
+		}
+		faces, err := getFaceData(db)
+		if err != nil {
+			http.Error(w, "Internal Server Error", 500)
+			log.Println(err)
+			return
+		}
+
+		bodies, err := getBodyData(db)
+		if err != nil {
+			http.Error(w, "Internal Server Error", 500)
+			log.Println(err)
+			return
+		}
+
+		hats, err := getHatData(db)
+		if err != nil {
+			http.Error(w, "Internal Server Error", 500)
+			log.Println(err)
+			return
+		}
+
+		userScore, err := getScoreByUserID(db, user.UserID)
+		if err != nil {
+			http.Error(w, "Internal Server Error", 500)
+			log.Println(err)
+			return
+		}
+
+		data := customPageData{
+			Faces:     faces,
+			Bodies:    bodies,
+			Hats:      hats,
+			UserScore: userScore,
+		}
+
+		err = tmpl.Execute(w, data)
+		if err != nil {
+			http.Error(w, "Internal Server Error", 500)
+			log.Println(err.Error())
+			return
+		}
+	}
+}
+
+func achievePageHandler(db *sqlx.DB) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var user userInfo
 		err := getJsonCookie(r, "userInfoCookie", &user)
