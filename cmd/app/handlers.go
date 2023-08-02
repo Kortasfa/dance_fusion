@@ -128,6 +128,17 @@ type customPageData struct {
 	UserScore int
 }
 
+type userAchievement struct {
+	UserAchievementID int    `db:"user_achievement_id"`
+	UserID            int    `db:"user_id"`
+	AchievementID     int    `db:"achievement_id"`
+	AchievementName   string `db:"achievement_name"`
+	Progress          int    `db:"progress"`
+	MaxProgress       int    `db:"max_progress"`
+	Completed         int    `db:"completed"`
+	Level             int    `db:"level"`
+}
+
 func homePageHandler(w http.ResponseWriter, r *http.Request) {
 	tmpl, err := template.ParseFiles("pages/homePage.html")
 	if err != nil {

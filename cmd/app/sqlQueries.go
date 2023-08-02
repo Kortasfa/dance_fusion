@@ -461,3 +461,7 @@ func addUserScoreSQL(db *sqlx.DB, userID int, score int) error {
 	_, err = db.Exec(query, totalScore+score, userID)
 	return err
 }
+
+func getUserAchievements(db *sqlx.DB, userID int) ([]userAchievement, error) {
+	return []userAchievement{}, nil
+}
