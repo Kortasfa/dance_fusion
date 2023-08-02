@@ -415,6 +415,8 @@ func customPageHandler(db *sqlx.DB) func(w http.ResponseWriter, r *http.Request)
 }
 
 func achievePageHandler(db *sqlx.DB) func(w http.ResponseWriter, r *http.Request) {
+func achievementsPageHandler(db *sqlx.DB) func(w http.ResponseWriter, r *http.Request) {
+>>>>>>> origin/main_test_0208
 	return func(w http.ResponseWriter, r *http.Request) {
 		var user userInfo
 		err := getJsonCookie(r, "userInfoCookie", &user)
@@ -423,12 +425,15 @@ func achievePageHandler(db *sqlx.DB) func(w http.ResponseWriter, r *http.Request
 			return
 		}
 		tmpl, err := template.ParseFiles("pages/userAccount.html")
+		tmpl, err := template.ParseFiles("pages/achievements.html")
+
 		if err != nil {
 			http.Error(w, "Internal Server Error", 500)
 			log.Println(err.Error())
 			return
 		}
 		faces, err := getFaceData(db)
+		achievements, err := getUserAchievements(db, user.UserID)
 		if err != nil {
 			http.Error(w, "Internal Server Error", 500)
 			log.Println(err)
@@ -461,6 +466,10 @@ func achievePageHandler(db *sqlx.DB) func(w http.ResponseWriter, r *http.Request
 			Bodies:    bodies,
 			Hats:      hats,
 			UserScore: userScore,
+		data := struct {
+			Achievements []userAchievement
+		}{
+			Achievements: achievements,
 		}
 
 		err = tmpl.Execute(w, data)

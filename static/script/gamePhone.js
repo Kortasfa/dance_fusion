@@ -207,6 +207,7 @@ btnLeaveRoom.addEventListener("click", exitFromGame);
 
 window.onbeforeunload = exitFromGame;
 async function exitFromGame() {
+    stop = 1;
     btnLeaveRoom.classList.add("hidden");
     colorFlag.classList.add("hidden");
     const response = await fetch("/api/exitFromGame", {
@@ -352,12 +353,12 @@ function sendDataToServer(data) {
                     console.log('Данные успешно отправлены.');
                 } else {
                     console.log('Ошибка при отправке данных. Статус:', response.status);
-                    if (response.status === 409) {
+                    /*if (response.status === 409) {
                         stop = 1;
                         exitFromGame().then(r => {})// При закрытии игры не надо выходить из комнаты. Надо оставлять пользователя в комнате. Просто пишем ""
                         document.querySelector('.dance-block__connection').innerText = "The room was closed";
                         window.location.replace("/join")
-                    }
+                    }*/
                 }
             })
             .catch(function (error) {

@@ -463,5 +463,32 @@ func addUserScoreSQL(db *sqlx.DB, userID int, score int) error {
 }
 
 func getUserAchievements(db *sqlx.DB, userID int) ([]userAchievement, error) {
+<<<<<<< HEAD
 	return []userAchievement{}, nil
+=======
+	const query = `
+		SELECT
+			user_achievement_id,
+			user_id,
+			achievement_id,
+			achievement_name,
+			progress,
+			completed,
+			level,
+			max_progress
+		FROM
+			user_achievements
+		WHERE
+		    user_id = ?
+	`
+	var data []userAchievement
+
+	err := db.Select(&data, query, userID)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return data, nil
+>>>>>>> origin/main_test_0208
 }
