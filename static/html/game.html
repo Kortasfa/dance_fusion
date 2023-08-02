@@ -147,7 +147,7 @@
       </div>
   </div>
   <script>
-      async function addUserScore(userID, userScore) {
+      async function addScoreForUser(userID, userScore) {
           const response = await fetch("/api/addUserScore", {
               method: 'POST',
               headers: {
@@ -245,29 +245,29 @@
                 })
                 .then(data => {
                     if (data.UserInfo) {
-                        console.log('Best Player Info:');
-                        console.log('User ID:', data.UserInfo.UserID);
-                        console.log('User Name:', data.UserInfo.UserName);
-                        console.log('Best Score:', data.BestScore);
                         let bestUserScore = document.querySelector('.best-player__score');
-                        bestUserScore.innerText = data.UserInfo.UserName + ': ' + data.BestScore;
                         let info = document.querySelectorAll('.player-score');
                         let users = document.querySelectorAll('.rank__hero');
-                        let bestPlayerScore = connectedUsers[0]["valueScore"];
-                        let bestPlayerId = users[0].id;
+                        let bestPlayerScore = 0;
+                        let bestPlayerId = 0;
                         let I = 0;
+                        connectedUsers.sort((user1, user2) => user2.valueScore - user1.valueScore);
                         for (let i = 0; i < connectedUsers.length; i++){
-                            info[i].innerText = info[i].innerText + ' ' + connectedUsers[i]["valueScore"];
-                            addUserScore(parseInt(users[i].id), parseInt(connectedUsers[i]["valueScore"]));
-                            if ((connectedUsers[i]["valueScore"] > bestPlayerScore) && (bestPlayerId > 0)){
-                                bestPlayerId = users[i].id;
-                                bestPlayerScore = connectedUsers[i]["valueScore"];
-                                I = i;
+                            info[i].innerText = connectedUsers[i]["userName"] + ': ' + connectedUsers[i]["valueScore"];
+                            if (parseInt(connectedUsers[i]["userID"]) > 0){
+                                addScoreForUser(parseInt(connectedUsers[i]["userID"]), parseInt(connectedUsers[i]["valueScore"]));
+                                if (connectedUsers[i]["valueScore"] > bestPlayerScore){
+                                    bestPlayerId = connectedUsers[i]["userID"];
+                                    bestPlayerScore = connectedUsers[i]["valueScore"];
+                                    I = i;
+                                }
                             }
                         }
                         if ((bestPlayerScore > data.BestScore) && (bestPlayerId > 0)){
                             bestUserScore.innerText = info[I].innerText;
                             updateBestUserInfo(parseInt(songId), parseInt(bestPlayerId), parseInt(bestPlayerScore));
+                        } else{
+                          bestUserScore.innerText = data.UserInfo.UserName + ': ' + data.BestScore;
                         }
                     } else {
                         console.log('Best Player Info not available for this song.');

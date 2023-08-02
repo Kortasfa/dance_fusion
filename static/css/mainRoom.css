@@ -234,7 +234,7 @@
 
 .bot__name{
     font: normal 400 20px 'Roboto';
-    color: #1E1C1C;
+    color: #FAFCF6;
     text-align: center;
 }
 
@@ -316,7 +316,7 @@
 
 .user__name{
     font: normal 400 20px/1.54 'Roboto';
-    color: #1E1C1C;
+    color: #FAFCF6;
     text-align: center;
 }
 
@@ -441,6 +441,7 @@
 .body{
     width: 90px;
     height: 90px;
+    border-radius: 50%;
 }
 
 .head__face{
