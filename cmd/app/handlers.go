@@ -422,7 +422,7 @@ func achievementsPageHandler(db *sqlx.DB) func(w http.ResponseWriter, r *http.Re
 			http.Redirect(w, r, "/logIn", http.StatusFound)
 			return
 		}
-		tmpl, err := template.ParseFiles("pages/achievements.html")
+		tmpl, err := template.ParseFiles("pages/userAchievements.html")
 		if err != nil {
 			http.Error(w, "Internal Server Error", 500)
 			log.Println(err.Error())

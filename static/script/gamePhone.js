@@ -210,6 +210,10 @@ async function exitFromGame() {
     stop = 1;
     btnLeaveRoom.classList.add("hidden");
     colorFlag.classList.add("hidden");
+    scale.style.height = 0 + 'px';
+    megaStar.classList.add("hidden");
+    stars.forEach(element => element.src = "/static/img/star_white.svg");
+    colorFlag.style.backgroundColor = "#BD63D4";
     const response = await fetch("/api/exitFromGame", {
         method: 'POST',
         headers: {

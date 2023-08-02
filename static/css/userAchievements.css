@@ -1,14 +1,74 @@
+* {
+    box-sizing: border-box;
+}
+
 .page {
     margin: 0;
     background: #FFE973;
+    display: flex;
+    justify-content: center;
 }
 
 .achievements {
     height: 100vh;
-    margin: 0 auto;
     width: 375px;
-    background-color: #BD63D4;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
 }
 
-.achievements__levels {
+.achievements__achieve-type {
+    display: flex;
+    gap: 40px;
+    padding: 10px;
+}
+
+.achieve-type__type {
+    width: 150px;
+    height: 40px;
+    border-radius: 10px;
+    background-color: #BD63D4;
+    font: 400 20px Roboto, sans-serif;
+    color: #1E1C1C;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-style: dashed;
+    border-width: 5px;
+    border-color: #8c06ab;
+}
+
+.type-selected {
+    background-color: #8c06ab;
+    border-style: solid;
+    border-width: 5px;
+    border-color: #670080;
+    color: #FAFCF6;
+}
+
+.achievements__positions {
+    width: 350px;
+    min-height: 50px;
+    background-color: #AEF26D;
+    border-radius: 10px;
+    border-style: dashed;
+    border-width: 5px;
+    border-color: #BD63D4;
+    display: flex;
+    align-items: center;
+    padding: 0 10px 0 10px;
+}
+
+.positions__position-name {
+    flex-grow: 1;
+    font: 400 20px Roboto, sans-serif;
+    color: #1E1C1C;
+    word-break: break-all;
+    margin-right: 10px;
+}
+
+.positions__part-complete {
+    font: 700 20px Roboto, sans-serif;
+    color: #670080;
 }

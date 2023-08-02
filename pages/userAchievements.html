@@ -12,18 +12,16 @@
 </head>
 <body class="page">
   <div class="achievements">
-    <div class="achievements__levels">
-      <div class="levels__level">
-        <div class="level__type level-selected">Easy</div>
-        <div class="level__type">Medium</div>
-        <div class="level__type">Hard</div>
-      </div>
+    <div class="achievements__achieve-type">
+      <div class="achieve-type__type type-selected">In progress</div>
+      <div class="achieve-type__type">Completed</div>
     </div>
-    <div class="achievements__positions" data-level = "{{ .Level }}">
-        <span class="positions__position-name">achievements</span>
-        <span class="positions__part-complete">0/5</span>
+    {{ range .Achievements }}
+    <div class="achievements__positions" data-complete = "{{ .Completed }}">
+        <span class="positions__position-name">{{ .AchievementName }}</span>
+        <span class="positions__part-complete">{{ .Progress }}/{{ .MaxProgress }}</span>
     </div>
+    {{ end }}
   </div>
-
 </body>
 </html>
