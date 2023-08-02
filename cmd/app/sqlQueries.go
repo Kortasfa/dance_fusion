@@ -62,7 +62,7 @@ func getMotionListPath(db *sqlx.DB, songName string) ([]string, error) {
 		FROM
 			motion_list_path
 		WHERE
-		   song_name=?
+		   song_name = ?
 	`
 
 	var playerOnePath, playerTwoPath, playerThreePath, playerFourPath string
@@ -336,6 +336,27 @@ func getBestPlayerInfo(db *sqlx.DB, songID int) (bestPlayerInfo, error) {
 	}, nil
 }
 
+func getBotInfo(db *sqlx.DB, botName string) (botInfo, error) {
+	const query = `
+		SELECT
+		    bot_id,
+		    bot_scores_path,
+		    img_hat,
+		    img_body,
+		    img_face,
+		    difficulty
+		FROM
+		    bots
+		WHERE
+		    bot_name = ?`
+	var botMainInfo botInfo
+	err := db.QueryRow(query, botName).Scan(&botMainInfo.BotId, &botMainInfo.BotScoresPath, &botMainInfo.BotImgHat, &botMainInfo.BotImgBody, &botMainInfo.BotImgFace, &botMainInfo.Difficulty)
+	if err != nil {
+		return botInfo{}, err
+	}
+	return botMainInfo, nil
+}
+
 func updateBestPlayerSQL(db *sqlx.DB, songID int, userID int, score int) error {
 	const query = `
 			UPDATE
@@ -379,4 +400,68 @@ func updateUserPassword(db *sqlx.DB, userID int, userPassword string) error {
 	}
 	_, err = db.Exec(query, string(hash), userID)
 	return err
+}
+
+func getBotNames(db *sqlx.DB) ([]botNameData, error) {
+	const query = `
+		SELECT
+			bot_name,
+			difficulty
+		FROM
+			bots
+	`
+	var data []botNameData
+
+	err := db.Select(&data, query)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return data, nil
+}
+
+func getBossInfo(db *sqlx.DB) ([]bossInfo, error) {
+	const query = `
+		SELECT
+		    boss_id,
+		    boss_name,
+		    boss_health_point,
+		    img_hat,
+		    img_body,
+		    img_face
+		FROM
+		    bosses
+		`
+	var data []bossInfo
+
+	err := db.Select(&data, query)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return data, nil
+}
+
+func addUserScoreSQL(db *sqlx.DB, userID int, score int) error {
+	totalScore, err := getScoreByUserID(db, userID)
+	if err != nil {
+		return err
+	}
+	const query = `
+			UPDATE
+				users
+			SET
+				total_score = ?
+			WHERE
+			    id = ?
+		`
+
+	_, err = db.Exec(query, totalScore+score, userID)
+	return err
+}
+
+func getUserAchievements(db *sqlx.DB, userID int) ([]userAchievement, error) {
+	return []userAchievement{}, nil
 }

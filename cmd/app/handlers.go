@@ -9,6 +9,7 @@ import (
 	"log"
 	"math/rand"
 	"net/http"
+	"strconv"
 	"time"
 )
 
@@ -63,11 +64,36 @@ type bestPlayerInfo struct {
 	Score  int `db:"best_score"`
 }
 
+type botInfo struct {
+	BotId         string `db:"bot_id"`
+	BotScoresPath string `db:"bot_scores_path"`
+	BotImgHat     string `db:"img_hat"`
+	BotImgBody    string `db:"img_body"`
+	BotImgFace    string `db:"img_face"`
+	Difficulty    int    `db:"difficulty"`
+}
+
+type botNameData struct {
+	BotName    string `db:"bot_name"`
+	Difficulty int    `db:"difficulty"`
+}
+
+type bossInfo struct {
+	BossId          string `db:"boss_id"`
+	BossName        string `db:"boss_name"`
+	BossHealthPoint string `db:"boss_health_point"`
+	BossImgHat      string `db:"img_hat"`
+	BossImgBody     string `db:"img_body"`
+	BossImgFace     string `db:"img_face"`
+}
+
 type menuPageData struct {
 	Styles         []stylesData
 	Songs          []songsData
 	RoomKey        string
 	ConnectedUsers []userInfo
+	Bots           []botNameData
+	Bosses         []bossInfo
 	WssURL         string
 }
 
@@ -102,11 +128,23 @@ type customPageData struct {
 	UserScore int
 }
 
+<<<<<<< HEAD
 type achievePageData struct {
 	Name          string `db:"name"`
 	MaxComplete   int    `db:"maxComplete"`
 	CountComplete int    `db:"countComplete"`
 	ScoreComplete int    `db:"scoreComplete"`
+=======
+type userAchievement struct {
+	UserAchievementID int    `db:"user_achievement_id"`
+	UserID            int    `db:"user_id"`
+	AchievementID     int    `db:"achievement_id"`
+	AchievementName   string `db:"achievement_name"`
+	Progress          int    `db:"progress"`
+	MaxProgress       int    `db:"max_progress"`
+	Completed         int    `db:"completed"`
+	Level             int    `db:"level"`
+>>>>>>> origin/main_test_0208
 }
 
 func homePageHandler(w http.ResponseWriter, r *http.Request) {
@@ -148,6 +186,14 @@ func handleRoom(db *sqlx.DB) func(w http.ResponseWriter, r *http.Request) {
 			w.WriteHeader(404)
 			return
 		}
+
+		for _, userID := range roomIDDict[roomID] { // Удаляем ботов из комнаты
+			userIDInt, err := strconv.Atoi(userID)
+			if err == nil && userIDInt < 0 {
+				roomIDDict[roomID] = removeValueFromSlice(roomIDDict[roomID], userID)
+			}
+		}
+
 		tmpl, err := template.ParseFiles("pages/mainRoom.html")
 		if err != nil {
 			http.Error(w, "Internal Server Error", 500)
@@ -175,11 +221,27 @@ func handleRoom(db *sqlx.DB) func(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
+		bots, err := getBotNames(db)
+		if err != nil {
+			http.Error(w, "Internal Server Error", 500)
+			log.Println(err)
+			return
+		}
+
+		bosses, err := getBossInfo(db)
+		if err != nil {
+			http.Error(w, "Internal Server Error", 500)
+			log.Println(err)
+			return
+		}
+
 		data := menuPageData{
 			Styles:         styles,
 			Songs:          songs,
 			RoomKey:        roomID,
 			ConnectedUsers: users,
+			Bots:           bots,
+			Bosses:         bosses,
 			WssURL:         "wss://" + r.Host + "/roomWS/" + roomID,
 		}
 
@@ -199,7 +261,7 @@ func handleCreateRoom(w http.ResponseWriter, r *http.Request) {
 		rand.Seed(time.Now().UnixNano())
 		var roomID int
 		for {
-			roomID = rand.Intn(100)
+			roomID = rand.Intn(100-10-1) + 10
 			_, exists := roomIDDict[fmt.Sprintf("%d", roomID)]
 			if !exists {
 				break
