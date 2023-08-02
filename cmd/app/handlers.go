@@ -128,12 +128,15 @@ type customPageData struct {
 	UserScore int
 }
 
+<<<<<<< HEAD
 type achievePageData struct {
 	Name          string `db:"name"`
 	MaxComplete   int    `db:"maxComplete"`
 	CountComplete int    `db:"countComplete"`
 	ScoreComplete int    `db:"scoreComplete"`
 
+=======
+>>>>>>> origin/main_test_0208
 type userAchievement struct {
 	UserAchievementID int    `db:"user_achievement_id"`
 	UserID            int    `db:"user_id"`
@@ -420,7 +423,11 @@ func customPageHandler(db *sqlx.DB) func(w http.ResponseWriter, r *http.Request)
 	}
 }
 
+<<<<<<< HEAD
 func achievePageHandler(db *sqlx.DB) func(w http.ResponseWriter, r *http.Request) {
+=======
+func achievementsPageHandler(db *sqlx.DB) func(w http.ResponseWriter, r *http.Request) {
+>>>>>>> origin/main_test_0208
 	return func(w http.ResponseWriter, r *http.Request) {
 		var user userInfo
 		err := getJsonCookie(r, "userInfoCookie", &user)
@@ -428,19 +435,28 @@ func achievePageHandler(db *sqlx.DB) func(w http.ResponseWriter, r *http.Request
 			http.Redirect(w, r, "/logIn", http.StatusFound)
 			return
 		}
+<<<<<<< HEAD
 		tmpl, err := template.ParseFiles("pages/userAccount.html")
+=======
+		tmpl, err := template.ParseFiles("pages/achievements.html")
+>>>>>>> origin/main_test_0208
 		if err != nil {
 			http.Error(w, "Internal Server Error", 500)
 			log.Println(err.Error())
 			return
 		}
+<<<<<<< HEAD
 		faces, err := getFaceData(db)
+=======
+		achievements, err := getUserAchievements(db, user.UserID)
+>>>>>>> origin/main_test_0208
 		if err != nil {
 			http.Error(w, "Internal Server Error", 500)
 			log.Println(err)
 			return
 		}
 
+<<<<<<< HEAD
 		bodies, err := getBodyData(db)
 		if err != nil {
 			http.Error(w, "Internal Server Error", 500)
@@ -467,6 +483,12 @@ func achievePageHandler(db *sqlx.DB) func(w http.ResponseWriter, r *http.Request
 			Bodies:    bodies,
 			Hats:      hats,
 			UserScore: userScore,
+=======
+		data := struct {
+			Achievements []userAchievement
+		}{
+			Achievements: achievements,
+>>>>>>> origin/main_test_0208
 		}
 
 		err = tmpl.Execute(w, data)
