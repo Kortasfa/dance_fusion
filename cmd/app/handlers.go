@@ -413,3 +413,39 @@ func customPageHandler(db *sqlx.DB) func(w http.ResponseWriter, r *http.Request)
 		}
 	}
 }
+
+func achievementsPageHandler(db *sqlx.DB) func(w http.ResponseWriter, r *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
+		var user userInfo
+		err := getJsonCookie(r, "userInfoCookie", &user)
+		if err != nil {
+			http.Redirect(w, r, "/logIn", http.StatusFound)
+			return
+		}
+		tmpl, err := template.ParseFiles("pages/achievements.html")
+		if err != nil {
+			http.Error(w, "Internal Server Error", 500)
+			log.Println(err.Error())
+			return
+		}
+		achievements, err := getUserAchievements(db, user.UserID)
+		if err != nil {
+			http.Error(w, "Internal Server Error", 500)
+			log.Println(err)
+			return
+		}
+
+		data := struct {
+			Achievements []userAchievement
+		}{
+			Achievements: achievements,
+		}
+
+		err = tmpl.Execute(w, data)
+		if err != nil {
+			http.Error(w, "Internal Server Error", 500)
+			log.Println(err.Error())
+			return
+		}
+	}
+}
