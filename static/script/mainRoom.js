@@ -186,6 +186,7 @@ function gameStart() {
         $.getScript(firstComponent, function() {
             $.getScript(secondComponent, function() {
                 (async () => {
+                    document.getElementsByClassName('loading')[0].style.display= 'flex';
                     classifier = new EdgeImpulseClassifier();
                     await classifier.init();
                     let project = classifier.getProjectInfo();
