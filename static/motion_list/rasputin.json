@@ -1,5 +1,4 @@
 {
-  "maxPoint": 3500,
   "color": "#4da589",
   "maxPoint": 4500,
   "motions":[
@@ -360,21 +359,6 @@
     },
     {
       "start_time": 90.7,
-      "duration": 0.8,
-      "name": "look-at-my-boots"
-    },
-    {
-      "start_time": 91.6,
-      "duration": 0.8,
-      "name": "look-at-my-boots"
-    },
-    {
-      "start_time": 93.1,
-      "duration": 0.8,
-      "name": "look-at-my-boots"
-    },
-    {
-      "start_time": 91.6,
       "duration": 0.8,
       "name": "look-at-my-boots"
     },
@@ -779,7 +763,7 @@
       "name": "russian-move"
     },
     {
-      "start_time": 180.5,
+      "start_time": 180.6,
       "duration": 0.8,
       "name": "russian-move"
     },

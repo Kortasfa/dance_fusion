@@ -41,15 +41,8 @@ function scoreGradeForgetYou(res, score, moveName) {
                 }
                 if (moveName === "going-to-the-side-with-clapping") {
                     if (score > 0.001 && score < 0.05) {
-                        score = 0.2;
+                        score = 0.05;
                     }
-                    if (score >= 0.05 & score < 0.1) {
-                        score = 0.3;
-                    }
-                    if (score >= 0.1) {
-                        score = 0.4;
-                    }
-
                 }
                 if (moveName === "hands-up-and-down") {
                     let sameMoveOne = res["results"].find(item => item.label === "up-down-click");
@@ -59,24 +52,9 @@ function scoreGradeForgetYou(res, score, moveName) {
                         score = 0.2;
                     }
                 }
-                if (moveName === "hands-up-down-sideways") {
-                    if (score > 0.001 && score < 0.05) {
-                        score = 0.2;
-                    }
-                    if (score >= 0.05 && score < 0.1) {
-                        score = 0.3;
-                    }
-                    if (score >= 0.1) {
-                        score = 0.4;
-                    }
-
-                }
                 if (moveName === "side-hit") {
                     let sameMoveOne = res["results"].find(item => item.label === "hands-up-and-down");
                     score = Math.max(motionDict["value"], sameMoveOne.value);
-                    if (score > 0.01 && score < 0.05) {
-                        score = 0.2;
-                    }
                     if (score >= 0.05 & score < 0.1) {
                         score = 0.3;
                     }
@@ -95,9 +73,6 @@ function scoreGradeForgetYou(res, score, moveName) {
                 if (moveName === "collapsing-breeding-locks") {
                     let sameMoveOne = res["results"].find(item => item.label === "up-down-hands");
                     score = Math.max(motionDict["value"], sameMoveOne.value);
-                    if (score > 0.01 && score < 0.1) {
-                        score = 0.1;
-                    }
                 }
                 if (moveName === "draw-circle") {
                     let sameMoveOne = res["results"].find(item => item.label === "hands-up-and-down");
@@ -119,9 +94,6 @@ function scoreGradeForgetYou(res, score, moveName) {
                 if (moveName === "broad-back") {
                     let sameMoveOne = res["results"].find(item => item.label === "hands-up-and-down");
                     score = Math.max(motionDict["value"], sameMoveOne.value);
-                    if (score > 0.01 && score < 0.1) {
-                        score = 0.1;
-                    }
                 }
                 if (moveName === "like-a-chicken") {
                     let sameMoveOne = res["results"].find(item => item.label === "hands-up-and-down");
@@ -154,12 +126,6 @@ function scoreGradeRasputin(res, score, moveName) {
     for (let motionDict of res["results"]) {
         if (motionDict["label"] === moveName) {
             score = motionDict["value"];
-            if (score === 0){
-                score = 0.2
-            }
-            if (score > 0.01 && score < 0.1) {
-                score = 0.25;
-            }
             if (moveName !== "russian-move") {
                 if (motionDict["russian-move"] > 0.3) {
                     score = 0

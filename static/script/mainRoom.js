@@ -255,7 +255,7 @@ function addBot(botName) {
         .then(data => {
             if (data.BotScoresPath) {
                 botInfo = data;
-                if (!addUser( "-" + data.BotId, "bot_1", "../" + data.BotImgHat, "../" + data.BotImgFace, "../" + data.BotImgBody)) {
+                if (!addUser( "-" + data.BotId,  "" + botName, "../" + data.BotImgHat, "../" + data.BotImgFace, "../" + data.BotImgBody)) {
                     return;
                 }
                 readJSONFromURL("../" + data.BotScoresPath).then(jsonData => {
