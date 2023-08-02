@@ -128,12 +128,6 @@ type customPageData struct {
 	UserScore int
 }
 
-type achievePageData struct {
-	Name          string `db:"name"`
-	MaxComplete   int    `db:"maxComplete"`
-	CountComplete int    `db:"countComplete"`
-	ScoreComplete int    `db:"scoreComplete"`
-
 type userAchievement struct {
 	UserAchievementID int    `db:"user_achievement_id"`
 	UserID            int    `db:"user_id"`
