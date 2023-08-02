@@ -1,0 +1,14 @@
+.page {
+    margin: 0;
+    background: #FFE973;
+}
+
+.achievements {
+    height: 100vh;
+    margin: 0 auto;
+    width: 375px;
+    background-color: #BD63D4;
+}
+
+.achievements__levels {
+}
