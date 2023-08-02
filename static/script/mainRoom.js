@@ -9,12 +9,23 @@ const gameMode = document.getElementById('gameMode');
 const bots = document.getElementById('bots')
 
 let readyGame = false;
+let numberOfUser = 0;
 let readyPlayer = false;
 let mode = ''
 let connectedUsers = [];
 let connectedBots = [];
 
 btnOpenInfo.addEventListener('click', openGuide);
+
+const audio = document.querySelector("audio");
+audio.volume = 0.5;
+let notClicked = 1;
+window.addEventListener("click", event => {
+    if (notClicked){
+        audio.play();
+        notClicked = 0;
+    }
+});
 
 function changeButton() {
     readyGame = readyPlayer && readySong;
@@ -24,6 +35,7 @@ function changeButton() {
 }
 
 function openSong(styleButtonBlock) {
+    returnBtn.classList.toggle('hide');
     listGenre.classList.add('none');
     songs.classList.remove('none');
     const songBlocks = document.getElementsByClassName('song__section');
@@ -59,6 +71,7 @@ function toggleBots(){
 }
 function closeList() {
     if (listSong.classList.contains('none')){
+        audio.play();
         returnBtn.classList.toggle('hide');
         listGenre.classList.add('none');
         gameMode.classList.remove('none');
@@ -102,6 +115,7 @@ function onImageClick(element) {
     const video = document.getElementById(videoSrcID);
     const fullVideo = document.getElementById('full' + videoSrcID);
     const videoPlayer = document.getElementById('videoPlayer');
+    audio.pause();
     let difficultyList = document.querySelector('.game-menu__difficulty');
     let difficultySegment = difficultyList.querySelectorAll('.segment')
 
@@ -347,7 +361,7 @@ function addUser(userID, userName, hatImgSrc, faceImgSrc, bodyImgSrc) {
         return false;
     }
     console.log('Пользователь присоединился: ' + userID);
-    connectedUsers.push({"userID": userID, "userName": userName, "valueScore": 0, "bodyImgSrc": bodyImgSrc, "faceImgSrc": faceImgSrc, "hatImgSrc": hatImgSrc});
+    connectedUsers.push({"userID": userID, "userName": userName, "bodyImgSrc": bodyImgSrc, "faceImgSrc": faceImgSrc, "hatImgSrc": hatImgSrc});
 
     let userMessage = document.getElementById('needUser');
     userMessage.classList.add('none');
@@ -366,6 +380,7 @@ function addUser(userID, userName, hatImgSrc, faceImgSrc, bodyImgSrc) {
     changeButton();
     return true;
 }
+
 
 function removeUser(userID) {
     console.log('Пользователь вышел: ' + userID);

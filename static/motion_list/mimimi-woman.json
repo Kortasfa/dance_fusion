@@ -1,0 +1,367 @@
+{
+  "color": "#cc3ca8",
+  "maxPoint": 4500,
+  "motions":
+  [
+    {
+      "start_time": 24.8,
+      "duration": 1.5,
+      "name": "banish-move"
+    },
+    {
+      "start_time": 26.8,
+      "duration": 1.2,
+      "name": "folding-hands"
+    },
+    {
+      "start_time": 28.8,
+      "duration": 1.5,
+      "name": "banish-move"
+    },
+    {
+      "start_time": 30.5,
+      "duration": 1.2,
+      "name": "folding-hands"
+    },
+    {
+      "start_time": 32.2,
+      "duration": 1.5,
+      "name": "banish-move"
+    },
+    {
+      "start_time": 34.2,
+      "duration": 1.0,
+      "name": "folding-hands"
+    },
+    {
+      "start_time": 36.2,
+      "duration": 1.5,
+      "name": "banish-move"
+    },
+    {
+      "start_time": 38.0,
+      "duration": 1.2,
+      "name": "folding-hands"
+    },
+    {
+      "start_time": 40.0,
+      "duration": 1.0,
+      "name": "statue"
+    },
+    {
+      "start_time": 43.0,
+      "duration": 7.0,
+      "name": "propeller"
+    },
+    {
+      "start_time": 50.1,
+      "duration": 1.9,
+      "name": "jump-right"
+    },
+    {
+      "start_time": 52.0,
+      "duration": 1.9,
+      "name": "jump-right"
+    },
+    {
+      "start_time": 54.0,
+      "duration": 1.9,
+      "name": "jump-right"
+    },
+    {
+      "start_time": 56.0,
+      "duration": 1.9,
+      "name": "jump-right"
+    },
+    {
+      "start_time": 57.9,
+      "duration": 2.2,
+      "name": "changing-hands"
+    },
+    {
+      "start_time": 65.5,
+      "duration": 6.0,
+      "name": "right-move-woman"
+    },
+    {
+      "start_time": 71.5,
+      "duration": 1.5,
+      "name": "statue"
+    },
+    {
+      "start_time": 73.3,
+      "duration": 1.0,
+      "name": "banish-move"
+    },
+    {
+      "start_time": 75.0,
+      "duration": 1.0,
+      "name": "banish-move"
+    },
+    {
+      "start_time": 77.0,
+      "duration": 1.0,
+      "name": "banish-move"
+    },
+    {
+      "start_time": 79.0,
+      "duration": 1.0,
+      "name": "banish-move"
+    },
+    {
+      "start_time": 80.1,
+      "duration": 6.0,
+      "name": "right-move-woman"
+    },
+    {
+      "start_time": 87.5,
+      "duration": 1.5,
+      "name": "banish-move"
+    },
+    {
+      "start_time": 89.0,
+      "duration": 1.2,
+      "name": "folding-hands"
+    },
+    {
+      "start_time": 91.5,
+      "duration": 1.5,
+      "name": "banish-move"
+    },
+    {
+      "start_time": 93.3,
+      "duration": 1.2,
+      "name": "folding-hands"
+    },
+    {
+      "start_time": 95.3,
+      "duration": 1.5,
+      "name": "banish-move"
+    },
+    {
+      "start_time": 97.5,
+      "duration": 1.2,
+      "name": "folding-hands"
+    },
+    {
+      "start_time": 99.0,
+      "duration": 1.5,
+      "name": "banish-move"
+    },
+    {
+      "start_time": 100.8,
+      "duration": 1.2,
+      "name": "folding-hands"
+    },
+    {
+      "start_time": 104.0,
+      "duration": 7.0,
+      "name": "propeller"
+    },
+    {
+      "start_time": 111.0,
+      "duration": 2.0,
+      "name": "jump-right"
+    },
+    {
+      "start_time": 113.0,
+      "duration": 2.0,
+      "name": "jump-right"
+    },
+    {
+      "start_time": 115.5,
+      "duration": 1.0,
+      "name": "jump-right"
+    },
+    {
+      "start_time": 116.6,
+      "duration": 1.5,
+      "name": "jump-right"
+    },
+    {
+      "start_time": 118.9,
+      "duration": 4.0,
+      "name": "changing-hands"
+    },
+    {
+      "start_time": 122.6,
+      "duration": 3.0,
+      "name": "right-move-woman"
+    },
+    {
+      "start_time": 126.5,
+      "duration": 5.5,
+      "name": "statue"
+    },
+    {
+      "start_time": 132.0,
+      "duration": 1.5,
+      "name": "banish-move"
+    },
+    {
+      "start_time": 133.7,
+      "duration": 1.0,
+      "name": "banish-move"
+    },
+    {
+      "start_time": 135.9,
+      "duration": 1.0,
+      "name": "banish-move"
+    },
+    {
+      "start_time": 137.9,
+      "duration": 1.0,
+      "name": "banish-move"
+    },
+    {
+      "start_time": 139.9,
+      "duration": 1.0,
+      "name": "banish-move"
+    },
+    {
+      "start_time": 141.5,
+      "duration": 6.0,
+      "name": "right-move-woman"
+    },
+    {
+      "start_time": 148.5,
+      "duration": 1.5,
+      "name": "banish-move"
+    },
+    {
+      "start_time": 150.3,
+      "duration": 1.2,
+      "name": "folding-hands"
+    },
+    {
+      "start_time": 152.3,
+      "duration": 1.5,
+      "name": "banish-move"
+    },
+    {
+      "start_time": 154.1,
+      "duration": 1.2,
+      "name": "folding-hands"
+    },
+    {
+      "start_time": 155.9,
+      "duration": 1.5,
+      "name": "banish-move"
+    },
+    {
+      "start_time": 158.0,
+      "duration": 1.2,
+      "name": "folding-hands"
+    },
+    {
+      "start_time": 160.0,
+      "duration": 1.5,
+      "name": "banish-move"
+    },
+    {
+      "start_time": 162.0,
+      "duration": 1.2,
+      "name": "folding-hands"
+    },
+    {
+      "start_time": 165.0,
+      "duration": 2.0,
+      "name": "mummy-moves"
+    },
+    {
+      "start_time": 168.8,
+      "duration": 0.5,
+      "name": "gold-clap"
+    },
+    {
+      "start_time": 169.3,
+      "duration": 1.8,
+      "name": "hurricane"
+    },
+    {
+      "start_time": 172.0,
+      "duration": 2.0,
+      "name": "mummy-moves"
+    },
+    {
+      "start_time": 175.2,
+      "duration": 0.5,
+      "name": "gold-clap"
+    },
+    {
+      "start_time": 176.0,
+      "duration": 1.8,
+      "name": "hurricane"
+    },
+    {
+      "start_time": 179.0,
+      "duration": 1.5,
+      "name": "banish-move"
+    },
+    {
+      "start_time": 180.0,
+      "duration": 1.2,
+      "name": "folding-hands"
+    },
+    {
+      "start_time": 182.5,
+      "duration": 1.5,
+      "name": "folding-hands"
+    },
+    {
+      "start_time": 184.5,
+      "duration": 1.2,
+      "name": "folding-hands"
+    },
+    {
+      "start_time": 186.0,
+      "duration": 1.5,
+      "name": "banish-move"
+    },
+    {
+      "start_time": 188.2,
+      "duration": 1.2,
+      "name": "folding-hands"
+    },
+    {
+      "start_time": 190.1,
+      "duration": 1.5,
+      "name": "banish-move"
+    },
+    {
+      "start_time": 192.2,
+      "duration": 1.2,
+      "name": "folding-hands"
+    },
+    {
+      "start_time": 195.0,
+      "duration": 7.0,
+      "name": "propeller"
+    },
+    {
+      "start_time": 203.0,
+      "duration": 1.5,
+      "name": "jump-right"
+    },
+    {
+      "start_time": 204.5,
+      "duration": 1.5,
+      "name": "jump-right"
+    },
+    {
+      "start_time": 206.3,
+      "duration": 1.5,
+      "name": "jump-right"
+    },
+    {
+      "start_time": 208.0,
+      "duration": 1.5,
+      "name": "jump-right"
+    },
+    {
+      "start_time": 210.8,
+      "duration": 1.5,
+      "name": "statue"
+    }
+  ]
+}
