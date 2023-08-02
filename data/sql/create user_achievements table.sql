@@ -1,6 +1,5 @@
 USE dance_fusion;
 
-<<<<<<< HEAD
 CREATE TABLE achievements(
                              `achievement_id` INTEGER AUTO_INCREMENT PRIMARY KEY,
                              `achievement_name` VARCHAR(255) NOT NULL,
@@ -10,8 +9,6 @@ CREATE TABLE achievements(
   CHARACTER SET = utf8mb4
   COLLATE utf8mb4_unicode_ci;
 
-=======
->>>>>>> origin/main_test_0208
 CREATE TABLE user_achievements (
                                    `user_achievement_id` INTEGER AUTO_INCREMENT PRIMARY KEY,
                                    `user_id` INT NOT NULL,
@@ -28,12 +25,10 @@ CREATE TABLE user_achievements (
     CHARACTER SET = utf8mb4
     COLLATE utf8mb4_unicode_ci;
 
-<<<<<<< HEAD
 DELIMITER //
 CREATE TRIGGER add_new_achievement_to_user_achievements
     AFTER INSERT ON achievements
     FOR EACH ROW
-=======
 CREATE TABLE achievements(
                       `achievement_id` INTEGER AUTO_INCREMENT PRIMARY KEY,
                       `achievement_name` VARCHAR(255) NOT NULL,
@@ -47,7 +42,6 @@ DELIMITER //
 CREATE TRIGGER add_new_achievement_to_user_achievements
 AFTER INSERT ON achievements
 FOR EACH ROW
->>>>>>> origin/main_test_0208
 BEGIN
     INSERT INTO user_achievements (user_id, achievement_id, achievement_name,  progress, completed, level, max_progress)
     SELECT
@@ -64,7 +58,6 @@ END;
 //
 DELIMITER ;
 
-<<<<<<< HEAD
 DELIMITER //
 CREATE TRIGGER add_new_user_to_user_achievements
     AFTER INSERT ON users
@@ -91,10 +84,10 @@ VALUES
 
 SELECT * FROM user_achievements;
 
-=======
+
 INSERT INTO achievements(achievement_name, level, max_progress)
 VALUES
     ("Debil", 2, 5);
     
 SELECT * FROM user_achievements;
->>>>>>> origin/main_test_0208
+
