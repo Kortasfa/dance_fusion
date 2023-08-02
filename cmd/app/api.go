@@ -3,7 +3,6 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/gorilla/websocket"
 	"github.com/jmoiron/sqlx"
 	"io"
 	"log"
@@ -181,23 +180,9 @@ func getMotion(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "User not found", 500)
 		return
 	}
-	for conn, gameFieldID := range gameFieldWSDict {
-		if gameFieldID == selectedRoomID {
-			//fmt.Println("отправляем", gameFieldID, data.SelectedRoomID)
-			err := conn.WriteMessage(websocket.TextMessage, reqData)
-			if err != nil {
-				err := conn.Close()
-				delete(gameFieldWSDict, conn)
-				if err != nil {
-					w.WriteHeader(409)
-					return
-				}
-			}
-			w.WriteHeader(200)
-			return
-		}
-	}
-	w.WriteHeader(409)
+
+	broadcastGameFieldWSMessage <- []string{selectedRoomID, string(reqData)}
+	w.WriteHeader(200)
 }
 
 func exitFromGameAPI(w http.ResponseWriter, r *http.Request) {
@@ -317,21 +302,8 @@ func sendPointToJoin(w http.ResponseWriter, r *http.Request) {
 		log.Println(err.Error())
 		return
 	}
-	for conn, userID := range joinPageWSDict {
-		if strconv.Itoa(data.UserID) == userID {
-			err := conn.WriteMessage(websocket.TextMessage, reqData)
-			if err != nil {
-				err := conn.Close()
-				delete(joinPageWSDict, conn)
-				if err != nil {
-					w.WriteHeader(409)
-					log.Println(err.Error())
-					return
-				}
-			}
-			break
-		}
-	}
+
+	broadcastJoinPageWSMessage <- []string{strconv.Itoa(data.UserID), string(reqData)}
 	w.WriteHeader(200)
 }
 
