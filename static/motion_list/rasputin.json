@@ -1,5 +1,6 @@
 {
-  "maxPoint": 3500,
+  "color": "#4da589",
+  "maxPoint": 4500,
   "motions":[
     {
       "start_time": 4.5,
