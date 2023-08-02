@@ -1,11 +1,11 @@
 .main {
-    background: #0DF2BF;
+    background: #FFE973;
     margin: 0;
 }
 
 .rank {
     width: fit-content;
-    margin: 25px 0 0 21px;
+    margin: 60px 0 0 20px;
     padding: 9px;
     border-radius: 10px;
     background: #FAFCF6;
@@ -19,6 +19,7 @@
     display: flex;
     flex-direction: column;
     align-items: center;
+    gap: 10px;
 }
 
 .hero__avatar {
@@ -29,13 +30,86 @@
 }
 
 .hero__name {
-    font: 400 20px Roboto, sans-serif;
-    color: #1E1C1C;
+    font: 700 20px Roboto, sans-serif;
+}
+
+.hero__name_user-one {
+    color: #8c06ab;
+}
+
+.hero__name_user-two {
+    color: #e8d30b;
+}
+
+.hero__name_user-three {
+    color: #009dff;
+}
+
+.hero__name_user-four {
+    color: #6ade10;
+}
+
+.rating-scales {
+    position: absolute;
+    display: flex;
+    flex-direction: row;
+    align-items: end;
+    left: 20px;
+    bottom: -350px;
+}
+
+.rating-scales__user-scale {
+    width: 30px;
+    max-height: 300px;
+    height: 0;
+}
+
+.rating-scales__user-scale_scale-1 {
+    background-color: #8c06ab;
+}
+
+.rating-scales__user-scale_scale-2 {
+    background-color: #e8d30b;
+}
+
+.rating-scales__user-scale_scale-3 {
+    background-color: #009dff;
+}
+
+.rating-scales__user-scale_scale-4 {
+    background-color: #6ade10;
+}
+
+.rating-scales__rating-stars {
+    margin-left: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.rating-stars__star {
+    width: 50px;
+    height: 50px;
+}
+
+.rating-stars__star_mega-star {
+    width: 60px;
+    height: 60px;
 }
 
 .hero__score {
-    font: 400 48px Roboto, sans-serif;
-    color: #F20D40;
+    width: fit-content;
+    display: flex;
+}
+
+.score__star {
+    width: 25px;
+    height: 25px;
+}
+
+.score__star_mega {
+    width: 30px;
+    height: 30px;
 }
 
 .btn-exit {
@@ -116,6 +190,7 @@
     justify-content: center;
     align-items: center;
     border-style: none;
+    margin: 15px auto;
 }
 
 .video-dance {
@@ -127,16 +202,48 @@
     min-height: 100%;
 }
 
+.user__head{
+    position: relative;
+    margin: 0 auto;
+    height: 90px;
+    width: 90px;
+}
+
+.head__body{
+    position: absolute;
+}
+
+.body{
+    width: 90px;
+    height: 90px;
+}
+
+.head__face{
+    position: absolute;
+    margin: 8px 5px;
+}
+
+.face{
+    width: 80px;
+    height: 80px;
+}
+
+.head__hat{
+    position: absolute;
+    margin: -65px 3px;
+}
+
+.hat{
+    width: 86px;
+    height: 90px;
+}
+
 .dance-movements {
     position:absolute;
     bottom:0;
     width:100%;
     height: 200px;
     background: rgba(250, 252, 246, 0.80);
-}
-
-.hidden {
-    display: none;
 }
 
 .hero__rating-good{
@@ -168,6 +275,10 @@
     animation-name: score;
 }
 
+.hidden {
+    display: none;
+}
+
 @keyframes score {
     0% { opacity: 0; width: 0;}
     10%{opacity: 1; width: 250px;}
@@ -187,4 +298,94 @@
 .hero__rating_bad{
     animation-duration: 1s;
     animation-name: score-x;
+}
+
+.rating{
+    background-color: #d9a0e7;
+    border-radius: 10px;
+    width: 500px;
+    margin: 0 auto;
+    display: flex;
+    border: 5px dashed #BD63D4;
+    flex-direction: column;
+}
+
+.rating__title {
+    display: flex;
+    margin: 5px auto;
+}
+
+
+.title__item {
+    font: 400 75px Cherry Bomb One, cursive;
+    color: #BD63D4;
+}
+
+.list{
+    width: 350px;
+    margin: 20px auto;
+    border-radius: 10px;
+    background: #FAFCF6;
+    border: 5px dashed #BD63D4;
+}
+
+.player{
+    font: 400 30px Roboto, sans-serif;
+    display: flex;
+    margin: 5px;
+}
+
+.best-player__score{
+     font:  400 30px Roboto, sans-serif;
+     color: #1E1C1C;
+     margin-top: 11px;
+ }
+
+.best-player__name{
+    font:  400 30px Roboto, sans-serif;
+    color: #1E1C1C;
+    margin-top: 11px;
+}
+
+.list__players{
+    padding: 0;
+}
+
+.player__place{
+    background-color: #d9a0e7;
+    width: 38px;
+    height: 38px;
+    text-align: center;
+    border-radius: 50%;
+    border: 3px dashed #BD63D4;
+}
+
+.best-player__crown{
+    width: 80px;
+}
+
+.pop-up-box__user-score{
+    word-wrap: anywhere;
+    width: 290px;
+    margin: 4px;
+}
+
+.best-player{
+    width: 420px;
+    margin: 20px auto;
+    border-radius: 10px;
+    background: #FAFCF6;
+    border: 5px dashed #BD63D4;
+}
+
+.best-player{
+    display: flex;
+}
+
+.player-score{
+    margin: 2px;
+}
+
+.hidden {
+    display: none;
 }

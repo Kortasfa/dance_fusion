@@ -4,11 +4,15 @@ const btnOpenInfo = document.getElementById('openGuide');
 const guide = document.getElementById('guide');
 const returnBtn = document.getElementById('returnButton');
 const PlayBtn = document.getElementById('play');
+const songs = document.querySelector('.songs');
+const gameMode = document.getElementById('gameMode');
+const bots = document.getElementById('bots')
 
 let readyGame = false;
-let numberOfUser = 0;
 let readyPlayer = false;
+let mode = ''
 let connectedUsers = [];
+let connectedBots = [];
 
 btnOpenInfo.addEventListener('click', openGuide);
 
@@ -20,9 +24,8 @@ function changeButton() {
 }
 
 function openSong(styleButtonBlock) {
-    returnBtn.classList.toggle('hide');
     listGenre.classList.add('none');
-    document.querySelector('.songs').classList.remove('none');
+    songs.classList.remove('none');
     const songBlocks = document.getElementsByClassName('song__section');
     for (let i = 0; i < songBlocks.length; i++) {
         if (songBlocks[i].id === styleButtonBlock.id && songBlocks[i].classList.contains('none')) {
@@ -31,18 +34,50 @@ function openSong(styleButtonBlock) {
     }
 }
 
-returnBtn.addEventListener('click', closeSong);
-
-function closeSong() {
-    returnBtn.classList.toggle('hide');
-    const songBlocks = document.getElementsByClassName('song__section');
-    for (let i = 0; i < songBlocks.length; i++) {
-        if (!songBlocks[i].classList.contains('none')) {
-            songBlocks[i].classList.add('none');
-        }
-    }
-    listSong.classList.add('none');
+function openStyles(regime) {
     listGenre.classList.remove('none');
+    returnBtn.classList.toggle('hide');
+    gameMode.classList.add('none');
+    mode = regime.getAttribute('mode');
+    if (mode == 'Boss'){
+    } else if (mode == 'Bots'){
+        bots.classList.remove('none');
+    }
+}
+
+returnBtn.addEventListener('click', closeList);
+
+function toggleBots(){
+    let botsMenu = document.getElementById('botMenu');
+    if (botsMenu.classList.contains('bots_open')){
+        botsMenu.classList.add('bots_close');
+        botsMenu.classList.remove('bots_open');
+    }else{
+        botsMenu.classList.add('bots_open');
+        botsMenu.classList.remove('bots_close');
+    }
+}
+function closeList() {
+    if (listSong.classList.contains('none')){
+        returnBtn.classList.toggle('hide');
+        listGenre.classList.add('none');
+        gameMode.classList.remove('none');
+        bots.classList.add('none');
+        for (let i = 0; i < connectedUsers.length; i++) {
+            if (parseInt(connectedUsers[i]["userID"]) < 0 ) {
+                removeUser(connectedUsers[i]["userID"]);
+            }
+        }
+    } else {
+        const songBlocks = document.getElementsByClassName('song__section');
+        for (let i = 0; i < songBlocks.length; i++) {
+            if (!songBlocks[i].classList.contains('none')) {
+                songBlocks[i].classList.add('none');
+            }
+        }
+        listSong.classList.add('none');
+        listGenre.classList.remove('none');
+    }
 }
 
 function openGuide() {
@@ -56,7 +91,10 @@ function closeGuide() {
 }
 
 let songName = '';
+let songNeuro = '';
 let fullSongName = '';
+let songId = 0;
+let difficulty = 0;
 let readySong = false;
 
 function onImageClick(element) {
@@ -64,8 +102,30 @@ function onImageClick(element) {
     const video = document.getElementById(videoSrcID);
     const fullVideo = document.getElementById('full' + videoSrcID);
     const videoPlayer = document.getElementById('videoPlayer');
+    let difficultyList = document.querySelector('.game-menu__difficulty');
+    let difficultySegment = difficultyList.querySelectorAll('.segment')
+
+    difficulty  =  document.getElementById('difficulty' + videoSrcID).innerText;
+    difficultyList.classList.remove('none')
+    for (let i = 0; i < 4; i++) {
+        if (i < difficulty) {
+            difficultySegment[i].classList.add('segment_on')
+        } else {
+            difficultySegment[i].classList.remove('segment_on')
+        }
+    }
+
+    songId = element.id;
 
     songName = document.querySelector('.song' + element.id).innerHTML;
+
+    songNeuro = camelCase(songName);
+
+    function camelCase(value) {
+        return value.toLowerCase().replace(/\s+(.)/g, function(match, group1) {
+            return group1.toUpperCase();
+        });
+    }
     readySong = true;
     changeButton();
 
@@ -81,30 +141,58 @@ Array.from(test).forEach(function (element) {
     });
 });
 
-$(document).ready(function () {
+var numb;
+var classifier;
+
+$(document).ready(function() {
     const playButton = $('#play');
-    const contentContainer = $('#content');
-
-    playButton.on('click', function () {
-        if (readyGame) {
-            socket.send(songName);
-            socket.close() // Закрываем вебсокет mainRoom
-
-            contentContainer.load("/static/html/game.html", function () {
-                const video = $('#video-dance')[0];
-                const src = $('#video-src')[0];
-                src.setAttribute('src', fullSongName);
-
-                video.addEventListener('loadeddata', function () {
-                    video.play();
-                });
-            });
-
-            return false;
-        }
-    });
 });
+let playButton = document.getElementById('play');
+playButton.addEventListener('click', gameStart);
+function gameStart() {
+    const contentContainer = $('#content');
+    if (readyGame) {
+        numb = (Math.round(Math.random()*1000)).toString();
+        let firstComponent = '/static/test/edge-impulse-standalone.js?version=' + numb;
+        let secondComponent = '/static/test/run-impulse.js?version=' + numb;
+        let thirdComponent = '/static/html/game.html?version=' + numb;
+        $.getScript(firstComponent, function() {
+            $.getScript(secondComponent, function() {
+                (async () => {
+                    classifier = new EdgeImpulseClassifier();
+                    await classifier.init();
+                    let project = classifier.getProjectInfo();
+                    console.log(project.owner + ' / ' + project.name + ' (version ' + project.deploy_version + ')');
 
+                    contentContainer.load(thirdComponent, function() {
+                        const video = $('#video-dance')[0];
+                        const src = $('#video-src')[0];
+                        src.setAttribute('src', fullSongName);
+
+                        video.addEventListener('loadeddata', function() {
+                            video.play();
+                            socket.send(songName);
+                            console.log(songName);
+                            socket.close(); // Закрываем вебсокет mainRoom
+                        });
+                    });
+                })();
+            });
+        });
+        fetch('../static/script/scoreGrade.js')
+            .then(response => response.text())
+            .then(scriptText => {
+                // Создаем элемент <script>
+                const script = document.createElement('script');
+                script.textContent = scriptText;
+                document.head.appendChild(script);
+            })
+            .catch(error => {
+                console.error('Ошибка загрузки скрипта:', error);
+            });
+    }
+    return readyGame;
+}
 
 function showVideo(videoID) {
     let videoSrcID = 'song' + videoID.id;
@@ -113,14 +201,107 @@ function showVideo(videoID) {
     videoPlayer.src = video.innerText;
 }
 
-const parent = document.querySelector('.songs');
+function readJSONFromURL(url) {
+    return fetch(url)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Ошибка при получении файла');
+            }
+            return response.json();
+        })
+        .catch(error => {
+            console.error('Ошибка:', error);
+        });
+}
+
+function addBot(botName) {
+    if (connectedUsers.length >= 4) {
+        console.log('Невозможно добавить бота, так как комната переполнена.');
+        return;
+    }
+    let botInfo = {};
+    fetch("../api/getBotPath", {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: `bot_name=${botName}`,
+    })
+        .then(response => {
+            if (!response.ok) {
+                if (response.status === 409) {
+                    throw new Error('No bot with such name');
+                }
+                else {
+                    throw new Error('Server Error');
+                }
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.BotScoresPath) {
+                botInfo = data;
+                if (!addUser( "-" + data.BotId, "bot_1", "../" + data.BotImgHat, "../" + data.BotImgFace, "../" + data.BotImgBody)) {
+                    return;
+                }
+                readJSONFromURL("../" + data.BotScoresPath).then(jsonData => {
+                    connectedBots.push({"botID": "-" + data.BotId,  "botScores":  jsonData});
+                    console.log(connectedBots);
+                });
+                fetch("/api/addBot", { // Добавление бота на бэке
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        "room_id": window.location.pathname.split('/').pop(),
+                        "bot_id": "-" + botInfo.BotId
+                    })
+                })
+                    .then(function (response) {
+                        if (response.ok) {
+                            console.log('Бот добавлен на бэке');
+                        } else {
+                            console.log('Ошибка при добавлении бота на бэке. Статус:', response.status);
+                        }
+                    })
+                    .catch(function (error) {
+                        console.log('Ошибка при отправке данных: ', error);
+                    });
+            } else {
+                console.log('Fail');
+            }
+        })
+        .catch(error => {
+            console.log('Error:', error);
+            return
+        });
+}
+
+let bossInfo;
+
+function bossGame(bossBlock) {
+    let name = bossBlock.querySelector(".boss__name").innerText;
+    let healthPoint = bossBlock.querySelector(".boss__health-point").innerText;
+    let bossBody= bossBlock.querySelector(".boss__body-img").src;
+    let bossFace = bossBlock.querySelector(".boss__face-img").src;
+    let bossHat = bossBlock.querySelector(".boss__hat-img").src;
+    if (!gameStart()) {
+        console.log("Игра не готова")
+        return;
+    }
+
+    bossInfo = {"name": name, "healthPoint": healthPoint, "bossBody": bossBody, "bossFace": bossFace, "bossHat": bossHat};
+
+}
+
 
 function changeColor(song) {
     song.classList.add('button_yellow');
 }
 
 function addColor(song) {
-    const menuItem = parent.querySelectorAll('.button_yellow');
+    const menuItem = songs.querySelectorAll('.button_yellow');
     for (let i = 0; i < menuItem.length; i++) {
         menuItem[i].classList.remove('button_yellow');
     }
@@ -140,8 +321,10 @@ socket.onmessage = function (event) {
     let userID = parts[1];
     if (action === "add") {
         let userName = parts[2];
-        let imgSrc = parts[3];
-        addUser(userID, userName, imgSrc);
+        let hatImgSrc = "../" + parts[3];
+        let faceImgSrc = "../" + parts[4];
+        let bodyImgSrc = "../" + parts[5];
+        addUser(userID, userName, hatImgSrc, faceImgSrc, bodyImgSrc);
     } else if (action === "remove") {
         removeUser(userID)
     }
@@ -152,23 +335,37 @@ socket.onclose = function (event) {
     console.log("WebSocket mainRoom connection closed.");
 };
 
-function addUser(userID, userName, imgSrc) {
+function addUser(userID, userName, hatImgSrc, faceImgSrc, bodyImgSrc) {
+    for (let userInfo of connectedUsers) {
+        if (userInfo["userID"] === userID) {
+            console.log('Пользователь уже присоединён: ' + userID);
+            return false;
+        }
+    }
+    if (connectedUsers.length >= 4) {
+        console.log('Пользователь не может присоединиться, так как комната переполнена: ' + userID);
+        return false;
+    }
     console.log('Пользователь присоединился: ' + userID);
-    connectedUsers.push({"userID": userID, "userName": userName, "imgSrc": imgSrc});
+    connectedUsers.push({"userID": userID, "userName": userName, "valueScore": 0, "bodyImgSrc": bodyImgSrc, "faceImgSrc": faceImgSrc, "hatImgSrc": hatImgSrc});
 
     let userMessage = document.getElementById('needUser');
     userMessage.classList.add('none');
     let indexUser = document.getElementById('user' + connectedUsers.length);
     let indexUserName = document.getElementById('userName' + connectedUsers.length);
-    let indexUserImg = indexUser.querySelector(".user__avatar");
+    let indexUserBodyImg = indexUser.querySelector(".body");
+    let indexUserFaceImg = indexUser.querySelector(".face");
+    let indexUserHatImg = indexUser.querySelector(".hat");
     indexUser.classList.remove('none');
-    indexUserImg.src = '../' + imgSrc;
+    indexUserBodyImg.src = bodyImgSrc;
+    indexUserFaceImg.src = faceImgSrc;
+    indexUserHatImg.src = hatImgSrc;
     indexUserName.innerText = userName;
 
     readyPlayer = true;
     changeButton();
+    return true;
 }
-
 
 function removeUser(userID) {
     console.log('Пользователь вышел: ' + userID);
@@ -204,4 +401,51 @@ function removeUser(userID) {
         indexUser.id = 'user' + (i - 1);
         indexUserName.id = 'userName' + (i - 1);
     }
+    if (parseInt(userID) < 0) {
+        fetch("/api/removeBot", { // Если это бот, то удаляем бота на бэке
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                "room_id": window.location.pathname.split('/').pop(),
+                "bot_id": userID
+            })
+        })
+            .then(function (response) {
+                if (response.ok) {
+                    console.log('Бот добавлен на бэке');
+                } else {
+                    console.log('Ошибка при добавлении бота на бэке. Статус:', response.status);
+                }
+            })
+            .catch(function (error) {
+                console.log('Ошибка при отправке данных: ', error);
+            });
+    }
 }
+
+
+const domain = window.location.protocol + "//" + window.location.hostname + "/join";
+const qr = new QRCode(document.getElementById("qrcode"), {
+    text: domain,
+    width: 125,
+    height: 125,
+});
+
+window.addEventListener('load', () => {
+    let difficulty = document.querySelectorAll('.difficulty');
+
+    for (let i = 0; i < difficulty.length; i++) {
+        let difficultySegment = difficulty[i].querySelectorAll('.piece')
+        let complexity = difficulty[i].getAttribute('difficulty');
+
+        for (let i = 0; i < 4; i++) {
+            if (i < complexity) {
+                difficultySegment[i].classList.add('segment_on')
+            } else {
+                difficultySegment[i].classList.remove('segment_on')
+            }
+        }
+    }
+});
