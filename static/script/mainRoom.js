@@ -12,6 +12,16 @@ let connectedUsers = [];
 
 btnOpenInfo.addEventListener('click', openGuide);
 
+const audio = document.querySelector("audio");
+audio.volume = 0.5;
+let notClicked = 1;
+window.addEventListener("click", event => {
+    if (notClicked){
+        audio.play();
+        notClicked = 0;
+    }
+});
+
 function changeButton() {
     readyGame = readyPlayer && readySong;
     if (readyGame) {
@@ -39,6 +49,7 @@ function closeSong() {
     for (let i = 0; i < songBlocks.length; i++) {
         if (!songBlocks[i].classList.contains('none')) {
             songBlocks[i].classList.add('none');
+            audio.play();
         }
     }
     listSong.classList.add('none');
@@ -65,7 +76,7 @@ function onImageClick(element) {
     const video = document.getElementById(videoSrcID);
     const fullVideo = document.getElementById('full' + videoSrcID);
     const videoPlayer = document.getElementById('videoPlayer');
-
+    audio.pause();
     songName = document.querySelector('.song' + element.id).innerHTML;
 
     songNeuro = camelCase(songName);
@@ -99,6 +110,7 @@ $(document).ready(function() {
     playButton.on('click', function() {
         if (readyGame) {
             // Load the first script
+            document.getElementsByClassName('loading')[0].style.display= 'flex';
             numb = (Math.round(Math.random()*1000)).toString();
             let firstComponent = '/static/test/edge-impulse-standalone.js?version=' + numb;
             let secondComponent = '/static/test/run-impulse.js?version=' + numb;
@@ -132,8 +144,6 @@ $(document).ready(function() {
         }
     });
 });
-
-
 
 function showVideo(videoID) {
     let videoSrcID = 'song' + videoID.id;
@@ -176,7 +186,6 @@ socket.onmessage = function (event) {
     } else if (action === "remove") {
         removeUser(userID)
     }
-
 };
 
 socket.onclose = function (event) {

@@ -1,4 +1,5 @@
 {
+  "color": "#4da589",
   "maxPoint": 4500,
   "motions":[
     {
@@ -317,7 +318,7 @@
       "name": "good-mood"
     },
     {
-      "start_time": 82.8,
+      "start_time": 82.9,
       "duration": 1.0,
       "name": "good-mood"
     },

@@ -345,6 +345,17 @@
     width: 86px;
     height: 90px;
 }
+
+.loading {
+    display: none;
+    position: absolute;
+    background-color: #ffe973;
+    left: 0;
+    top:0;
+    width: 100%;
+    height: 100%;
+}
+
 @media screen and (max-width: 1577px){
     .btn-back {
         margin-bottom: 250px;
