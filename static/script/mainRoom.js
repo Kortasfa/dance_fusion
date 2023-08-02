@@ -37,7 +37,6 @@ function changeButton() {
 }
 
 function openSong(styleButtonBlock) {
-    returnBtn.classList.toggle('hide');
     listGenre.classList.add('none');
     songs.classList.remove('none');
     const songBlocks = document.getElementsByClassName('song__section');
@@ -376,7 +375,7 @@ function addUser(userID, userName, hatImgSrc, faceImgSrc, bodyImgSrc) {
         return false;
     }
     console.log('Пользователь присоединился: ' + userID);
-    connectedUsers.push({"userID": userID, "userName": userName, "bodyImgSrc": bodyImgSrc, "faceImgSrc": faceImgSrc, "hatImgSrc": hatImgSrc});
+    connectedUsers.push({"userID": userID, "userName": userName, "valueScore": 0, "bodyImgSrc": bodyImgSrc, "faceImgSrc": faceImgSrc, "hatImgSrc": hatImgSrc});
 
     let userMessage = document.getElementById('needUser');
     userMessage.classList.add('none');
@@ -446,7 +445,7 @@ function removeUser(userID) {
                 if (response.ok) {
                     console.log('Бот удалён на бэке');
                 } else {
-                    console.log('Ошибка при добавлении бота на бэке. Статус:', response.status);
+                    console.log('Ошибка при удалении бота на бэке. Статус:', response.status);
                 }
             })
             .catch(function (error) {
