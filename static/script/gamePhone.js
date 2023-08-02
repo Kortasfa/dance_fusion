@@ -207,10 +207,6 @@ window.onbeforeunload = exitFromGame;
 async function exitFromGame() {
     btnLeaveRoom.classList.add("hidden");
     colorFlag.classList.add("hidden");
-    scale.style.height = 0 + 'px';
-    megaStar.classList.add("hidden");
-    colorFlag.style.backgroundColor = "#BD63D4";
-    stars.forEach(element => element.src = "/static/img/star_white.svg");
     const response = await fetch("/api/exitFromGame", {
         method: 'POST',
         headers: {
