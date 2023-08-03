@@ -3,7 +3,7 @@ const listGenre = document.getElementById('listGenre');
 const btnOpenInfo = document.getElementById('openGuide');
 const guide = document.getElementById('guide');
 const returnBtn = document.getElementById('returnButton');
-const PlayBtn = document.getElementById('play');
+const playBtn = document.getElementById('play');
 const songs = document.querySelector('.songs');
 const gameMode = document.getElementById('gameMode');
 const bots = document.getElementById('bots');
@@ -16,12 +16,16 @@ let readyPlayer = false;
 let mode = ''
 let connectedUsers = [];
 let connectedBots = [];
+let startedGame = false;
 
 btnOpenInfo.addEventListener('click', openGuide);
+window.onbeforeunload = sendGameEndInfoToServer;
 
 const audio = document.querySelector("audio");
 audio.volume = 0.5;
 let notClicked = 1;
+
+
 window.addEventListener("click", event => {
     if (notClicked){
         audio.play();
@@ -32,7 +36,7 @@ window.addEventListener("click", event => {
 function changeButton() {
     readyGame = readyPlayer && readySong;
     if (readyGame) {
-        PlayBtn.classList.add('button_ready');
+        playBtn.classList.add('button_ready');
     }
 }
 
@@ -54,8 +58,12 @@ function openStyles(regime) {
     mode = regime.getAttribute('mode');
     if (mode == 'Boss'){
         boss.classList.remove('none');
+        playBtn.classList.add('none');
     } else if (mode == 'Bots'){
         bots.classList.remove('none');
+        setTimeout(function() {
+            bots.classList.remove('none');
+        }, 800);
     }
 }
 
@@ -76,10 +84,18 @@ function closeList() {
         returnBtn.classList.toggle('hide');
         listGenre.classList.add('none');
         gameMode.classList.remove('none');
-        bots.classList.add('none');
-        botsMenu.classList.add('bots_open');
-        botsMenu.classList.remove('bots_close');
-        boss.classList.add('none');
+        if(mode === 'Bots'){
+            botsMenu.classList.add('bots_close');
+            botsMenu.classList.add('bots_open');
+            setTimeout(function() {
+                bots.classList.add('none');
+                botsMenu.classList.remove('bots_close');
+            }, 1001);
+        }
+        if (mode === 'Boss') {
+            boss.classList.add('none');
+            playBtn.classList.remove('none');
+        }
         for (let i = 0; i < connectedUsers.length; i++) {
             if (parseInt(connectedUsers[i]["userID"]) < 0 ) {
                 removeUser(connectedUsers[i]["userID"]);
@@ -122,12 +138,13 @@ let fullSongName = '';
 let songId = 0;
 let difficulty = 0;
 let readySong = false;
+const videoPlayer = document.getElementById('videoPlayer');
 
 function onImageClick(element) {
     const videoSrcID = 'song' + element.id;
     const video = document.getElementById(videoSrcID);
     const fullVideo = document.getElementById('full' + videoSrcID);
-    const videoPlayer = document.getElementById('videoPlayer');
+
     audio.pause();
     let difficultyList = document.querySelector('.game-menu__difficulty');
     let difficultySegment = difficultyList.querySelectorAll('.segment')
@@ -179,6 +196,8 @@ playButton.addEventListener('click', gameStart);
 function gameStart() {
     const contentContainer = $('#content');
     if (readyGame) {
+        startedGame = true;
+        sendGameStartInfoToServer().then(() => {})
         numb = (Math.round(Math.random()*1000)).toString();
         let firstComponent = '/static/test/edge-impulse-standalone.js?version=' + numb;
         let secondComponent = '/static/test/run-impulse.js?version=' + numb;
@@ -187,6 +206,7 @@ function gameStart() {
             $.getScript(secondComponent, function() {
                 (async () => {
                     document.getElementsByClassName('loading')[0].style.display= 'flex';
+                    videoPlayer.src = '';
                     classifier = new EdgeImpulseClassifier();
                     await classifier.init();
                     let project = classifier.getProjectInfo();
@@ -306,16 +326,16 @@ let bossInfo;
 
 function bossGame(bossBlock) {
     let name = bossBlock.querySelector(".boss__name").innerText;
-    let healthPoint = bossBlock.querySelector(".boss__health-point").innerText;
-    let bossBody= bossBlock.querySelector(".boss__body-img").src;
-    let bossFace = bossBlock.querySelector(".boss__face-img").src;
-    let bossHat = bossBlock.querySelector(".boss__hat-img").src;
+    let healthPoint = bossBlock.querySelector(".boss__health-point").innerText.replace('Hp: ', '');
+    let bossBody= bossBlock.querySelector(".body").src;
+    let bossFace = bossBlock.querySelector(".face").src;
+    let bossHat = bossBlock.querySelector(".hat").src;
+    let bossId = bossBlock.id;
     if (!gameStart()) {
         console.log("Игра не готова")
         return;
     }
-
-    bossInfo = {"name": name, "healthPoint": healthPoint, "bossBody": bossBody, "bossFace": bossFace, "bossHat": bossHat};
+    bossInfo = {"bossId": bossId, "name": name, "healthPoint": healthPoint, "bossBody": bossBody, "bossFace": bossFace, "bossHat": bossHat};
 
 }
 
@@ -356,6 +376,9 @@ socket.onmessage = function (event) {
 };
 
 socket.onclose = function (event) {
+    if (!startedGame) {
+        window.location.href = "/room";
+    }
     console.log("WebSocket mainRoom connection closed.");
 };
 
@@ -479,3 +502,33 @@ window.addEventListener('load', () => {
         }
     }
 });
+
+async function sendGameStartInfoToServer() {
+    let response = await fetch("/api/startGame", {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: `room_id=${window.location.pathname.split('/').pop()}`,
+    });
+    if (response.ok) {
+        console.log('Отправил сообщение о начале игры');
+    } else {
+        console.log('Не получилось отправить сообщение о начале', response.status);
+    }
+}
+
+async function sendGameEndInfoToServer() {
+    let response = await fetch("/api/endGame", {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: `room_id=${window.location.pathname.split('/').pop()}`,
+    });
+    if (response.ok) {
+        console.log('Отправил сообщение о конце игры');
+    } else {
+        console.log('Не получилось отправить сообщение о конче игры', response.status);
+    }
+}

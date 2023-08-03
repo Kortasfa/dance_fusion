@@ -185,7 +185,7 @@
 
 .party__bots{
     position: absolute;
-    margin: 56px 0 0 522px;
+    margin: 53px 0 0 522px;
     display: flex;
 }
 
@@ -227,9 +227,13 @@
 }
 
 @keyframes closeBotsAnimation {
-    0% { z-index: -1;
-        margin-left: 140px;}
-    100% { margin-left: 0px;}
+    0% {
+        z-index: -1;
+        margin-left: 140px;
+    }
+    100% {
+        margin-left: 0;
+    }
 }
 
 .bot__name{
@@ -406,14 +410,6 @@
     animation: blink 1s infinite;
 }
 
-.none{
-    display: none;
-}
-
-.hide{
-    visibility: hidden;
-}
-
 .button_yellow{
     background: #AEF26D;
 }
@@ -472,6 +468,69 @@
     top:0;
     width: 100%;
     height: 100%;
+    z-index: 2;
+}
+
+.logo {
+    display: flex;
+    /*user-select: none;*/
+}
+
+.logo__item {
+    font: 400 42px Cherry Bomb One, cursive;
+    color: #BD63D4;
+    animation: wavy 1s infinite;
+    animation-delay: calc(.1s * var(--i));;
+}
+
+@keyframes wavy {
+    0%, 40%, 100% {
+        transform: translateY(0)
+    }
+    20% {
+        transform: translateY(-20px)
+    }
+}
+
+.game-menu__boss{
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+}
+
+.boss__button{
+    border: 5px dashed #BD63D4;
+    border-radius: 10px;
+    position: relative;
+    width: 290px;
+    display: flex;
+    background-color: #f4f4f4;
+    margin: 10px;
+    box-shadow: 0 6px 4px -4px rgba(0, 0, 0, .2);
+}
+
+.boss__head{
+    margin: 4px;
+}
+
+.boss__data{
+    font: normal 400 20px/1.54 'Roboto';
+    color: #1E1C1C;
+    margin: 18px;
+}
+
+.boss_open{
+    animation-duration: 1s;
+    animation-name: openBoss;
+}
+
+@keyframes openBoss {
+    0%{
+        height: 0;
+    }
+    100%{
+        height: auto;
+    }
 }
 
 @media screen and (max-width: 1577px){
@@ -654,6 +713,18 @@
     .party__user {
         margin: 15px;
         width: 60px;
+    }
+
+    .boss__data {
+        margin: 12px;
+        font: normal 400 13px/1.54 'Roboto';
+    }
+    .boss__button {
+        width: 157px;
+        margin: 5px;
+    }
+    .boss__head{
+        margin: 4px;
     }
 }
 

@@ -203,7 +203,7 @@ func exitFromGame(r *http.Request) (int, string, error) {
 		log.Println(err.Error())
 		return 0, "", err
 	}
-
+	// создать список комнат, в котоорых в данный момент происходит игра. Если этой комнаты в игре нет, то ничего не посылать
 	selectedRoomID, found := retrieveUserRoom(strconv.Itoa(user.UserID))
 	if !found {
 		return user.UserID, "хз, он уже давно вышел", nil
@@ -222,7 +222,10 @@ func exitFromGame(r *http.Request) (int, string, error) {
 	if err != nil {
 		return 0, "", err
 	}
-	broadcastGameFieldWSMessage <- []string{selectedRoomID, string(messageData)}
+	if containsInSlice(activeGameRooms, selectedRoomID) {
+		endGame(selectedRoomID)
+		broadcastGameFieldWSMessage <- []string{selectedRoomID, string(messageData)}
+	}
 	return user.UserID, selectedRoomID, nil
 }
 
@@ -558,7 +561,10 @@ func deletePlayerFromGame(w http.ResponseWriter, r *http.Request) {
 			log.Println(err.Error())
 			return
 		}
-		broadcastGameFieldWSMessage <- []string{selectedRoomID, string(messageData)}
+		if containsInSlice(activeGameRooms, selectedRoomID) {
+			endGame(selectedRoomID)
+			broadcastGameFieldWSMessage <- []string{selectedRoomID, string(messageData)}
+		}
 		w.WriteHeader(http.StatusOK)
 	}
 	w.WriteHeader(http.StatusNotFound)
@@ -644,4 +650,108 @@ func removeBot(w http.ResponseWriter, r *http.Request) {
 	}
 	roomIDDict[data.RoomID] = removeValueFromSlice(roomIDDict[data.RoomID], data.BotID)
 	w.WriteHeader(http.StatusOK)
+}
+
+func startGameAPI(w http.ResponseWriter, r *http.Request) {
+	roomID := r.FormValue("room_id")
+	if !containsInSlice(activeGameRooms, roomID) {
+		activeGameRooms = append(activeGameRooms, roomID)
+	}
+	w.WriteHeader(http.StatusOK)
+}
+
+func endGame(roomID string) {
+	if containsInSlice(activeGameRooms, roomID) {
+		activeGameRooms = removeValueFromSlice(activeGameRooms, roomID)
+	}
+}
+
+func endGameAPI(w http.ResponseWriter, r *http.Request) {
+	roomID := r.FormValue("room_id")
+	endGame(roomID)
+	w.WriteHeader(http.StatusOK)
+}
+
+func checkForAchievements(db *sqlx.DB) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		reqData, err := io.ReadAll(r.Body)
+		if err != nil {
+			http.Error(w, "Parsing error", 500)
+			log.Println(err.Error())
+			return
+		}
+
+		var data struct {
+			UserID int   `json:"user_id"`
+			SongID int   `json:"song_id"`
+			BotIDs []int `json:"bot_ids"`
+			BossID int   `json:"boss_id"`
+		}
+
+		err = json.Unmarshal(reqData, &data)
+		if err != nil {
+			http.Error(w, "JSON parsing error", 500)
+			log.Println(err.Error())
+			return
+		}
+
+		data.BotIDs = append(data.BotIDs, 0)
+
+		query := `
+			SELECT
+				user_achievement_id,
+				progress,
+				max_progress
+			FROM
+				user_achievements
+			WHERE
+				user_id = ? AND song_id = ? AND bot_id IN (?) AND boss_id = ?
+		`
+		var achievementProgressData []struct {
+			AchievementID int `db:"user_achievement_id"`
+			Progress      int `db:"progress"`
+			MaxProgress   int `db:"max_progress"`
+		}
+
+		err = db.Select(&achievementProgressData, query, data.UserID, data.SongID, data.BotIDs, data.BossID)
+		if err != nil {
+			http.Error(w, "Database error", 500)
+			log.Println(err.Error())
+			return
+		}
+
+		for _, progressInfo := range achievementProgressData {
+			achievementID := progressInfo.AchievementID
+			progress := progressInfo.Progress
+			maxProgress := progressInfo.MaxProgress
+
+			if progress < maxProgress {
+				progress++
+			}
+
+			completed := 0
+			if progress >= maxProgress {
+				completed = 1
+			}
+
+			updateQuery := `
+				UPDATE
+				    user_achievements
+				SET
+				    progress = ?,
+					completed = ?
+				WHERE
+				    user_achievement_id = ?
+			`
+
+			_, err = db.Exec(updateQuery, progress, completed, achievementID)
+			if err != nil {
+				http.Error(w, "user achievements table update error", 500)
+				log.Println(err.Error())
+				return
+			}
+		}
+
+		w.WriteHeader(http.StatusOK)
+	}
 }

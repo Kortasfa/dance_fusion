@@ -9,8 +9,11 @@ const btnLogOut = document.getElementById("logout");
 const user = document.querySelector(".users");
 const menu = document.querySelector(".menu");
 const custom = document.getElementById("custom");
+const achievements = document.getElementById("achievements")
 const btnLeaveRoom = document.querySelector(".btn-leave-room");
 const colorFlag = document.querySelector(".color-flag");
+
+let inGame = false;
 
 function setJsonCookie(name, value, expirationDays) {
     const jsonValue = JSON.stringify(value);
@@ -66,6 +69,8 @@ function sendMessage() {
         XHR.open("POST", "/api/joinToRoom");
         XHR.onload = function () {
             if (XHR.status === 200) {
+                user.style.pointerEvents='none'
+                menu.classList.add("menu-hidden");
                 entranceField.classList.add("hidden");
                 danceField.classList.remove("hidden");
                 emptyID.classList.add("hidden");
@@ -161,8 +166,15 @@ function joinRoom(userID) {
             }
         } else if ("Exit" in receivedJSON) {
             console.log("Вас выгняли");
-            exitFromGame().then()
+            // Тут надо делать всё то же самое, что в exitFromGame, но без зпроса
+            inGame = false;
+            stop = 1;
+            btnLeaveRoom.classList.add("hidden");
+            colorFlag.classList.add("hidden");
+            entranceField.classList.remove("hidden");
+            danceField.classList.add("hidden");
         } else {
+            inGame = true;
             value = 0;
             stop = 0;
             pix = 0;
@@ -180,6 +192,7 @@ function joinRoom(userID) {
     };
 
     socket.onclose = function(event) {
+        window.location.reload();
         console.log("WebSocket connection closed.");
     };
 }
@@ -208,8 +221,15 @@ btnLeaveRoom.addEventListener("click", exitFromGame);
 window.onbeforeunload = exitFromGame;
 async function exitFromGame() {
     stop = 1;
+    user.style.pointerEvents='auto'
     btnLeaveRoom.classList.add("hidden");
     colorFlag.classList.add("hidden");
+    scale.style.height = 0 + 'px';
+    megaStar.classList.add("hidden");
+    stars.forEach(element => element.src = "/static/img/star_white.svg");
+    colorFlag.style.backgroundColor = "#BD63D4";
+    entranceField.classList.remove("hidden");
+    danceField.classList.add("hidden");
     const response = await fetch("/api/exitFromGame", {
         method: 'POST',
         headers: {
@@ -220,16 +240,16 @@ async function exitFromGame() {
     if (!response.ok) {
         console.log('Не удалось выйти из игры');
     } else {
-        if (socket !== undefined) {
+        if (inGame && socket !== undefined) {
             console.log("Закрываем бобанный WS");
             socket.close();
             socket = undefined
         }
+        inGame = false;
         console.log('Вышел из игры');
         entranceField.classList.remove("hidden");
         danceField.classList.add("hidden");
     }
-    stop = 1;
 }
 
 async function exitFromAccount() {
@@ -272,8 +292,12 @@ function userMenu() {
 btnLogOut.addEventListener("click", exitFromAccount)
 btnGo.addEventListener("click", sendMessage);
 user.addEventListener("click", userMenu);
-custom.addEventListener("click", function() {window.location.href = 'custom '});
-
+custom.addEventListener("click", function() {
+    window.location.href = "custom"
+});
+achievements.addEventListener("click", function () {
+    window.location.href = "achievements"
+});
 
 if (window.DeviceMotionEvent && window.DeviceOrientationEvent) {
     const sensorFrequency = 62.5;
