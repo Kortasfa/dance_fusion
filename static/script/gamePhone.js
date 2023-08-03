@@ -12,6 +12,8 @@ const custom = document.getElementById("custom");
 const btnLeaveRoom = document.querySelector(".btn-leave-room");
 const colorFlag = document.querySelector(".color-flag");
 
+let inGame = false;
+
 function setJsonCookie(name, value, expirationDays) {
     const jsonValue = JSON.stringify(value);
     const encodedValue = encodeURIComponent(jsonValue);
@@ -162,12 +164,14 @@ function joinRoom(userID) {
         } else if ("Exit" in receivedJSON) {
             console.log("Вас выгняли");
             // Тут надо делать всё то же самое, что в exitFromGame, но без зпроса
+            inGame = false;
             stop = 1;
             btnLeaveRoom.classList.add("hidden");
             colorFlag.classList.add("hidden");
             entranceField.classList.remove("hidden");
             danceField.classList.add("hidden");
         } else {
+            inGame = true;
             value = 0;
             stop = 0;
             pix = 0;
@@ -226,11 +230,12 @@ async function exitFromGame() {
     if (!response.ok) {
         console.log('Не удалось выйти из игры');
     } else {
-        if (socket !== undefined) {
+        if (inGame && socket !== undefined) {
             console.log("Закрываем бобанный WS");
             socket.close();
             socket = undefined
         }
+        inGame = false;
         console.log('Вышел из игры');
         entranceField.classList.remove("hidden");
         danceField.classList.add("hidden");
