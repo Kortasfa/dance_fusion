@@ -471,7 +471,7 @@ func getUserAchievements(db *sqlx.DB, userID int) ([]userAchievement, error) {
 			achievement_name,
 			progress,
 			completed,
-			level,
+			collected,
 			max_progress
 		FROM
 			user_achievements

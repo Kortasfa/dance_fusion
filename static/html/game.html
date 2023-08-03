@@ -107,10 +107,10 @@
     </div>
   </div>
   <a class="btn-exit" href="/room">
-      <img src="/static/img/log_out.svg" alt="">
+    <img src="/static/img/log_out.svg" alt="">
   </a>
   <video id="video-dance" class="video-dance" type="video/mp4" width="100%" autoplay="autoplay">
-      <source id="video-src" src="../video/previews/americanGirl.mp4">
+    <source id="video-src" src="../video/previews/americanGirl.mp4">
   </video>
   <div class="pop-up hidden" id="pop-up">
       <div class="rating">
@@ -211,7 +211,7 @@
           }
       }
 
-      async function sendPoint(userID, point) {
+      async function sendPoint(userID, ) {
           const response = await fetch("/api/sendPoint", {
               method: 'POST',
               headers: {
@@ -391,6 +391,7 @@
                         sendPoint(userID, point).then(() => {
                         })
                     } else {
+                        console.log('Лежит', deviationCount);
                         addScore(userID.toString(), 0, maxPoint);
                     }
                     if (referenceUser === userID.toString()) {
@@ -432,5 +433,7 @@
                 return Math.floor(Math.random() * (max - min)) + min;
             }
         }
+
+
     </script>
 </div>
