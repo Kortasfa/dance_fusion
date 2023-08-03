@@ -214,6 +214,8 @@ async function exitFromGame() {
     megaStar.classList.add("hidden");
     stars.forEach(element => element.src = "/static/img/star_white.svg");
     colorFlag.style.backgroundColor = "#BD63D4";
+    entranceField.classList.remove("hidden");
+    danceField.classList.add("hidden");
     const response = await fetch("/api/exitFromGame", {
         method: 'POST',
         headers: {
