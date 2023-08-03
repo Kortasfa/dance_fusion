@@ -161,7 +161,12 @@ function joinRoom(userID) {
             }
         } else if ("Exit" in receivedJSON) {
             console.log("Вас выгняли");
-            exitFromGame().then()
+            // Тут надо делать всё то же самое, что в exitFromGame, но без зпроса
+            stop = 1;
+            btnLeaveRoom.classList.add("hidden");
+            colorFlag.classList.add("hidden");
+            entranceField.classList.remove("hidden");
+            danceField.classList.add("hidden");
         } else {
             value = 0;
             stop = 0;
@@ -180,6 +185,7 @@ function joinRoom(userID) {
     };
 
     socket.onclose = function(event) {
+        window.location.reload();
         console.log("WebSocket connection closed.");
     };
 }
@@ -229,7 +235,6 @@ async function exitFromGame() {
         entranceField.classList.remove("hidden");
         danceField.classList.add("hidden");
     }
-    stop = 1;
 }
 
 async function exitFromAccount() {

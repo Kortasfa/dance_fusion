@@ -191,7 +191,10 @@ function playerDamage(score) {
 
 let btnExit = document.querySelector(".btn-exit");
 btnExit.addEventListener("click", expelUsers)
-window.onbeforeunload = expelUsers
+window.onbeforeunload = function (){
+    sendGameEndInfoToServer()
+        .then(() => {expelUsers();})
+}
 
 function expelUsers() {
     console.log('Выгоняем всех челов из игры');
@@ -200,14 +203,6 @@ function expelUsers() {
             expelUser(user["userID"]).then(() => {});
         }
     }
-    if (bossInfo) {
-        playerDamage(score);
-    }
-}
-
-function playerDamage(score) {
-    let bossHPCount = document.querySelector(".boss__hp-bar");
-    bossHPCount.innerText = (parseInt(bossHPCount.innerText) - score).toString();
 }
 
 if (bossInfo) {

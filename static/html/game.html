@@ -317,6 +317,7 @@
             try {
                 let jsonData = JSON.parse(event.data);
                 if ("ExitingUser" in jsonData) {
+                    console.log(jsonData);
                     console.log("Удаляем пользователя на чёрт");
                     removeUser(jsonData.ExitingUser);
                     return;
@@ -419,6 +420,7 @@
             };
 
             socket.onclose = function (event) {
+                window.location.href = "/room";
                 console.log("WebSocket connection closed.");
             };
         })();
