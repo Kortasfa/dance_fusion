@@ -8,6 +8,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"strconv"
 )
 
 func roomWSHandler(db *sqlx.DB) func(w http.ResponseWriter, r *http.Request) {
@@ -51,6 +52,16 @@ func roomWSHandler(db *sqlx.DB) func(w http.ResponseWriter, r *http.Request) {
 						break
 					}
 					userID := userSlice[i]
+					userIDInt, err := strconv.Atoi(userID)
+					if err != nil {
+						http.Error(w, "Внутренняя ошибка сервера", http.StatusInternalServerError)
+						log.Println(err.Error())
+						delete(roomWSDict, conn)
+						return
+					}
+					if userIDInt < 0 {
+						continue
+					}
 					motionListPath := motionListPaths[i]
 					fmt.Println("Надо отправить JSON этому", userID)
 					fmt.Println("Надо отправить motionListPath этому", userID, "вот json", motionListPath)

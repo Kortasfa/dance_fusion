@@ -83,7 +83,7 @@ function addScore(userID, score, maxScore) {
     let starThree= document.getElementById("star-3-" + userID);
     let starFour = document.getElementById("star-4-" + userID);
     let starFive = document.getElementById("star-5-" + userID);
-    let megaStar = document.getElementById("mega-star" + userID);
+    let megaStar = document.getElementById("mega-star-" + userID);
 
     let userIndex;
     for (userIndex = 0; userIndex < connectedUsers.length; userIndex++) {
