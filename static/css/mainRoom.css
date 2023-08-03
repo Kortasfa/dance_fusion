@@ -1,5 +1,8 @@
-*
-{
+* {
+    user-select: none;
+}
+
+* {
     font-weight: normal;
     background-repeat: no-repeat;
     margin: 0;
@@ -52,10 +55,68 @@
     }
 }
 .game-menu__preview{
+    position: relative;
     width: 535px;
     margin: 10px auto;
     height: 300px;
     border-radius: 15px;
+}
+.game-menu__difficulty{
+    position: absolute;
+    display: flex;
+    height: 42px;
+    width: 120px;
+    margin: 185px 0 0 460px;
+    border-radius: 10px;
+    background-color: #BD63D4;
+    justify-content: space-evenly;
+    align-items: center;
+}
+
+.song__difficulty{
+    position: absolute;
+    display: flex;
+    height: 26px;
+    width: 68px;
+    margin: 10px 0 0 280px;
+    border-radius: 10px;
+    background-color: #BD63D4;
+    justify-content: space-evenly;
+    align-items: center;
+}
+
+.bot__difficulty{
+    margin: 0 auto;
+    display: flex;
+    height: 26px;
+    width: 68px;
+    border-radius: 10px;
+    background-color: #BD63D4;
+    justify-content: space-evenly;
+    align-items: center;
+}
+
+.bot{
+    margin: 5px;
+    padding: 10px;
+}
+
+.piece{
+    width: 7px;
+    height: 19px;
+    background-color: #e88eff;
+    border-radius: 10px;
+}
+
+.segment{
+    width: 13px;
+    height: 35px;
+    background-color: #e88eff;
+    border-radius: 10px;
+}
+
+.segment_on{
+    background-color: #FFE973;
 }
 
 .content{
@@ -75,17 +136,23 @@
 }
 
 .header__guide{
-    height: 125px;
-    width: 265px;
+    height: 250px;
+    width: 189px;
+    margin: 0 auto;
     display: flex;
     text-align: center;
     border-radius: 0 0 0 10px;
     flex-wrap: nowrap;
+    flex-direction: column;
 }
 
 .header__icon{
-    height: 68px;
-    margin: auto;
+    height: 55px;
+    margin: 0 5px 0 auto;
+}
+
+.qrcode{
+    margin: 0 auto;
 }
 
 .guide__title{
@@ -95,7 +162,13 @@
 }
 
 .guide__code{
-    font: normal 400 48px/1.54 'Roboto';
+    font: normal 400 48px 'Roboto';
+    margin: 0 0 -1px 63px;
+}
+
+.guide__subtitle{
+    display: flex;
+    margin-bottom: 5px;
 }
 
 .body__view_song{
@@ -103,8 +176,66 @@
 }
 
 .dance-style__button{
-
     margin: 24px;
+}
+
+.game-mode__button{
+    margin: 24px;
+}
+
+.party__bots{
+    position: absolute;
+    margin: 56px 0 0 522px;
+    display: flex;
+}
+
+.bots__button{
+    font: normal 400 20px/1.54 'Roboto';
+    color: #1E1C1C;
+    writing-mode: vertical-rl;
+    width: 30px;
+    height: 60px;
+    text-align: center;
+    background-color: #BD63D4;
+    border-left: 1px dashed #670080;
+    border-radius: 0 10px 10px 0;
+}
+
+.bots{
+    border-radius: 10px 0 10px 10px;
+    background-color: #BD63D4;
+    z-index: -1;
+    width: 120px;
+}
+
+.bots_open{
+    animation-duration: 1s;
+    animation-name: openBotsAnimation;
+    z-index: 1;
+    margin-left: 140px
+}
+
+@keyframes openBotsAnimation {
+    0% {z-index: -1; margin-left: 0;}
+    100% {z-index: -1;margin-left: 140px;}
+}
+
+.bots_close{
+    animation-duration: 1s;
+    animation-name: closeBotsAnimation;
+    z-index: -1;
+}
+
+@keyframes closeBotsAnimation {
+    0% { z-index: -1;
+        margin-left: 140px;}
+    100% { margin-left: 0px;}
+}
+
+.bot__name{
+    font: normal 400 20px 'Roboto';
+    color: #FAFCF6;
+    text-align: center;
 }
 
 .button__text{
@@ -152,6 +283,7 @@
 }
 
 .game-menu{
+    position: relative;
     width: 642px;
     min-height: 600px;
     background-color: #BD63D4;
@@ -170,7 +302,8 @@
 
 .party__user{
     margin: 27px;
-    width: 84px;
+    margin-top: 40px;
+    width: fit-content;
 }
 
 .user__avatar{
@@ -183,7 +316,7 @@
 
 .user__name{
     font: normal 400 20px/1.54 'Roboto';
-    color: #1E1C1C;
+    color: #FAFCF6;
     text-align: center;
 }
 
@@ -235,7 +368,7 @@
    }
 
 .songs{
-    margin: 27px 0px 0px 10px;
+    margin: 27px 0 0 10px;
     overflow: auto;
     overflow-x: hidden;
     height: 590px;
@@ -292,9 +425,82 @@
 
 .songs::-webkit-scrollbar {
     width: 0;
-  }
+}
 
+.user__head{
+    position: relative;
+    margin: 0 auto;
+    height: 90px;
+    width: 90px;
+}
+
+.head__body{
+    position: absolute;
+}
+
+.body{
+    width: 90px;
+    height: 90px;
+    border-radius: 50%;
+}
+
+.head__face{
+    position: absolute;
+    margin: 8px 5px;
+}
+
+.face{
+    width: 80px;
+    height: 80px;
+}
+
+.head__hat{
+    position: absolute;
+    margin: -65px 3px;
+}
+
+.hat{
+    width: 86px;
+    height: 90px;
+}
+
+.loading {
+    display: none;
+    position: absolute;
+    background-color: #ffe973;
+    left: 0;
+    top:0;
+    width: 100%;
+    height: 100%;
+}
+
+@media screen and (max-width: 1577px){
+    .btn-back {
+        margin-bottom: 250px;
+    }
+}
+@media screen and (max-width: 1560px){
+    .songs{
+        height: 380px
+    }
+
+    .header__guide {
+        height: 132px;
+        width: 333px;
+        flex-direction: row
+    }
+
+    .btn-back {
+        margin-bottom: 285px;
+    }
+}
 @media screen and (max-width: 1180px) {
+    .header__guide{
+        height: 250px;
+        width: 189px;
+        margin: 0 auto;
+        flex-direction: column;
+    }
     .content {
     margin: auto;
     display: flex;
@@ -306,7 +512,7 @@
     flex-direction: column;
 }
     .songs {
-    margin: 25px 0px 15px 10px;
+    margin: 25px 0 15px 10px;
     overflow: auto;
     overflow-x: hidden;
     height: 353px;}
@@ -364,6 +570,19 @@
         width: 355px;
     }
 
+    .segment {
+        width: 9px;
+        height: 20px;
+    }
+
+    .game-menu__difficulty {
+        position: absolute;
+        display: flex;
+        height: 27px;
+        width: 88px;
+        margin: 110px 0 0 250px;
+    }
+
     .game-menu__party {
         height: 90px;
     }
@@ -399,6 +618,49 @@
         margin: 15px;
         width: 42px;
     }
+    .user__head{
+        position: relative;
+        margin: 0 auto;
+        height: 60px;
+        width: 60px;
+    }
 
+    .head__body{
+        position: absolute;
+    }
 
+    .body{
+        width: 60px;
+        height: 60px;
+    }
+
+    .head__face{
+        margin: 6px 3px;
+    }
+
+    .face{
+        width: 54px;
+        height: 54px;
+    }
+
+    .head__hat{
+        margin: -47px 0;
+    }
+
+    .hat{
+        width: 60px;
+        height: 60px;
+    }
+    .party__user {
+        margin: 15px;
+        width: 60px;
+    }
+}
+
+.none{
+    display: none;
+}
+
+.hide{
+    visibility: hidden;
 }

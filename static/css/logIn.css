@@ -1,3 +1,7 @@
+* {
+    user-select: none;
+}
+
 .page {
     background-color: #FFE973;
     display: flex;
