@@ -1,6 +1,6 @@
 let isBtnClicked = false;
 let scoreGood = 20;
-let scoreOk = 14;
+let scoreOk = 3;
 let scorePerfect = 31;
 
 const danceVideo = document.getElementById("video-dance");
@@ -26,7 +26,6 @@ function getUsersByCookie() {
         let indexUserBodyImg = indexUser.querySelector(".body");
         let indexUserFaceImg = indexUser.querySelector(".face");
         let indexUserHatImg = indexUser.querySelector(".hat");
-        userScore.querySelector('.player-score').innerText = userName + ":";
         userScore.classList.remove('hidden');
         indexUser.classList.remove('hidden');
         indexUser.id = userID;
@@ -192,7 +191,10 @@ function playerDamage(score) {
 
 let btnExit = document.querySelector(".btn-exit");
 btnExit.addEventListener("click", expelUsers)
-window.onbeforeunload = expelUsers
+window.onbeforeunload = function (){
+    sendGameEndInfoToServer()
+        .then(() => {expelUsers();})
+}
 
 function expelUsers() {
     console.log('Выгоняем всех челов из игры');
@@ -201,14 +203,6 @@ function expelUsers() {
             expelUser(user["userID"]).then(() => {});
         }
     }
-    if (bossInfo) {
-        playerDamage(score);
-    }
-}
-
-function playerDamage(score) {
-    let bossHPCount = document.querySelector(".boss__hp-bar");
-    bossHPCount.innerText = (parseInt(bossHPCount.innerText) - score).toString();
 }
 
 if (bossInfo) {

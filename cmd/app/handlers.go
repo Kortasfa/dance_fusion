@@ -31,6 +31,8 @@ var broadcastJoinPageWSMessage = make(chan []string)  // [UserID, Data]
 var gameFieldWSDict = make(map[*websocket.Conn]string) // {WSConnection: gameFieldID, WSConnection: gameFieldID, WSConnection: gameFieldID, ...}
 var broadcastGameFieldWSMessage = make(chan []string)
 
+var activeGameRooms []string
+
 type activeRoomData struct {
 	ActiveRoomID string
 }
