@@ -126,12 +126,13 @@ let fullSongName = '';
 let songId = 0;
 let difficulty = 0;
 let readySong = false;
+const videoPlayer = document.getElementById('videoPlayer');
 
 function onImageClick(element) {
     const videoSrcID = 'song' + element.id;
     const video = document.getElementById(videoSrcID);
     const fullVideo = document.getElementById('full' + videoSrcID);
-    const videoPlayer = document.getElementById('videoPlayer');
+
     audio.pause();
     let difficultyList = document.querySelector('.game-menu__difficulty');
     let difficultySegment = difficultyList.querySelectorAll('.segment')
@@ -193,6 +194,7 @@ function gameStart() {
             $.getScript(secondComponent, function() {
                 (async () => {
                     document.getElementsByClassName('loading')[0].style.display= 'flex';
+                    videoPlayer.src = '';
                     classifier = new EdgeImpulseClassifier();
                     await classifier.init();
                     let project = classifier.getProjectInfo();
