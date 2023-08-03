@@ -31,6 +31,8 @@ var broadcastJoinPageWSMessage = make(chan []string)  // [UserID, Data]
 var gameFieldWSDict = make(map[*websocket.Conn]string) // {WSConnection: gameFieldID, WSConnection: gameFieldID, WSConnection: gameFieldID, ...}
 var broadcastGameFieldWSMessage = make(chan []string)
 
+var activeGameRooms []string
+
 type activeRoomData struct {
 	ActiveRoomID string
 }
@@ -136,7 +138,7 @@ type userAchievement struct {
 	Progress          int    `db:"progress"`
 	MaxProgress       int    `db:"max_progress"`
 	Completed         int    `db:"completed"`
-	Level             int    `db:"level"`
+	Collected         int    `db:"collected"`
 }
 
 func homePageHandler(w http.ResponseWriter, r *http.Request) {
@@ -422,7 +424,7 @@ func achievementsPageHandler(db *sqlx.DB) func(w http.ResponseWriter, r *http.Re
 			http.Redirect(w, r, "/logIn", http.StatusFound)
 			return
 		}
-		tmpl, err := template.ParseFiles("pages/achievements.html")
+		tmpl, err := template.ParseFiles("pages/userAchievements.html")
 		if err != nil {
 			http.Error(w, "Internal Server Error", 500)
 			log.Println(err.Error())

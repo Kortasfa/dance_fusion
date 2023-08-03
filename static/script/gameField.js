@@ -71,6 +71,7 @@ btnContinue.addEventListener("click", function () {
 })
 
 let pix;
+let percentage;
 
 function addScore(userID, score, maxScore) {
     let valueScore;
@@ -83,7 +84,7 @@ function addScore(userID, score, maxScore) {
     let starThree= document.getElementById("star-3-" + userID);
     let starFour = document.getElementById("star-4-" + userID);
     let starFive = document.getElementById("star-5-" + userID);
-    let megaStar = document.getElementById("mega-star" + userID);
+    let megaStar = document.getElementById("mega-star-" + userID);
 
     let userIndex;
     for (userIndex = 0; userIndex < connectedUsers.length; userIndex++) {
@@ -135,7 +136,6 @@ function addScore(userID, score, maxScore) {
     if (valueScore >= 0.2 * maxPractice) {
         starOne.src = "/static/img/star_blue.svg";
         starComplete = 1;
-        console.log("ПОЯВИЛАСЬ ЗВЕЗДА ", starComplete)
     }
     if (valueScore >= 0.4 * maxPractice) {
         starTwo.src = "/static/img/star_blue.svg"
@@ -191,7 +191,10 @@ function playerDamage(score) {
 
 let btnExit = document.querySelector(".btn-exit");
 btnExit.addEventListener("click", expelUsers)
-window.onbeforeunload = expelUsers
+window.onbeforeunload = function (){
+    sendGameEndInfoToServer()
+        .then(() => {expelUsers();})
+}
 
 function expelUsers() {
     console.log('Выгоняем всех челов из игры');
@@ -200,14 +203,6 @@ function expelUsers() {
             expelUser(user["userID"]).then(() => {});
         }
     }
-    if (bossInfo) {
-        playerDamage(score);
-    }
-}
-
-function playerDamage(score) {
-    let bossHPCount = document.querySelector(".boss__hp-bar");
-    bossHPCount.innerText = (parseInt(bossHPCount.innerText) - score).toString();
 }
 
 if (bossInfo) {
@@ -235,5 +230,25 @@ async function expelUser(userID) {
     }
     if (socket) {
         socket.close();
+    }
+}
+
+
+
+async function getAchievements(userID, userScore) {
+    const response = await fetch("/api/addUserScore", {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            "user_id": userID, // Integer
+            "score": userScore // Integer
+        }),
+    });
+    if (response.ok) {
+        console.log('Score пользователя обновлен');
+    } else {
+        console.log('Не удалось обновить score пользователя');
     }
 }

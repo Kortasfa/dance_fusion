@@ -468,6 +468,28 @@
     top:0;
     width: 100%;
     height: 100%;
+    z-index: 2;
+}
+
+.logo {
+    display: flex;
+    /*user-select: none;*/
+}
+
+.logo__item {
+    font: 400 42px Cherry Bomb One, cursive;
+    color: #BD63D4;
+    animation: wavy 1s infinite;
+    animation-delay: calc(.1s * var(--i));;
+}
+
+@keyframes wavy {
+    0%, 40%, 100% {
+        transform: translateY(0)
+    }
+    20% {
+        transform: translateY(-20px)
+    }
 }
 
 .game-menu__boss{

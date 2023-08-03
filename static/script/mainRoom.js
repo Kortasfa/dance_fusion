@@ -16,12 +16,16 @@ let readyPlayer = false;
 let mode = ''
 let connectedUsers = [];
 let connectedBots = [];
+let startedGame = false;
 
 btnOpenInfo.addEventListener('click', openGuide);
+window.onbeforeunload = sendGameEndInfoToServer;
 
 const audio = document.querySelector("audio");
 audio.volume = 0.5;
 let notClicked = 1;
+
+
 window.addEventListener("click", event => {
     if (notClicked){
         audio.play();
@@ -134,12 +138,13 @@ let fullSongName = '';
 let songId = 0;
 let difficulty = 0;
 let readySong = false;
+const videoPlayer = document.getElementById('videoPlayer');
 
 function onImageClick(element) {
     const videoSrcID = 'song' + element.id;
     const video = document.getElementById(videoSrcID);
     const fullVideo = document.getElementById('full' + videoSrcID);
-    const videoPlayer = document.getElementById('videoPlayer');
+
     audio.pause();
     let difficultyList = document.querySelector('.game-menu__difficulty');
     let difficultySegment = difficultyList.querySelectorAll('.segment')
@@ -191,6 +196,8 @@ playButton.addEventListener('click', gameStart);
 function gameStart() {
     const contentContainer = $('#content');
     if (readyGame) {
+        startedGame = true;
+        sendGameStartInfoToServer().then(() => {})
         numb = (Math.round(Math.random()*1000)).toString();
         let firstComponent = '/static/test/edge-impulse-standalone.js?version=' + numb;
         let secondComponent = '/static/test/run-impulse.js?version=' + numb;
@@ -199,6 +206,7 @@ function gameStart() {
             $.getScript(secondComponent, function() {
                 (async () => {
                     document.getElementsByClassName('loading')[0].style.display= 'flex';
+                    videoPlayer.src = '';
                     classifier = new EdgeImpulseClassifier();
                     await classifier.init();
                     let project = classifier.getProjectInfo();
@@ -368,6 +376,9 @@ socket.onmessage = function (event) {
 };
 
 socket.onclose = function (event) {
+    if (!startedGame) {
+        window.location.href = "/room";
+    }
     console.log("WebSocket mainRoom connection closed.");
 };
 
@@ -491,3 +502,33 @@ window.addEventListener('load', () => {
         }
     }
 });
+
+async function sendGameStartInfoToServer() {
+    let response = await fetch("/api/startGame", {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: `room_id=${window.location.pathname.split('/').pop()}`,
+    });
+    if (response.ok) {
+        console.log('Отправил сообщение о начале игры');
+    } else {
+        console.log('Не получилось отправить сообщение о начале', response.status);
+    }
+}
+
+async function sendGameEndInfoToServer() {
+    let response = await fetch("/api/endGame", {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: `room_id=${window.location.pathname.split('/').pop()}`,
+    });
+    if (response.ok) {
+        console.log('Отправил сообщение о конце игры');
+    } else {
+        console.log('Не получилось отправить сообщение о конче игры', response.status);
+    }
+}

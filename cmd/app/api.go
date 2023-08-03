@@ -203,7 +203,7 @@ func exitFromGame(r *http.Request) (int, string, error) {
 		log.Println(err.Error())
 		return 0, "", err
 	}
-
+	// создать список комнат, в котоорых в данный момент происходит игра. Если этой комнаты в игре нет, то ничего не посылать
 	selectedRoomID, found := retrieveUserRoom(strconv.Itoa(user.UserID))
 	if !found {
 		return user.UserID, "хз, он уже давно вышел", nil
@@ -222,7 +222,10 @@ func exitFromGame(r *http.Request) (int, string, error) {
 	if err != nil {
 		return 0, "", err
 	}
-	broadcastGameFieldWSMessage <- []string{selectedRoomID, string(messageData)}
+	if containsInSlice(activeGameRooms, selectedRoomID) {
+		endGame(selectedRoomID)
+		broadcastGameFieldWSMessage <- []string{selectedRoomID, string(messageData)}
+	}
 	return user.UserID, selectedRoomID, nil
 }
 
@@ -558,7 +561,10 @@ func deletePlayerFromGame(w http.ResponseWriter, r *http.Request) {
 			log.Println(err.Error())
 			return
 		}
-		broadcastGameFieldWSMessage <- []string{selectedRoomID, string(messageData)}
+		if containsInSlice(activeGameRooms, selectedRoomID) {
+			endGame(selectedRoomID)
+			broadcastGameFieldWSMessage <- []string{selectedRoomID, string(messageData)}
+		}
 		w.WriteHeader(http.StatusOK)
 	}
 	w.WriteHeader(http.StatusNotFound)
@@ -643,5 +649,25 @@ func removeBot(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	roomIDDict[data.RoomID] = removeValueFromSlice(roomIDDict[data.RoomID], data.BotID)
+	w.WriteHeader(http.StatusOK)
+}
+
+func startGameAPI(w http.ResponseWriter, r *http.Request) {
+	roomID := r.FormValue("room_id")
+	if !containsInSlice(activeGameRooms, roomID) {
+		activeGameRooms = append(activeGameRooms, roomID)
+	}
+	w.WriteHeader(http.StatusOK)
+}
+
+func endGame(roomID string) {
+	if containsInSlice(activeGameRooms, roomID) {
+		activeGameRooms = removeValueFromSlice(activeGameRooms, roomID)
+	}
+}
+
+func endGameAPI(w http.ResponseWriter, r *http.Request) {
+	roomID := r.FormValue("room_id")
+	endGame(roomID)
 	w.WriteHeader(http.StatusOK)
 }
