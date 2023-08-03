@@ -71,6 +71,7 @@ btnContinue.addEventListener("click", function () {
 })
 
 let pix;
+let percentage;
 
 function addScore(userID, score, maxScore) {
     let valueScore;
@@ -135,7 +136,6 @@ function addScore(userID, score, maxScore) {
     if (valueScore >= 0.2 * maxPractice) {
         starOne.src = "/static/img/star_blue.svg";
         starComplete = 1;
-        console.log("ПОЯВИЛАСЬ ЗВЕЗДА ", starComplete)
     }
     if (valueScore >= 0.4 * maxPractice) {
         starTwo.src = "/static/img/star_blue.svg"
@@ -230,5 +230,25 @@ async function expelUser(userID) {
     }
     if (socket) {
         socket.close();
+    }
+}
+
+
+
+async function getAchievements(userID, userScore) {
+    const response = await fetch("/api/addUserScore", {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            "user_id": userID, // Integer
+            "score": userScore // Integer
+        }),
+    });
+    if (response.ok) {
+        console.log('Score пользователя обновлен');
+    } else {
+        console.log('Не удалось обновить score пользователя');
     }
 }
