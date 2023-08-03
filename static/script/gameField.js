@@ -233,9 +233,41 @@ async function expelUser(userID) {
     }
 }
 
-
-
 async function getAchievements(userID, userScore) {
+    for (let i = 0; i < connectedUsers.length; i++) {
+        if (connectedUsers[i]["userID"] > 0) {
+            let botsID = [];
+            for (let j = i + 1; j < connectedUsers.length; j++) {
+                if (connectedUsers[j]["userID"] < 0) {
+                    botsID.push(parseInt(connectedUsers[j][userID]) * (-1));
+                }
+            }
+            if (bossInfo) {
+                let bossID = 0;
+                let bossHPCount = document.querySelector(".boss__hp-bar");
+                if (bossHPCount <= 0) {
+                    bossID = bossInfo.bossId;
+                }
+            }
+            const response = await fetch("/api/addUserScore", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    "user_id": userID, // Integer
+                    "song_id": songId, // Integer
+                    "bot_ids": botsID,
+                    "boss_id": bossID
+                }),
+            });
+            if (response.ok) {
+                console.log('Данные на достижения отправлены');
+            } else {
+                console.log('Не удалось отправить данные');
+            }
+        }
+    }
     const response = await fetch("/api/addUserScore", {
         method: 'POST',
         headers: {
