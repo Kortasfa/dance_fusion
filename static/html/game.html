@@ -247,7 +247,6 @@
                     if (data.UserInfo) {
                         let bestUserScore = document.querySelector('.best-player__score');
                         let info = document.querySelectorAll('.player-score');
-                        let users = document.querySelectorAll('.rank__hero');
                         let bestPlayerScore = 0;
                         let bestPlayerId = 0;
                         let I = 0;
@@ -263,7 +262,7 @@
                                 }
                             }
                         }
-                        if ((bestPlayerScore > data.BestScore) && (bestPlayerId > 0)){
+                        if ((bestPlayerScore > data.BestScore)){
                             bestUserScore.innerText = info[I].innerText;
                             updateBestUserInfo(parseInt(songId), parseInt(bestPlayerId), parseInt(bestPlayerScore));
                         } else{

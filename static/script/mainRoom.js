@@ -3,7 +3,7 @@ const listGenre = document.getElementById('listGenre');
 const btnOpenInfo = document.getElementById('openGuide');
 const guide = document.getElementById('guide');
 const returnBtn = document.getElementById('returnButton');
-const PlayBtn = document.getElementById('play');
+const playBtn = document.getElementById('play');
 const songs = document.querySelector('.songs');
 const gameMode = document.getElementById('gameMode');
 const bots = document.getElementById('bots');
@@ -36,7 +36,7 @@ window.addEventListener("click", event => {
 function changeButton() {
     readyGame = readyPlayer && readySong;
     if (readyGame) {
-        PlayBtn.classList.add('button_ready');
+        playBtn.classList.add('button_ready');
     }
 }
 
@@ -58,8 +58,12 @@ function openStyles(regime) {
     mode = regime.getAttribute('mode');
     if (mode == 'Boss'){
         boss.classList.remove('none');
+        playBtn.classList.add('none');
     } else if (mode == 'Bots'){
         bots.classList.remove('none');
+        setTimeout(function() {
+            bots.classList.remove('none');
+        }, 800);
     }
 }
 
@@ -80,10 +84,18 @@ function closeList() {
         returnBtn.classList.toggle('hide');
         listGenre.classList.add('none');
         gameMode.classList.remove('none');
-        bots.classList.add('none');
-        botsMenu.classList.add('bots_open');
-        botsMenu.classList.remove('bots_close');
-        boss.classList.add('none');
+        if(mode === 'Bots'){
+            botsMenu.classList.add('bots_close');
+            botsMenu.classList.add('bots_open');
+            setTimeout(function() {
+                bots.classList.add('none');
+                botsMenu.classList.remove('bots_close');
+            }, 1001);
+        }
+        if (mode === 'Boss') {
+            boss.classList.add('none');
+            playBtn.classList.remove('none');
+        }
         for (let i = 0; i < connectedUsers.length; i++) {
             if (parseInt(connectedUsers[i]["userID"]) < 0 ) {
                 removeUser(connectedUsers[i]["userID"]);
