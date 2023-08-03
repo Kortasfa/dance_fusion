@@ -1,3 +1,5 @@
+USE dance_fusion;
+
 CREATE TABLE songs(
                       `id` INTEGER AUTO_INCREMENT PRIMARY KEY,
                       `song_name` VARCHAR(255) NOT NULL,
@@ -12,7 +14,6 @@ CREATE TABLE songs(
 ) ENGINE = InnoDB
   CHARACTER SET = utf8mb4
   COLLATE utf8mb4_unicode_ci;
-
 
 INSERT INTO songs(song_name, author_name, image_src, video_src, preview_video_src, style_id, difficulty)
 VALUES
