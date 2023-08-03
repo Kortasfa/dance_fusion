@@ -205,8 +205,7 @@ function expelUsers() {
     }
 }
 
-if (bossInfo) {
-    console.log("zahar best");
+if (mode == 'Boss') {
     document.querySelector(".boss-container").classList.remove("hidden");
     document.querySelector(".boss__name").innerText = bossInfo.name;
     document.querySelector(".boss__hp-bar").innerText = (parseInt(bossInfo.healthPoint) * connectedUsers.length).toString();
