@@ -8,19 +8,34 @@
     display: flex;
     align-items: center;
     flex-direction: column;
-    overflow: hidden;
+    overflow-x: hidden;
+    overflow-y: hidden;
 }
 
 .logo {
     display: flex;
+    margin-top: 60px;
 }
 
 .logo__item {
-    font: 400 42px Cherry Bomb One, cursive;
+    font: 400 30px Cherry Bomb One, cursive;
     color: #BD63D4;
 
     animation: wavy 1s infinite;
     animation-delay: calc(.1s * var(--i));;
+}
+
+.btn-leave-room {
+    position: absolute;
+    top: 20px;
+    right: 10px;
+    background: #BD63D4;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 .achievements {
@@ -29,6 +44,8 @@
     display: flex;
     flex-direction: column;
     align-items: center;
+    margin-top: 20px;
+    overflow: hidden;
 }
 
 .achievements__achieve-type {
@@ -38,7 +55,7 @@
 }
 
 .achieve-type__type {
-    width: 150px;
+    width: 130px;
     height: 40px;
     border-radius: 10px;
     background-color: #BD63D4;
@@ -61,6 +78,7 @@
 }
 
 .achievements__achieve-items {
+    height: 70vh;
     padding: 10px 0 10px 0;
     display: flex;
     flex-direction: column;
@@ -69,8 +87,7 @@
 }
 
 .achieve-items__positions {
-    width: 350px;
-    min-height: 50px;
+    width: 320px;
     background-color: #AEF26D;
     border-radius: 10px;
     border-style: dashed;
@@ -78,7 +95,7 @@
     border-color: #BD63D4;
     display: flex;
     align-items: center;
-    padding: 0 10px 0 10px;
+    padding: 5px 10px 5px 10px;
 }
 
 .positions__position-name {
@@ -115,4 +132,12 @@
     20% {
         transform: translateY(-20px)
     }
+}
+
+@media screen and (min-width: 370px) {
+
+    .achieve-items__positions {
+        width: 350px;
+    }
+
 }

@@ -211,7 +211,7 @@
           }
       }
 
-      async function sendPoint(userID, point) {
+      async function sendPoint(userID, ) {
           const response = await fetch("/api/sendPoint", {
               method: 'POST',
               headers: {
@@ -427,5 +427,7 @@
                 return Math.floor(Math.random() * (max - min)) + min;
             }
         }
+
+
     </script>
 </div>

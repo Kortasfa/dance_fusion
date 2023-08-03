@@ -238,3 +238,23 @@ async function expelUser(userID) {
         socket.close();
     }
 }
+
+
+
+async function getAchievements(userID, userScore) {
+    const response = await fetch("/api/addUserScore", {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            "user_id": userID, // Integer
+            "score": userScore // Integer
+        }),
+    });
+    if (response.ok) {
+        console.log('Score пользователя обновлен');
+    } else {
+        console.log('Не удалось обновить score пользователя');
+    }
+}

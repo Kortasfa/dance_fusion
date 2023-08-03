@@ -136,7 +136,7 @@ type userAchievement struct {
 	Progress          int    `db:"progress"`
 	MaxProgress       int    `db:"max_progress"`
 	Completed         int    `db:"completed"`
-	Level             int    `db:"level"`
+	Collected         int    `db:"collected"`
 }
 
 func homePageHandler(w http.ResponseWriter, r *http.Request) {

@@ -9,6 +9,7 @@ const btnLogOut = document.getElementById("logout");
 const user = document.querySelector(".users");
 const menu = document.querySelector(".menu");
 const custom = document.getElementById("custom");
+const achievements = document.getElementById("achievements")
 const btnLeaveRoom = document.querySelector(".btn-leave-room");
 const colorFlag = document.querySelector(".color-flag");
 
@@ -66,6 +67,8 @@ function sendMessage() {
         XHR.open("POST", "/api/joinToRoom");
         XHR.onload = function () {
             if (XHR.status === 200) {
+                user.style.pointerEvents='none'
+                menu.classList.add("menu-hidden");
                 entranceField.classList.add("hidden");
                 danceField.classList.remove("hidden");
                 emptyID.classList.add("hidden");
@@ -208,6 +211,7 @@ btnLeaveRoom.addEventListener("click", exitFromGame);
 window.onbeforeunload = exitFromGame;
 async function exitFromGame() {
     stop = 1;
+    user.style.pointerEvents='auto'
     btnLeaveRoom.classList.add("hidden");
     colorFlag.classList.add("hidden");
     scale.style.height = 0 + 'px';
@@ -278,8 +282,12 @@ function userMenu() {
 btnLogOut.addEventListener("click", exitFromAccount)
 btnGo.addEventListener("click", sendMessage);
 user.addEventListener("click", userMenu);
-custom.addEventListener("click", function() {window.location.href = 'custom '});
-
+custom.addEventListener("click", function() {
+    window.location.href = "custom"
+});
+achievements.addEventListener("click", function () {
+    window.location.href = "achievements"
+});
 
 if (window.DeviceMotionEvent && window.DeviceOrientationEvent) {
     const sensorFrequency = 62.5;
