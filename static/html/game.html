@@ -185,7 +185,7 @@
               }
           }
           let lastUser = true;
-          for (i; i < connectedUsers.length; i++) {
+          for (let i = 0; i < connectedUsers.length; i++) {
               if (parseInt(connectedUsers[i]["userID"]) > 0) {
                   lastUser = false
                   break;
@@ -203,7 +203,7 @@
                   break
               }
           }
-
+          console.log("Сворачиваем игру, так как все вышли");
           if (lastUser) {
               window.location.href = "/room";
           } else {
