@@ -1,11 +1,17 @@
 USE dance_fusion;
-drop table user_achievements;
-drop table achievements;
+DROP TABLE IF EXISTS user_achievements;
+DROP TABLE IF EXISTS achievements;
+DROP TRIGGER IF EXISTS add_new_achievement_to_user_achievements;
+DROP TRIGGER IF EXISTS add_new_user_to_user_achievements;
 
 CREATE TABLE achievements(
                              `achievement_id` INTEGER AUTO_INCREMENT PRIMARY KEY,
                              `achievement_name` VARCHAR(255) NOT NULL,
-                             `max_progress` INTEGER NOT NULL
+                             `max_progress` INTEGER NOT NULL,
+                             `song_id` INTEGER NOT NULL,
+                             `bot_id` INTEGER NOT NULL DEFAULT 0,
+                             `boss_id` INTEGER NOT NULL DEFAULT 0,
+                             `score` INTEGER NOT NULL
 ) ENGINE = InnoDB
   CHARACTER SET = utf8mb4
   COLLATE utf8mb4_unicode_ci;
@@ -19,6 +25,10 @@ CREATE TABLE user_achievements (
                                    `completed` TINYINT NOT NULL DEFAULT 0,
                                    `collected` TINYINT NOT NULL DEFAULT 0,
                                    `max_progress` INTEGER NOT NULL,
+                                   `song_id` INTEGER NOT NULL,
+                                   `bot_id` INTEGER NOT NULL DEFAULT 0,
+                                   `boss_id` INTEGER NOT NULL DEFAULT 0,
+                                   `score` INTEGER NOT NULL,
                                    FOREIGN KEY (`user_id`) REFERENCES dance_fusion.users(`id`),
                                    FOREIGN KEY (`achievement_id`) REFERENCES dance_fusion.achievements(`achievement_id`)
 )
@@ -31,7 +41,7 @@ CREATE TRIGGER add_new_achievement_to_user_achievements
 AFTER INSERT ON achievements
 FOR EACH ROW
 BEGIN
-    INSERT INTO user_achievements (user_id, achievement_id, achievement_name,  progress, completed, collected, max_progress)
+    INSERT INTO user_achievements (user_id, achievement_id, achievement_name,  progress, completed, collected, max_progress, song_id, bot_id, boss_id, score)
     SELECT
         u.id AS user_id,
         NEW.achievement_id,
@@ -39,7 +49,11 @@ BEGIN
         0 AS progress,
         0 AS completed,
         0 AS collected,
-        NEW.max_progress
+        NEW.max_progress,
+        NEW.song_id,
+        NEW.bot_id,
+        NEW.boss_id,
+        NEW.score
     FROM
         users u;
 END;
@@ -49,9 +63,9 @@ DELIMITER ;
 DELIMITER //
 CREATE TRIGGER add_new_user_to_user_achievements
     AFTER INSERT ON users
-    FOR EACH ROW
+FOR EACH ROW
 BEGIN
-    INSERT INTO user_achievements (user_id, achievement_id, achievement_name,  progress, completed, collected, max_progress)
+    INSERT INTO user_achievements (user_id, achievement_id, achievement_name,  progress, completed, collected, max_progress, song_id, bot_id, boss_id, score)
     SELECT
         NEW.id,
         a.achievement_id AS achievement_id,
@@ -59,16 +73,20 @@ BEGIN
         0 AS progress,
         0 AS completed,
         0 AS collected,
-        a.max_progress AS max_progress
+        a.max_progress AS max_progress,
+        a.song_id AS song_id,
+        a.bot_id AS bot_id,
+        a.boss_id AS boss_id,
+        a.score AS score
     FROM
         achievements a;
 END;
 //
 DELIMITER ;
 
-INSERT INTO achievements(achievement_name, max_progress)
+INSERT INTO achievements(achievement_name, max_progress, song_id, bot_id, boss_id, score)
 VALUES
-    ("Debil", 5);
+    ("Сыграть в Forget You", 5, 1, 0, 0, 1000);
 
 
 SELECT * FROM user_achievements;
