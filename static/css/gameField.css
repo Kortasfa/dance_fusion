@@ -239,6 +239,30 @@
     height: 90px;
 }
 
+.boss__body-img{
+    width: 180px;
+    height: 180px;
+    border-radius: 50%;
+}
+
+.boss__face{
+    margin: 16px 10px;
+}
+
+.boss__face-img{
+    width: 160px;
+    height: 160px;
+}
+
+.boss__hat{
+    margin: -130px 6px;
+}
+
+.boss__hat-img{
+    width: 172px;
+    height: 180px;
+}
+
 .dance-movements {
     position:absolute;
     bottom:0;
