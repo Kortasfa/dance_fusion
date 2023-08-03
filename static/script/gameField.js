@@ -2,6 +2,8 @@ let isBtnClicked = false;
 let scoreGood = 20;
 let scoreOk = 3;
 let scorePerfect = 31;
+let bossHp;
+let bossHealth;
 
 const danceVideo = document.getElementById("video-dance");
 const modalElem = document.getElementById("pop-up");
@@ -12,6 +14,7 @@ const starThreeScale = document.getElementById("star-3");
 const starFourScale = document.getElementById("star-4");
 const starFiveScale = document.getElementById("star-5");
 const megaStarScale = document.getElementById("mega-star");
+const bossHpBar = document.querySelector('.boss__hp-bar');
 
 function getUsersByCookie() {
     for (let i = 0; i < connectedUsers.length; i++) {
@@ -184,9 +187,11 @@ function addScore(userID, score, maxScore) {
     }
 }
 
+let hpBar;
 function playerDamage(score) {
-    let bossHPCount = document.querySelector(".boss__hp-bar");
-    bossHPCount.innerText = (parseInt(bossHPCount.innerText) - score).toString();
+    bossHp = bossHp - score;
+    hpBar =  100 * (bossHp / bossHealth);
+    bossHpBar.style.width = hpBar + 'px';
 }
 
 let btnExit = document.querySelector(".btn-exit");
@@ -208,10 +213,12 @@ function expelUsers() {
 if (mode == 'Boss') {
     document.querySelector(".boss-container").classList.remove("hidden");
     document.querySelector(".boss__name").innerText = bossInfo.name;
-    document.querySelector(".boss__hp-bar").innerText = (parseInt(bossInfo.healthPoint) * connectedUsers.length).toString();
+    // document.querySelector(".boss__hp-bar").innerText = (parseInt(bossInfo.healthPoint) * connectedUsers.length).toString();
     document.querySelector(".boss__body-img").src = bossInfo.bossBody;
     document.querySelector(".boss__face-img").src = bossInfo.bossFace;
     document.querySelector(".boss__hat-img").src = bossInfo.bossHat;
+    bossHealth = parseInt(bossInfo.healthPoint) * connectedUsers.length;
+    bossHp = bossHealth;
 }
 
 async function expelUser(userID) {
