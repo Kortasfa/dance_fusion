@@ -326,16 +326,16 @@ let bossInfo;
 
 function bossGame(bossBlock) {
     let name = bossBlock.querySelector(".boss__name").innerText;
-    let healthPoint = bossBlock.querySelector(".boss__health-point").innerText;
-    let bossBody= bossBlock.querySelector(".boss__body-img").src;
-    let bossFace = bossBlock.querySelector(".boss__face-img").src;
-    let bossHat = bossBlock.querySelector(".boss__hat-img").src;
+    let healthPoint = bossBlock.querySelector(".boss__health-point").innerText.replace('Hp: ', '');
+    let bossBody= bossBlock.querySelector(".body").src;
+    let bossFace = bossBlock.querySelector(".face").src;
+    let bossHat = bossBlock.querySelector(".hat").src;
+    let bossId = bossBlock.id;
     if (!gameStart()) {
         console.log("Игра не готова")
         return;
     }
-
-    bossInfo = {"name": name, "healthPoint": healthPoint, "bossBody": bossBody, "bossFace": bossFace, "bossHat": bossHat};
+    bossInfo = {"bossId": bossId, "name": name, "healthPoint": healthPoint, "bossBody": bossBody, "bossFace": bossFace, "bossHat": bossHat};
 
 }
 
