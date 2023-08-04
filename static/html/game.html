@@ -203,8 +203,8 @@
                   break
               }
           }
-          console.log("Сворачиваем игру, так как все вышли");
           if (lastUser) {
+              console.log("Сворачиваем игру, так как все вышли");
               window.location.href = "/room";
           } else {
               referenceUser = getReferenceUser();
@@ -317,7 +317,7 @@
             try {
                 let jsonData = JSON.parse(event.data);
                 if ("ExitingUser" in jsonData) {
-                    console.log("Удаляем пользователя на чёрт");
+                    console.log("Удаляем пользователя на чёрт", jsonData.ExitingUser);
                     removeUser(jsonData.ExitingUser);
                     return;
                 }

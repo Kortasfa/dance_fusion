@@ -288,20 +288,25 @@ func joinPageHandler(db *sqlx.DB) func(w http.ResponseWriter, r *http.Request) {
 		var user userInfo
 		err = getJsonCookie(r, "userInfoCookie", &user)
 		if err != nil {
+			delCookieIfExists(w, r, "userInfoCookie")
 			http.Redirect(w, r, "/logIn", http.StatusFound)
 			log.Println(err.Error())
 			return
 		}
 		tmpl, err := template.ParseFiles("pages/gamePhone.html")
 		if err != nil {
+			delCookieIfExists(w, r, "userInfoCookie")
 			http.Error(w, "Internal Server Error", 500)
+			http.Redirect(w, r, "/logIn", http.StatusFound)
 			log.Println(err.Error())
 			return
 		}
 
 		newAchievement, err := hasNewAchievement(db, user.UserID)
 		if err != nil {
+			delCookieIfExists(w, r, "userInfoCookie")
 			http.Error(w, "Internal Server Error", 500)
+			http.Redirect(w, r, "/logIn", http.StatusFound)
 			log.Println(err.Error())
 			return
 		}
@@ -313,7 +318,9 @@ func joinPageHandler(db *sqlx.DB) func(w http.ResponseWriter, r *http.Request) {
 
 		err = tmpl.Execute(w, data)
 		if err != nil {
+			delCookieIfExists(w, r, "userInfoCookie")
 			http.Error(w, "Internal Server Error", 500)
+			http.Redirect(w, r, "/logIn", http.StatusFound)
 			log.Println(err.Error())
 			return
 		}

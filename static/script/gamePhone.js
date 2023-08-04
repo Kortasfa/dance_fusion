@@ -181,6 +181,7 @@ function joinRoom(userID) {
             maxTheory = receivedJSON["maxPoint"];
             colorID = receivedJSON["color"];
             colorFlag.style.backgroundColor = colorID;
+            console.log("Получил json с движениями, отправляем color на game");
             sendSongJson(enterInRoom.value, maxTheory, colorID).then(() => {})
             scale.style.height = 0 + 'px';
             megaStar.classList.add("hidden");
