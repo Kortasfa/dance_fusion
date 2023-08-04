@@ -18,8 +18,7 @@ VALUES
     ('Zaxar', 'static/bots_list/bot_smart_zaxar.json', 'static/img/hat/withoutHat.png', 'static/img/special/papichBarMontage.gif', '../static/img/face/withoutFace.png', 2),
     ('Valeryan', 'static/bots_list/bot_up_down_hand_valeryan.json', 'static/img/hat/withoutHat.png', 'static/img/special/siBody.png', '../static/img/face/withoutFace.png', 1),
     ('Dasha', 'static/bots_list/bot_super_dasha.json', 'static/img/hat/robinHoodHat.png', 'static/img/body/fe73ac.png', '../static/img/face/badFace.png', 1),
-    ('Michael Jackson', 'static/bots_list/bot_michael_jackson.json', 'static/img/hat/withoutHat.png', 'static/img/special/michaelJackson.png', '../static/img/face/withoutFace.png', 4),
-    ('Kerim', 'static/bots_list/bot_kerim.json', 'static/img/hat/beretHat.png', 'static/img/body/fe5955.png', '../static/img/face/pickUpFace.png', 4);
+    ('Michael Jackson', 'static/bots_list/bot_michael_jackson.json', 'static/img/hat/withoutHat.png', 'static/img/special/michaelJackson.png', '../static/img/face/withoutFace.png', 4);
 select * from bots;
 
 
