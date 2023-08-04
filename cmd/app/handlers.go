@@ -278,23 +278,45 @@ func handleCreateRoom(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/room/"+room.ActiveRoomID, http.StatusFound)
 }
 
-func joinPageHandler(w http.ResponseWriter, r *http.Request) {
-	_, err := r.Cookie("userInfoCookie")
-	if err != nil {
-		http.Redirect(w, r, "/logIn", http.StatusFound)
-		return
-	}
-	tmpl, err := template.ParseFiles("pages/gamePhone.html")
-	if err != nil {
-		http.Error(w, "Internal Server Error", 500)
-		log.Println(err.Error())
-		return
-	}
-	err = tmpl.Execute(w, nil)
-	if err != nil {
-		http.Error(w, "Internal Server Error", 500)
-		log.Println(err.Error())
-		return
+func joinPageHandler(db *sqlx.DB) func(w http.ResponseWriter, r *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
+		_, err := r.Cookie("userInfoCookie")
+		if err != nil {
+			http.Redirect(w, r, "/logIn", http.StatusFound)
+			return
+		}
+		var user userInfo
+		err = getJsonCookie(r, "userInfoCookie", &user)
+		if err != nil {
+			http.Redirect(w, r, "/logIn", http.StatusFound)
+			log.Println(err.Error())
+			return
+		}
+		tmpl, err := template.ParseFiles("pages/gamePhone.html")
+		if err != nil {
+			http.Error(w, "Internal Server Error", 500)
+			log.Println(err.Error())
+			return
+		}
+
+		newAchievement, err := hasNewAchievement(db, user.UserID)
+		if err != nil {
+			http.Error(w, "Internal Server Error", 500)
+			log.Println(err.Error())
+			return
+		}
+		data := struct {
+			NewAchievement int
+		}{
+			NewAchievement: newAchievement,
+		}
+
+		err = tmpl.Execute(w, data)
+		if err != nil {
+			http.Error(w, "Internal Server Error", 500)
+			log.Println(err.Error())
+			return
+		}
 	}
 }
 
@@ -436,7 +458,12 @@ func achievementsPageHandler(db *sqlx.DB) func(w http.ResponseWriter, r *http.Re
 			log.Println(err)
 			return
 		}
-
+		err = removeHasNewAchievement(db, user.UserID)
+		if err != nil {
+			http.Error(w, "Internal Server Error", 500)
+			log.Println(err)
+			return
+		}
 		data := struct {
 			Achievements []userAchievement
 		}{
