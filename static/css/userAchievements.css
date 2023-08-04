@@ -108,18 +108,22 @@
     color: #670080;
 }
 
-.achievements__positions__collected {
+.achievements__positions__completed {
     background-color: #00eaff;
     border-style: solid;
     border-width: 5px;
     border-color: #670080;
 }
 
-.achievements__positions__completed {
+.achievements__positions__collected {
     background-color: #BD63D4;
     border-style: solid;
     border-width: 5px;
     border-color: #670080;
+}
+
+.hidden {
+    display: none;
 }
 
 @keyframes wavy {
