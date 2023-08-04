@@ -229,6 +229,7 @@ async function exitFromGame() {
     colorFlag.style.backgroundColor = "#BD63D4";
     entranceField.classList.remove("hidden");
     danceField.classList.add("hidden");
+    document.querySelector('.dance-block__connection').innerText = 'You are joined!'
     const response = await fetch("/api/exitFromGame", {
         method: 'POST',
         headers: {
@@ -274,14 +275,18 @@ async function exitFromAccount() {
 }
 
 //let isOpen = false;
+
+menu.classList.add("hidden");
 function userMenu() {
+        menu.classList.remove("hidden");
         menu.classList.remove("menu-hidden");
         menu.classList.add("menu-open");
 
 }
 document.addEventListener('click', function(event) {
-    if (!user.contains(event.target)) {
-        menu.classList.add("menu-hidden")
+        if (!user.contains(event.target)) {
+        menu.classList.add("menu-hidden");
+        menu.classList.remove("menu-open");
     }
 });
 
