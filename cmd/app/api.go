@@ -223,7 +223,10 @@ func exitFromGame(r *http.Request) (int, string, error) {
 		return 0, "", err
 	}
 	if containsInSlice(activeGameRooms, selectedRoomID) {
-		endGame(selectedRoomID)
+		if getConnectedUsersCount(selectedRoomID) < 1 {
+			fmt.Println("Сворачиваем игру: ", selectedRoomID)
+			endGame(selectedRoomID)
+		}
 		broadcastGameFieldWSMessage <- []string{selectedRoomID, string(messageData)}
 	}
 	return user.UserID, selectedRoomID, nil
@@ -328,7 +331,7 @@ func getDataSongJson(w http.ResponseWriter, r *http.Request) {
 		log.Println(err.Error())
 		return
 	}
-	fmt.Println(data.RoomID, data.MaxPoint, data.ColorID)
+	fmt.Println("Записываем color и maxPoint в broadcastGameFieldWSMessage", data.RoomID, data.MaxPoint, data.ColorID)
 	broadcastGameFieldWSMessage <- []string{data.RoomID, string(reqData)}
 	w.WriteHeader(200)
 }
@@ -562,7 +565,10 @@ func deletePlayerFromGame(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		if containsInSlice(activeGameRooms, selectedRoomID) {
-			endGame(selectedRoomID)
+			if getConnectedUsersCount(selectedRoomID) < 1 {
+				fmt.Println("Сворачиваем игру: ", selectedRoomID)
+				endGame(selectedRoomID)
+			}
 			broadcastGameFieldWSMessage <- []string{selectedRoomID, string(messageData)}
 		}
 		w.WriteHeader(http.StatusOK)

@@ -60,6 +60,7 @@ func roomWSHandler(db *sqlx.DB) func(w http.ResponseWriter, r *http.Request) {
 						return
 					}
 					if userIDInt < 0 {
+						i++
 						continue
 					}
 					motionListPath := motionListPaths[i]
