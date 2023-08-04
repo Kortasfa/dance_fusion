@@ -241,19 +241,20 @@
 .boss-container{
     width: 200px;
     height: 300px;
-    background: #FFE973;
     position: absolute;
-    border-style: none;
     top: 250px;
     right: 35px;
-    border-radius: 10px;
     display: flex;
     flex-direction: column;
     align-items: center;
 }
 
 .boss__name{
-    font: 700 28px Roboto, sans-serif;
+    font: 700 26px Roboto, sans-serif;
+    border-radius: 10px;
+    background: #FAFCF6;
+    padding: 5px;
+    margin-top: 10px;
 }
 
 .boss__head{
@@ -262,8 +263,19 @@
 }
 
 .boss__hp-bar{
+    margin-top: 10px;
     height: 40px;
+    width: 192px;
+    border-radius: 10px;
+    background: #FAFCF6;
+    border: 5px dashed #BD63D4;
+}
+
+.hp-bar{
+    height: 40px;
+    width: 192px;
     background-color: #ff5c5c;
+    border-radius: 5px;
 }
 
 
@@ -271,7 +283,6 @@
     width: 180px;
     height: 180px;
     border-radius: 50%;
-    border-radius: 10px;
 }
 
 .boss__face{
