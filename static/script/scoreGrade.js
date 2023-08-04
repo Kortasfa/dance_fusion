@@ -123,29 +123,23 @@ function scoreGradeForgetYou(res, score, moveName) {
     return score;
 }
 function scoreGradeRasputin(res, score, moveName) {
+    let sameMoveList = ["i-am-fly", "russian-move", "kalinka-move", "look-at-my-boots", "good-mood"]
     for (let motionDict of res["results"]) {
         if (motionDict["label"] === moveName) {
             score = motionDict["value"];
-            if (moveName !== "russian-move") {
-                if (motionDict["russian-move"] > 0.3) {
-                    score = 0
+            if (!sameMoveList.includes(moveName)) {
+                if (motionDict["russian-move"] > 0.8) {
+                    return 0
                 }
-            }
-            if (moveName !== "gold-jump") {
-                if (motionDict["gold-jump"] > 0.3) {
-                    score = 0
-                }
-            }
-            if (moveName !== "kalinka-move") {
-                if (motionDict["kalinka-move"] > 0.3) {
-                    score = 0
+
+                if (motionDict["i-am-fly"] > 0.8) {
+                    return 0
                 }
             }
             if (moveName === "i-am-fly") {
-                let sameMoveOne = res["results"].find(item => item.label === "gold-jump");
+                let sameMoveOne = res["results"].find(item => item.label === "russian-move");
                 let sameMoveTwo = res["results"].find(item => item.label === "clap-clap");
-                let sameMoveThree = res["results"].find(item => item.label === "russian-move");
-                score = Math.max(motionDict["value"], sameMoveOne.value, sameMoveTwo.value, sameMoveThree.value);
+                score = Math.max(motionDict["value"], sameMoveOne.value ,sameMoveTwo.value);
             }
             if (moveName === "russian-move") {
                 let sameMoveOne = res["results"].find(item => item.label === "kalinka-move");
@@ -154,22 +148,18 @@ function scoreGradeRasputin(res, score, moveName) {
             }
             if (moveName === "kalinka-move") {
                 let sameMoveOne = res["results"].find(item => item.label === "russian-move");
-                let sameMoveTwo = res["results"].find(item => item.label === "gold-jump");
-                score = Math.max(motionDict["value"], sameMoveOne.value, sameMoveTwo.value);
+                score = Math.max(motionDict["value"], sameMoveOne.value);
             }
             if (moveName === "guitar-move") {
                 let sameMoveOne = res["results"].find(item => item.label === "kalinka-move");
-                let sameMoveTwo = res["results"].find(item => item.label === "gold-jump");
-                score = Math.max(motionDict["value"], sameMoveOne.value, sameMoveTwo.value);
+                score = Math.max(motionDict["value"], sameMoveOne.value);
             }
             if (moveName === "up-down-move") {
                 let sameMoveOne = res["results"].find(item => item.label === "clap-clap");
-                let sameMoveTwo = res["results"].find(item => item.label === "gold-jump");
-                score = Math.max(motionDict["value"], sameMoveOne.value, sameMoveTwo.value);
+                score = Math.max(motionDict["value"], sameMoveOne.value);
             }
             if (moveName === "big-and-strong") {
-                let sameMoveOne = res["results"].find(item => item.label === "gold-jump");
-                score = Math.max(motionDict["value"], sameMoveOne.value);
+                score = Math.max(motionDict["value"]);
             }
             if (moveName === "look-at-my-boots") {
                 let sameMoveOne = res["results"].find(item => item.label === "russian-move");
@@ -188,7 +178,10 @@ function scoreGradeRasputin(res, score, moveName) {
                 let sameMoveOne = res["results"].find(item => item.label === "russian-move");
                 score = Math.max(motionDict["value"], sameMoveOne.value);
             }
-
+            if (score < 0.05)
+            {
+                score = score * 10;
+            }
         }
     }
     return score;
