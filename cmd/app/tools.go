@@ -60,3 +60,12 @@ func removeValueFromSlice(words []string, valueToRemove string) []string {
 
 	return result
 }
+
+func containsInSlice(s []string, item string) bool {
+	for i := 0; i < len(s); i++ {
+		if s[i] == item {
+			return true
+		}
+	}
+	return false
+}

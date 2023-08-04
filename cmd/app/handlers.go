@@ -13,6 +13,8 @@ import (
 	"time"
 )
 
+const hashCost = 8
+
 var upgrader = websocket.Upgrader{
 	ReadBufferSize:  1024,
 	WriteBufferSize: 1024,
@@ -27,7 +29,13 @@ var joinPageWSDict = make(map[*websocket.Conn]string) // {WSConnection: UserID, 
 var broadcastJoinPageWSMessage = make(chan []string)  // [UserID, Data]
 
 var gameFieldWSDict = make(map[*websocket.Conn]string) // {WSConnection: gameFieldID, WSConnection: gameFieldID, WSConnection: gameFieldID, ...}
-//var broadcastGameFieldWSMessage = make(chan []string)
+var broadcastGameFieldWSMessage = make(chan []string)
+
+var activeGameRooms []string
+
+type activeRoomData struct {
+	ActiveRoomID string
+}
 
 type stylesData struct {
 	StyleID   int    `db:"id"`
@@ -42,19 +50,53 @@ type songsData struct {
 	VideoSrc        string `db:"video_src"`
 	ImageSrc        string `db:"image_src"`
 	StyleID         int    `db:"style_id"`
+	Difficulty      int    `db:"difficulty"`
 }
 
 type userInfo struct {
 	UserID   int
 	UserName string
-	ImgSrc   string
+	HatSrc   string
+	FaceSrc  string
+	BodySrc  string
+}
+
+type bestPlayerInfo struct {
+	UserID int `db:"best_player_id"`
+	Score  int `db:"best_score"`
+}
+
+type botInfo struct {
+	BotId         string `db:"bot_id"`
+	BotScoresPath string `db:"bot_scores_path"`
+	BotImgHat     string `db:"img_hat"`
+	BotImgBody    string `db:"img_body"`
+	BotImgFace    string `db:"img_face"`
+	Difficulty    int    `db:"difficulty"`
+}
+
+type botNameData struct {
+	BotName    string `db:"bot_name"`
+	Difficulty int    `db:"difficulty"`
+}
+
+type bossInfo struct {
+	BossId          string `db:"boss_id"`
+	BossName        string `db:"boss_name"`
+	BossHealthPoint string `db:"boss_health_point"`
+	BossImgHat      string `db:"img_hat"`
+	BossImgBody     string `db:"img_body"`
+	BossImgFace     string `db:"img_face"`
 }
 
 type menuPageData struct {
-	Styles  []stylesData
-	Songs   []songsData
-	RoomKey string
-	WssURL  string
+	Styles         []stylesData
+	Songs          []songsData
+	RoomKey        string
+	ConnectedUsers []userInfo
+	Bots           []botNameData
+	Bosses         []bossInfo
+	WssURL         string
 }
 
 type userAvatarData struct {
@@ -82,9 +124,21 @@ type bodyData struct {
 }
 
 type customPageData struct {
-	Faces  []facesData
-	Bodies []bodyData
-	Hats   []hatData
+	Faces     []facesData
+	Bodies    []bodyData
+	Hats      []hatData
+	UserScore int
+}
+
+type userAchievement struct {
+	UserAchievementID int    `db:"user_achievement_id"`
+	UserID            int    `db:"user_id"`
+	AchievementID     int    `db:"achievement_id"`
+	AchievementName   string `db:"achievement_name"`
+	Progress          int    `db:"progress"`
+	MaxProgress       int    `db:"max_progress"`
+	Completed         int    `db:"completed"`
+	Collected         int    `db:"collected"`
 }
 
 func homePageHandler(w http.ResponseWriter, r *http.Request) {
@@ -107,44 +161,33 @@ func homePageHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func sendConnectedUserInfo(db *sqlx.DB, roomID string) error {
-	userIDs := roomIDDict[roomID]
-	for _, userID := range userIDs {
-		const query = `
-			SELECT
-				name,
-				img_src
-			FROM
-				users
-			WHERE id = ?`
-
-		var data struct {
-			UserName string `db:"name"`
-			ImgSrc   string `db:"img_src"`
-		}
-
-		id, err := strconv.Atoi(userID)
-		if err != nil {
-			return err
-		}
-		err = db.Get(&data, query, id)
-		if err != nil {
-			return err
-		}
-		broadcastJoiningUserID <- []string{"add", roomID, userID, data.UserName, data.ImgSrc}
-	}
-	return nil
-}
-
 func handleRoom(db *sqlx.DB) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
 		roomID := vars["id"]
+
+		var room activeRoomData
+		err := getJsonCookie(r, "activeRoomCookie", &room)
+		if err != nil {
+			http.Redirect(w, r, "/room", http.StatusFound)
+		}
+		if room.ActiveRoomID != roomID {
+			http.Redirect(w, r, "/room/"+room.ActiveRoomID, http.StatusFound)
+		}
+
 		_, exists := roomIDDict[roomID]
 		if !exists {
 			w.WriteHeader(404)
 			return
 		}
+
+		for _, userID := range roomIDDict[roomID] { // Удаляем ботов из комнаты
+			userIDInt, err := strconv.Atoi(userID)
+			if err == nil && userIDInt < 0 {
+				roomIDDict[roomID] = removeValueFromSlice(roomIDDict[roomID], userID)
+			}
+		}
+
 		tmpl, err := template.ParseFiles("pages/mainRoom.html")
 		if err != nil {
 			http.Error(w, "Internal Server Error", 500)
@@ -165,11 +208,35 @@ func handleRoom(db *sqlx.DB) func(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
+		users, err := getConnectedUsers(roomID, db)
+		if err != nil {
+			http.Error(w, "Internal Server Error", 500)
+			log.Println(err)
+			return
+		}
+
+		bots, err := getBotNames(db)
+		if err != nil {
+			http.Error(w, "Internal Server Error", 500)
+			log.Println(err)
+			return
+		}
+
+		bosses, err := getBossInfo(db)
+		if err != nil {
+			http.Error(w, "Internal Server Error", 500)
+			log.Println(err)
+			return
+		}
+
 		data := menuPageData{
-			Styles:  styles,
-			Songs:   songs,
-			RoomKey: roomID,
-			WssURL:  "wss://" + r.Host + "/roomWS/" + roomID,
+			Styles:         styles,
+			Songs:          songs,
+			RoomKey:        roomID,
+			ConnectedUsers: users,
+			Bots:           bots,
+			Bosses:         bosses,
+			WssURL:         "wss://" + r.Host + "/roomWS/" + roomID,
 		}
 
 		err = tmpl.Execute(w, data)
@@ -178,31 +245,37 @@ func handleRoom(db *sqlx.DB) func(w http.ResponseWriter, r *http.Request) {
 			log.Println(err.Error())
 			return
 		}
-
-		go func() {
-			time.Sleep(1000 * time.Millisecond)
-			err = sendConnectedUserInfo(db, roomID)
-			if err != nil {
-				http.Error(w, "Internal Server Error", 500)
-				log.Println(err.Error())
-				return
-			}
-		}()
 	}
 }
 
 func handleCreateRoom(w http.ResponseWriter, r *http.Request) {
-	rand.Seed(time.Now().UnixNano())
-	var roomID int
-	for {
-		roomID = rand.Intn(100)
-		_, exists := roomIDDict[fmt.Sprintf("%d", roomID)]
-		if !exists {
-			break
+	var room activeRoomData
+	err := getJsonCookie(r, "activeRoomCookie", &room)
+	if err != nil {
+		rand.Seed(time.Now().UnixNano())
+		var roomID int
+		for {
+			roomID = rand.Intn(100-10-1) + 10
+			_, exists := roomIDDict[fmt.Sprintf("%d", roomID)]
+			if !exists {
+				break
+			}
 		}
+		roomIDDict[fmt.Sprintf("%d", roomID)] = []string{}
+		room.ActiveRoomID = fmt.Sprintf("%d", roomID)
+		err := setJsonCookie(w, "activeRoomCookie", room, time.Hour*24)
+		if err != nil {
+			log.Println("Error setting active room cookie:", err)
+			http.Error(w, "Internal Server Error", 500)
+			return
+		}
+		http.Redirect(w, r, fmt.Sprintf("/room/%d", roomID), http.StatusFound)
 	}
-	roomIDDict[fmt.Sprintf("%d", roomID)] = []string{}
-	http.Redirect(w, r, fmt.Sprintf("/room/%d", roomID), http.StatusFound)
+	_, exists := roomIDDict[room.ActiveRoomID]
+	if !exists {
+		roomIDDict[room.ActiveRoomID] = []string{}
+	}
+	http.Redirect(w, r, "/room/"+room.ActiveRoomID, http.StatusFound)
 }
 
 func joinPageHandler(w http.ResponseWriter, r *http.Request) {
@@ -287,7 +360,8 @@ func logIn(w http.ResponseWriter, r *http.Request) {
 
 func customPageHandler(db *sqlx.DB) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
-		_, err := r.Cookie("userInfoCookie")
+		var user userInfo
+		err := getJsonCookie(r, "userInfoCookie", &user)
 		if err != nil {
 			http.Redirect(w, r, "/logIn", http.StatusFound)
 			return
@@ -319,10 +393,54 @@ func customPageHandler(db *sqlx.DB) func(w http.ResponseWriter, r *http.Request)
 			return
 		}
 
+		userScore, err := getScoreByUserID(db, user.UserID)
+		if err != nil {
+			http.Error(w, "Internal Server Error", 500)
+			log.Println(err)
+			return
+		}
+
 		data := customPageData{
-			Faces:  faces,
-			Bodies: bodies,
-			Hats:   hats,
+			Faces:     faces,
+			Bodies:    bodies,
+			Hats:      hats,
+			UserScore: userScore,
+		}
+
+		err = tmpl.Execute(w, data)
+		if err != nil {
+			http.Error(w, "Internal Server Error", 500)
+			log.Println(err.Error())
+			return
+		}
+	}
+}
+
+func achievementsPageHandler(db *sqlx.DB) func(w http.ResponseWriter, r *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
+		var user userInfo
+		err := getJsonCookie(r, "userInfoCookie", &user)
+		if err != nil {
+			http.Redirect(w, r, "/logIn", http.StatusFound)
+			return
+		}
+		tmpl, err := template.ParseFiles("pages/userAchievements.html")
+		if err != nil {
+			http.Error(w, "Internal Server Error", 500)
+			log.Println(err.Error())
+			return
+		}
+		achievements, err := getUserAchievements(db, user.UserID)
+		if err != nil {
+			http.Error(w, "Internal Server Error", 500)
+			log.Println(err)
+			return
+		}
+
+		data := struct {
+			Achievements []userAchievement
+		}{
+			Achievements: achievements,
 		}
 
 		err = tmpl.Execute(w, data)

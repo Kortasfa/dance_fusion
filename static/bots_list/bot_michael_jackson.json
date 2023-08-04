@@ -1,0 +1,6 @@
+{
+  "minScore": 40,
+  "maxScore": 50,
+  "chanceZero": 0.57,
+  "stdDeviationRatio": 10
+}

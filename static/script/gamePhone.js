@@ -7,7 +7,13 @@ const emptyID = document.getElementById("id-empty");
 const fullID = document.getElementById("id-full");
 const btnLogOut = document.getElementById("logout");
 const user = document.querySelector(".users");
-const menu = document.querySelector(".menu")
+const menu = document.querySelector(".menu");
+const custom = document.getElementById("custom");
+const achievements = document.getElementById("achievements")
+const btnLeaveRoom = document.querySelector(".btn-leave-room");
+const colorFlag = document.querySelector(".color-flag");
+
+let inGame = false;
 
 function setJsonCookie(name, value, expirationDays) {
     const jsonValue = JSON.stringify(value);
@@ -38,7 +44,9 @@ const userInfo = getJsonCookie("userInfoCookie");
 let userID = userInfo.UserID;
 
 document.querySelector('.user__name').textContent = userInfo.UserName;
-document.querySelector('.user__avatar').src = userInfo.ImgSrc;
+document.querySelector('.body').src = "../" + userInfo.BodySrc;
+document.querySelector('.face').src = "../" + userInfo.FaceSrc;
+document.querySelector('.hat').src = "../" + userInfo.HatSrc;
 
 function sendMessage() {
     if (enterInRoom.value === "") {
@@ -61,11 +69,15 @@ function sendMessage() {
         XHR.open("POST", "/api/joinToRoom");
         XHR.onload = function () {
             if (XHR.status === 200) {
+                user.style.pointerEvents='none'
+                menu.classList.add("menu-hidden");
                 entranceField.classList.add("hidden");
                 danceField.classList.remove("hidden");
                 emptyID.classList.add("hidden");
                 fullID.classList.add("hidden");
                 warningID.classList.add("hidden");
+                btnLeaveRoom.classList.remove("hidden");
+                colorFlag.classList.remove("hidden");
                 console.log("Connected to the room!");
                 joinRoom(userInfo.UserID)
             } else if (XHR.status === 404) {
@@ -89,6 +101,19 @@ function sendMessage() {
 }
 
 let socket;
+let value;
+let pix;
+let percentage;
+let maxTheory;
+let colorID;
+let scale = document.querySelector(".dance-block__rating-scale");
+const starOne = document.getElementById("star-1");
+const starTwo = document.getElementById("star-2");
+const starThree = document.getElementById("star-3");
+const starFour = document.getElementById("star-4");
+const starFive = document.getElementById("star-5");
+const megaStar = document.getElementById("mega-star");
+const stars = document.querySelectorAll(".rating-stars__star");
 function joinRoom(userID) {
     socket = new WebSocket("wss://" + window.location.hostname + "/ws/joinToRoom/" + userID);
     socket.onopen = function(event) {
@@ -96,20 +121,115 @@ function joinRoom(userID) {
     };
 
     socket.onmessage = function(event) {
+        let maxPractice = maxTheory - maxTheory * 0.2; //4480
         let receivedData = event.data;
-        handleDanceData(JSON.parse(receivedData));
-        document.querySelector('.dance-block__connection').innerText = 'Dance!';
-3
+        let receivedJSON = JSON.parse(receivedData);
+        console.log(receivedJSON);
+        if ("point" in receivedJSON) {
+            let score = receivedJSON["point"];
+            console.log("score: " + score);
+            if (value > 5600) return
+            value += score;
+            console.log("value: " + value);
+            if (value <= maxTheory) {
+                console.log("value: " + value);
+                percentage = (value / maxPractice);
+                console.log("percentage: " + percentage);
+                pix = 250 * percentage;
+                console.log("pix: " + pix);
+            }
+            if (value > maxTheory) {
+                percentage = (value / maxTheory);
+                console.log("percentage: " + percentage);
+                pix = 50 * percentage;
+                console.log("pix: " + pix);
+            }
+            scale.style.height = pix + 'px';
+            if (value >= 0.2 * maxPractice) {
+                starOne.src = "/static/img/star_blue.svg"
+            }
+            if (value >= 0.4 * maxPractice) {
+                starTwo.src = "/static/img/star_blue.svg"
+            }
+            if (value >= 0.6 * maxPractice) {
+                starThree.src = "/static/img/star_blue.svg"
+            }
+            if (value >= 0.8 * maxPractice) {
+                starFour.src = "/static/img/star_blue.svg"
+            }
+            if (value >= maxPractice) {
+                starFive.src = "/static/img/star_blue.svg"
+            }
+            if (value >= 0.9 * maxTheory) {
+                megaStar.src = "/static/img/mega-star.svg"
+                megaStar.classList.remove("hidden");
+            }
+        } else if ("Exit" in receivedJSON) {
+            console.log("Вас выгняли");
+            // Тут надо делать всё то же самое, что в exitFromGame, но без зпроса
+            inGame = false;
+            stop = 1;
+            btnLeaveRoom.classList.add("hidden");
+            colorFlag.classList.add("hidden");
+            entranceField.classList.remove("hidden");
+            danceField.classList.add("hidden");
+        } else {
+            inGame = true;
+            value = 0;
+            stop = 0;
+            pix = 0;
+            percentage = 0;
+            maxTheory = receivedJSON["maxPoint"];
+            colorID = receivedJSON["color"];
+            colorFlag.style.backgroundColor = colorID;
+            sendSongJson(enterInRoom.value, maxTheory, colorID).then(() => {})
+            scale.style.height = 0 + 'px';
+            megaStar.classList.add("hidden");
+            stars.forEach(element => element.src = "/static/img/star_white.svg");
+            handleDanceData(receivedJSON["motions"]);
+            document.querySelector('.dance-block__connection').innerText = 'Dance!';
+        }
     };
 
     socket.onclose = function(event) {
+        window.location.reload();
         console.log("WebSocket connection closed.");
     };
 }
 
+async function sendSongJson(roomID, maxTheory, colorID) {
+    const response = await fetch("/api/sendDataSongJson", {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            "roomID": roomID,
+            "maxPoint": maxTheory,
+            "colorID": colorID
+        }),
+    });
+    if (response.ok) {
+        console.log('Максимальный балл отправлен');
+    } else {
+        console.log('Не удалось отправить максимальный балл');
+    }
+}
+
+btnLeaveRoom.addEventListener("click", exitFromGame);
 
 window.onbeforeunload = exitFromGame;
 async function exitFromGame() {
+    stop = 1;
+    user.style.pointerEvents='auto'
+    btnLeaveRoom.classList.add("hidden");
+    colorFlag.classList.add("hidden");
+    scale.style.height = 0 + 'px';
+    megaStar.classList.add("hidden");
+    stars.forEach(element => element.src = "/static/img/star_white.svg");
+    colorFlag.style.backgroundColor = "#BD63D4";
+    entranceField.classList.remove("hidden");
+    danceField.classList.add("hidden");
     const response = await fetch("/api/exitFromGame", {
         method: 'POST',
         headers: {
@@ -120,16 +240,21 @@ async function exitFromGame() {
     if (!response.ok) {
         console.log('Не удалось выйти из игры');
     } else {
-        if (socket !== undefined) {
+        if (inGame && socket !== undefined) {
+            console.log("Закрываем бобанный WS");
             socket.close();
             socket = undefined
         }
+        inGame = false;
         console.log('Вышел из игры');
+        entranceField.classList.remove("hidden");
+        danceField.classList.add("hidden");
     }
-    stop = 1;
 }
 
 async function exitFromAccount() {
+    exitFromGame().then(() => {})
+    window.onbeforeunload = null;
     const response = await fetch("/api/exitFromAccount", {
         method: 'POST',
         headers: {
@@ -167,7 +292,12 @@ function userMenu() {
 btnLogOut.addEventListener("click", exitFromAccount)
 btnGo.addEventListener("click", sendMessage);
 user.addEventListener("click", userMenu);
-
+custom.addEventListener("click", function() {
+    window.location.href = "custom"
+});
+achievements.addEventListener("click", function () {
+    window.location.href = "achievements"
+});
 
 if (window.DeviceMotionEvent && window.DeviceOrientationEvent) {
     const sensorFrequency = 62.5;
@@ -195,7 +325,7 @@ if (window.DeviceMotionEvent && window.DeviceOrientationEvent) {
     function startRecording(name, duration) {
         window.addEventListener('devicemotion', handleSensorData, true);
         window.addEventListener('deviceorientation', handleSensorData, true);
-        setTimeout(function () {stopRecording(name);}, duration * 1300); // 1000 /// // / / /// / / / / / / / / / / /  / /              /////
+        setTimeout(function () {stopRecording(name);}, duration * 1300);
     }
 
     function stopRecording(name) {
@@ -247,24 +377,23 @@ function sendDataToServer(data) {
                     console.log('Данные успешно отправлены.');
                 } else {
                     console.log('Ошибка при отправке данных. Статус:', response.status);
-                    if (response.status === 409) {
+                    /*if (response.status === 409) {
                         stop = 1;
-                        exitFromGame().then(r => {})
-                        document.querySelector('.dance-block__connection').innerText = 'Комната была закрыта';
-                        //window.location.replace("/join")
-                    }
+                        exitFromGame().then(r => {})// При закрытии игры не надо выходить из комнаты. Надо оставлять пользователя в комнате. Просто пишем ""
+                        document.querySelector('.dance-block__connection').innerText = "The room was closed";
+                        window.location.replace("/join")
+                    }*/
                 }
             })
             .catch(function (error) {
-                console.log('Ошибка при отправке данных:', error);
+                console.log('Ошибка при отправке данных: ', error);
             });
     } else {
-        console.log('123');
+        console.log('игра остановлена');
     }
 }
 
 function handleDanceData(danceDataJson) {
-    //let oldStartTime = 0;
     for (let danceData of danceDataJson) {
         setTimeout(function () {
                 if (stop !== 1) {
@@ -272,6 +401,5 @@ function handleDanceData(danceDataJson) {
                 }
             },
             (danceData['start_time']) * 1000);
-        //oldStartTime += danceData['start_time'];
     }
 }

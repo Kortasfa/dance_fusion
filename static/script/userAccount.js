@@ -3,9 +3,27 @@ const userFace = document.querySelector('.user-face');
 const userHat = document.querySelector('.user-hat');
 const element = document.querySelectorAll('.element');
 const item = document.querySelectorAll('.type');
-const userLvl = parseInt(document.getElementById('level').innerText);
+let userLvl = 0;
 const saveButton = document.getElementById('saveButton');
+parseInt(document.getElementById('level').innerText)
+function getJsonCookie(name){
+    const cookies = document.cookie.split(';');
+    for (let i = 0; i < cookies.length; i++) {
+        const cookie = cookies[i].trim();
+        if (cookie.startsWith(name + '=')) {
+            const encodedValue = cookie.substring(name.length + 1);
+            const decodedValue = decodeURIComponent(encodedValue);
+            return JSON.parse(decodedValue);
+        }
+    }
+    return null;
+}
 
+const userInfo = getJsonCookie("userInfoCookie");
+userHat.src = userInfo.HatSrc;
+userFace.src = userInfo.FaceSrc;
+userBody.src = userInfo.BodySrc;
+document.querySelector('.avatar__name').innerText = userInfo.UserName;
 function openElement(type){
     let nameType = '.' + type.id;
     let itemSelect = document.querySelectorAll(nameType);
@@ -23,20 +41,30 @@ function openElement(type){
 }
 
 function changeHat(hat){
-    if (hat.classList.contains('unavailable')){} else
-    userHat.src = hat.querySelector(".element__hat").getAttribute("src");
+    if (!hat.classList.contains('unavailable')) {
+        userHat.src = hat.querySelector(".element__hat").getAttribute("src");
+    }
 }
 
 function changeFace(face){
-    if (face.classList.contains('unavailable')){} else
-    userFace.src = face.querySelector(".element__face").getAttribute("src");
+    if (!face.classList.contains('unavailable')) {
+        userFace.src = face.querySelector(".element__face").getAttribute("src");
+    }
 }
 
 function changeBody(body){
-    if (body.classList.contains('unavailable')){} else
-    userBody.src = body.querySelector(".element__body").getAttribute("src");
+    if (!body.classList.contains('unavailable')){
+        userBody.src = body.querySelector(".element__body").getAttribute("src");
+    }
 }
 function verificationLvl() {
+    let lvlScore = 3000;
+    while (userScore > lvlScore) {
+        userLvl++;
+        userScore = userScore - lvlScore;
+        lvlScore = Math.round(lvlScore * 1.1);
+    }
+    document.getElementById('level').innerText = userLvl;
     for(let i = 0;  i < element.length; i++){
         if (userLvl < element[i].getAttribute('lvl'))
         element[i].classList.add('unavailable')
@@ -46,6 +74,7 @@ verificationLvl()
 
 
 async function changeAvatar() {
+
     if ((userHat.getAttribute("src") !== null) && (userFace.getAttribute("src") !== null) && (userBody.getAttribute("src") !== null)){
         const dataToSend = {
             hatSrc: userHat.getAttribute("src"),
@@ -61,6 +90,7 @@ async function changeAvatar() {
         });
         if (response.ok) {
             console.log('Кастомизация принята');
+            window.location.href = 'join';
         } else {
             console.log('Не удалось применить кастомизацию');
         }
