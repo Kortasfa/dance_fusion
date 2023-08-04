@@ -758,23 +758,11 @@ func checkForAchievements(db *sqlx.DB) http.HandlerFunc {
 
 func earnPointsForAchievements(db *sqlx.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		reqData, err := io.ReadAll(r.Body)
+		var _ = r.FormValue("achievement_id")
+		var user userInfo
+		err := getJsonCookie(r, "userInfoCookie", &user)
 		if err != nil {
-			http.Error(w, "Parsing error", 500)
-			log.Println(err.Error())
-			return
-		}
-
-		var data struct {
-			UserID int   `json:"user_id"`
-			SongID int   `json:"song_id"`
-			BotIDs []int `json:"bot_ids"`
-			BossID int   `json:"boss_id"`
-		}
-
-		err = json.Unmarshal(reqData, &data)
-		if err != nil {
-			http.Error(w, "JSON parsing error", 500)
+			http.Redirect(w, r, "/logIn", http.StatusFound)
 			log.Println(err.Error())
 			return
 		}

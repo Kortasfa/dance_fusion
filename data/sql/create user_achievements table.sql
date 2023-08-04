@@ -92,11 +92,11 @@ VALUES
 	('Win the easy bot', 1, 0, 1, 0, 2000),
 	('Win the medium bot', 1, 2, 0, 0, 3000),
     ('Win the hard bot', 1, 0, 3, 0, 4000),
-    ('Win the extrim bot', 1, 0, 4, 0, 5000),
-    ('Finish off Rhythmo', 1, 0, 0, 0, 2000),
-    ('Finish off Electric Maestro', 1, 0, 0, 0, 3000),
-    ('Finish off Funk Fusionist', 1, 0, 0, 0, 4000),
-    ('Finish off Tempo Titan', 1, 0, 0, 0, 5000);
+    ('Win the extreme bot', 1, 0, 4, 0, 5000),
+    ('Finish off Rhythmo', 1, 0, 0, 4, 2000),
+    ('Finish off Electric Maestro', 1, 0, 0, 3, 3000),
+    ('Finish off Funk Fusionist', 1, 0, 0, 2, 4000),
+    ('Finish off Tempo Titan', 1, 0, 0, 1, 5000);
 
 
 SELECT * FROM user_achievements;
