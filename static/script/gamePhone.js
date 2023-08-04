@@ -69,8 +69,9 @@ function sendMessage() {
         XHR.open("POST", "/api/joinToRoom");
         XHR.onload = function () {
             if (XHR.status === 200) {
-                user.style.pointerEvents='none'
-                menu.classList.add("menu-hidden");
+                user.style.pointerEvents='none';
+                menu.classList.add("menu-hidden"); //
+                menu.classList.remove("menu-open"); //
                 entranceField.classList.add("hidden");
                 danceField.classList.remove("hidden");
                 emptyID.classList.add("hidden");
@@ -230,6 +231,8 @@ async function exitFromGame() {
     colorFlag.style.backgroundColor = "#BD63D4";
     entranceField.classList.remove("hidden");
     danceField.classList.add("hidden");
+    menu.classList.remove("menu-hidden"); //
+    isOpen = false; //
     const response = await fetch("/api/exitFromGame", {
         method: 'POST',
         headers: {
