@@ -9,8 +9,8 @@ CREATE TABLE songs(
                       `preview_video_src` VARCHAR(255) NOT NULL,
                       `style_id` INTEGER NOT NULL,
                       `difficulty` INTEGER NOT NULL,
-                      `best_player_id` INTEGER,
-                      `best_score` INTEGER
+                      `best_player_id` INTEGER DEFAULT 1,
+                      `best_score` INTEGER DEFAULT 0
 ) ENGINE = InnoDB
   CHARACTER SET = utf8mb4
   COLLATE utf8mb4_unicode_ci;
