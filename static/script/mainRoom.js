@@ -11,7 +11,6 @@ const botsMenu = document.getElementById('botMenu');
 const boss = document.getElementById('boss');
 
 let readyGame = false;
-let numberOfUser = 0;
 let readyPlayer = false;
 let mode = ''
 let connectedUsers = [];
@@ -414,7 +413,10 @@ function addUser(userID, userName, hatImgSrc, faceImgSrc, bodyImgSrc) {
     indexUserHatImg.src = hatImgSrc;
     indexUserName.innerText = userName;
 
-    readyPlayer = true;
+    if (userID > 0){
+        readyPlayer = true;
+    }
+
     changeButton();
     return true;
 }
