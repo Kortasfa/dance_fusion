@@ -177,7 +177,7 @@ function joinRoom(userID) {
             entranceField.classList.remove("hidden");
             danceField.classList.add("hidden");
             document.querySelector('.dance-block__connection').innerText = 'You are joined!'
-            if (inGame && socket !== undefined) {
+            if (socket !== undefined) {
                 console.log("Закрываем бобанный WS");
                 socket.close();
                 socket = undefined
@@ -254,7 +254,7 @@ async function exitFromGame() {
     if (!response.ok) {
         console.log('Не удалось выйти из игры');
     } else {
-        if (inGame && socket !== undefined) {
+        if (socket !== undefined) {
             console.log("Закрываем бобанный WS");
             socket.close();
             socket = undefined
