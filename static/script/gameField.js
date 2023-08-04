@@ -23,13 +23,11 @@ function getUsersByCookie() {
         let bodyImgSrc = connectedUsers[i]["bodyImgSrc"];
         let faceImgSrc = connectedUsers[i]["faceImgSrc"];
         let hatImgSrc = connectedUsers[i]["hatImgSrc"];
-        let userScore = document.getElementById('player-result' + (i + 1));
         let indexUser = document.getElementById('hero' + (i + 1));
         let indexUserName = indexUser.querySelector(".hero__name");
         let indexUserBodyImg = indexUser.querySelector(".body");
         let indexUserFaceImg = indexUser.querySelector(".face");
         let indexUserHatImg = indexUser.querySelector(".hat");
-        userScore.classList.remove('hidden');
         indexUser.classList.remove('hidden');
         indexUser.id = userID;
         let indexUserScale = document.getElementById("scale-" + (i + 1));

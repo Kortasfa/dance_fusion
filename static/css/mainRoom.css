@@ -19,6 +19,7 @@
     overflow-y: auto;
     width: 46%;
     height: 100vh;
+    z-index: 2;
     background-color: #00eaff;
     margin-left: calc(-96% + 590px);
 }
