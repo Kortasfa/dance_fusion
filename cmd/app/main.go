@@ -61,6 +61,8 @@ func main() {
 	r.HandleFunc("/api/removeBot", removeBot).Methods("POST")
 	r.HandleFunc("/api/startGame", startGameAPI).Methods("POST")
 	r.HandleFunc("/api/endGame", endGameAPI).Methods("POST")
+	r.HandleFunc("/api/checkForAchievements", checkForAchievements(dbx)).Methods("POST")
+	r.HandleFunc("/api/earnPointsForAchievements", earnPointsForAchievements(dbx)).Methods("POST")
 
 	go handleRoomWSMessages()
 	go handleJoinPageWSMessages()
@@ -77,5 +79,5 @@ func main() {
 }
 
 func openDB() (*sql.DB, error) {
-	return sql.Open(dbDriverName, "root:root@tcp(localhost:3306)/dance_fusion?charset=utf8mb4&collation=utf8mb4_unicode_ci&parseTime=true")
+	return sql.Open(dbDriverName, "root:P@ssw0rd@tcp(localhost:3306)/dance_fusion?charset=utf8mb4&collation=utf8mb4_unicode_ci&parseTime=true")
 }

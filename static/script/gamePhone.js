@@ -69,8 +69,7 @@ function sendMessage() {
         XHR.open("POST", "/api/joinToRoom");
         XHR.onload = function () {
             if (XHR.status === 200) {
-                user.style.pointerEvents='none'
-                menu.classList.add("menu-hidden");
+                user.style.pointerEvents='none';
                 entranceField.classList.add("hidden");
                 danceField.classList.remove("hidden");
                 emptyID.classList.add("hidden");
@@ -274,20 +273,17 @@ async function exitFromAccount() {
     }
 }
 
-let isOpen = false;
+//let isOpen = false;
 function userMenu() {
-    if (!isOpen) {
         menu.classList.remove("menu-hidden");
         menu.classList.add("menu-open");
-        isOpen = true;
-    }
-    else {
-        menu.classList.add("menu-hidden");
-        menu.classList.remove("menu-open");
-        isOpen = false;
-    }
-}
 
+}
+document.addEventListener('click', function(event) {
+    if (!user.contains(event.target)) {
+        menu.classList.add("menu-hidden")
+    }
+});
 
 btnLogOut.addEventListener("click", exitFromAccount)
 btnGo.addEventListener("click", sendMessage);
