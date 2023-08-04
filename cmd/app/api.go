@@ -708,9 +708,9 @@ func checkForAchievements(db *sqlx.DB) http.HandlerFunc {
 				user_id = ? AND song_id = ? AND bot_id IN (?) AND boss_id = ?
 		`
 		var achievementProgressData []struct {
-			AchievementID int `db:"user_achievement_id"`
-			Progress      int `db:"progress"`
-			MaxProgress   int `db:"max_progress"`
+			UserAchievementID int `db:"user_achievement_id"`
+			Progress          int `db:"progress"`
+			MaxProgress       int `db:"max_progress"`
 		}
 
 		err = db.Select(&achievementProgressData, query, data.UserID, data.SongID, data.BotIDs, data.BossID)
@@ -721,7 +721,7 @@ func checkForAchievements(db *sqlx.DB) http.HandlerFunc {
 		}
 
 		for _, progressInfo := range achievementProgressData {
-			achievementID := progressInfo.AchievementID
+			userAchievementID := progressInfo.UserAchievementID
 			progress := progressInfo.Progress
 			maxProgress := progressInfo.MaxProgress
 
@@ -744,7 +744,7 @@ func checkForAchievements(db *sqlx.DB) http.HandlerFunc {
 				    user_achievement_id = ?
 			`
 
-			_, err = db.Exec(updateQuery, progress, completed, achievementID)
+			_, err = db.Exec(updateQuery, progress, completed, userAchievementID)
 			if err != nil {
 				http.Error(w, "user achievements table update error", 500)
 				log.Println(err.Error())
@@ -753,5 +753,30 @@ func checkForAchievements(db *sqlx.DB) http.HandlerFunc {
 		}
 
 		w.WriteHeader(http.StatusOK)
+	}
+}
+
+func earnPointsForAchievements(db *sqlx.DB) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		reqData, err := io.ReadAll(r.Body)
+		if err != nil {
+			http.Error(w, "Parsing error", 500)
+			log.Println(err.Error())
+			return
+		}
+
+		var data struct {
+			UserID int   `json:"user_id"`
+			SongID int   `json:"song_id"`
+			BotIDs []int `json:"bot_ids"`
+			BossID int   `json:"boss_id"`
+		}
+
+		err = json.Unmarshal(reqData, &data)
+		if err != nil {
+			http.Error(w, "JSON parsing error", 500)
+			log.Println(err.Error())
+			return
+		}
 	}
 }
