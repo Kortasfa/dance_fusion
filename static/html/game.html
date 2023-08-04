@@ -251,6 +251,7 @@
                         let bestPlayerId = 0;
                         let I = 0;
                         connectedUsers.sort((user1, user2) => user2.valueScore - user1.valueScore);
+                        getAchievements().then(() => {});
                         for (let i = 0; i < connectedUsers.length; i++){
                             info[i].innerText = connectedUsers[i]["userName"] + ': ' + connectedUsers[i]["valueScore"];
                             if (parseInt(connectedUsers[i]["userID"]) > 0){
