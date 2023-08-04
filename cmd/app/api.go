@@ -700,6 +700,7 @@ func checkForAchievements(db *sqlx.DB) http.HandlerFunc {
 		query := `
 			SELECT
 				user_achievement_id,
+				user_id,
 				progress,
 				max_progress
 			FROM
@@ -772,6 +773,7 @@ func earnPointsForAchievements(db *sqlx.DB) http.HandlerFunc {
 			log.Println(err.Error())
 			return
 		}
+		fmt.Println("Получил id ", achievementIDInt)
 		var user userInfo
 		err = getJsonCookie(r, "userInfoCookie", &user)
 		if err != nil {
@@ -796,13 +798,13 @@ func earnPointsForAchievements(db *sqlx.DB) http.HandlerFunc {
 			Collected         int `db:"collected"`
 			Score             int `db:"score"`
 		}
-
-		err = db.Select(&achievementData, query, user.UserID, achievementIDInt)
+        err = db.QueryRow(query, user.UserID, achievementIDInt).Scan(&achievementData.UserAchievementID, &achievementData.Completed, &achievementData.Collected, &achievementData.Score)
 		if err != nil {
 			http.Error(w, "Database error", 500)
 			log.Println(err.Error())
 			return
 		}
+		fmt.Println("Получил информацию о ачивке ", achievementData)
 		if achievementData.Completed != 1 {
 			http.Error(w, "achievement not yet completed", 409)
 			return
@@ -811,6 +813,7 @@ func earnPointsForAchievements(db *sqlx.DB) http.HandlerFunc {
 			http.Error(w, "award already received", 409)
 			return
 		}
+		fmt.Println("Прошёл бэк проверку")
 		updateQuery := `
 				UPDATE
 				    user_achievements
@@ -826,6 +829,7 @@ func earnPointsForAchievements(db *sqlx.DB) http.HandlerFunc {
 			log.Println(err.Error())
 			return
 		}
+		fmt.Println("Поменял collected на 1", achievementData.UserAchievementID)
 
 		err = addUserScoreSQL(db, user.UserID, achievementData.Score)
 		if err != nil {
@@ -833,6 +837,7 @@ func earnPointsForAchievements(db *sqlx.DB) http.HandlerFunc {
 			log.Println(err.Error())
 			return
 		}
+		fmt.Println("Добавил score пользователю", user.UserID, achievementData.Score)
 		w.WriteHeader(http.StatusOK)
 	}
 }

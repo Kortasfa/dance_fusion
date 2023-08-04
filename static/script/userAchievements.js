@@ -39,22 +39,34 @@ function checkAchievements() {
          element.classList.remove("hidden");
          if (element.dataset.complete === "1") {
             element.classList.add("achievements__positions__completed");
+            element.addEventListener("click", function (){
+               earnPointsForAchievements(element.id).then(r => {})
+               element.dataset.collect = "1";
+               element.classList.remove("achievements__positions__completed");
+               element.classList.add("achievements__positions__collected");
+               setTimeout(() => {
+                  element.classList.add("hidden");
+               }, 1000);
+            })
          }
          if (element.dataset.collect === "1") {
             element.classList.add("hidden");
          }
       }
       if (completedType.classList.contains("type-selected")) {
-         element.classList.remove("hidden")
          if ((element.dataset.complete === "1") || (element.dataset.complete === "0")) {
             element.classList.add("hidden");
          }
          if (element.dataset.collect === "1") {
             element.classList.add("achievements__positions__collected");
+            element.classList.remove("hidden");
+            element.style.pointerEvents = "none";
          }
       }
    });
 }
+
+
 
 checkAchievements();
 
