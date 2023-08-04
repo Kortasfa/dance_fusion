@@ -709,6 +709,7 @@ func checkForAchievements(db *sqlx.DB) http.HandlerFunc {
 		`
 		var achievementProgressData []struct {
 			UserAchievementID int `db:"user_achievement_id"`
+			UserID            int `db:"user_id"`
 			Progress          int `db:"progress"`
 			MaxProgress       int `db:"max_progress"`
 		}
@@ -724,6 +725,12 @@ func checkForAchievements(db *sqlx.DB) http.HandlerFunc {
 			userAchievementID := progressInfo.UserAchievementID
 			progress := progressInfo.Progress
 			maxProgress := progressInfo.MaxProgress
+			err = addHasNewAchievement(db, progressInfo.UserID)
+			if err != nil {
+				http.Error(w, "Internal Server Error", 500)
+				log.Println(err)
+				return
+			}
 
 			if progress < maxProgress {
 				progress++
@@ -758,13 +765,74 @@ func checkForAchievements(db *sqlx.DB) http.HandlerFunc {
 
 func earnPointsForAchievements(db *sqlx.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		var _ = r.FormValue("achievement_id")
+		achievementID := r.FormValue("achievement_id")
+		achievementIDInt, err := strconv.Atoi(achievementID)
+		if err != nil {
+			http.Error(w, "invalid achievement id", 500)
+			log.Println(err.Error())
+			return
+		}
 		var user userInfo
-		err := getJsonCookie(r, "userInfoCookie", &user)
+		err = getJsonCookie(r, "userInfoCookie", &user)
 		if err != nil {
 			http.Redirect(w, r, "/logIn", http.StatusFound)
 			log.Println(err.Error())
 			return
 		}
+		query := `
+			SELECT
+				user_achievement_id,
+				completed,
+				collected,
+				score
+			FROM
+				user_achievements
+			WHERE
+				user_id = ? AND achievement_id = ?
+		`
+		var achievementData struct {
+			UserAchievementID int `db:"user_achievement_id"`
+			Completed         int `db:"completed"`
+			Collected         int `db:"collected"`
+			Score             int `db:"score"`
+		}
+
+		err = db.Select(&achievementData, query, user.UserID, achievementIDInt)
+		if err != nil {
+			http.Error(w, "Database error", 500)
+			log.Println(err.Error())
+			return
+		}
+		if achievementData.Completed != 1 {
+			http.Error(w, "achievement not yet completed", 409)
+			return
+		}
+		if achievementData.Collected != 0 {
+			http.Error(w, "award already received", 409)
+			return
+		}
+		updateQuery := `
+				UPDATE
+				    user_achievements
+				SET
+					collected = 1
+				WHERE
+				    user_achievement_id = ?
+			`
+
+		_, err = db.Exec(updateQuery, achievementData.UserAchievementID)
+		if err != nil {
+			http.Error(w, "user achievements table update error", 500)
+			log.Println(err.Error())
+			return
+		}
+
+		err = addUserScoreSQL(db, user.UserID, achievementData.Score)
+		if err != nil {
+			http.Error(w, "achievement scoring error", 500)
+			log.Println(err.Error())
+			return
+		}
+		w.WriteHeader(http.StatusOK)
 	}
 }
