@@ -84,13 +84,13 @@
     </div>
   </div>
   <div class="boss-container boss hidden">
-    <div class="boss__name"></div>
     <div  class="boss__head user__head">
       <div class="boss__body head__body"><img class="boss__body-img" alt=""></div>
       <div class="boss__face head__face"><img class="boss__face-img" alt=""></div>
       <div class="boss__hat head__hat"><img class="boss__hat-img" alt=""></div>
     </div>
-    <div class="boss__hp-bar"></div>
+    <div class="boss__name"></div>
+    <div class="boss__hp-bar"><div class="hp-bar"></div></div>
   </div>
   <div class="rating-scales">
     <div class="rating-scales__user-scale rating-scales__user-scale_scale-1" id="scale-1"></div>
@@ -197,14 +197,14 @@
               index += 1;
               if (userBlock.id === userID.toString()) {
                   userBlock.id = "0";
-                  let userScore = document.getElementById('user-score' + index);
-                  userScore.classList.add('hidden');
+                  // let userScore = document.getElementById('user-score' + index);
+                  // userScore.classList.add('hidden');
                   userBlock.classList.add('hidden');
                   break
               }
           }
-          console.log("Сворачиваем игру, так как все вышли");
           if (lastUser) {
+              console.log("Сворачиваем игру, так как все вышли");
               window.location.href = "/room";
           } else {
               referenceUser = getReferenceUser();
@@ -250,9 +250,12 @@
                         let bestPlayerScore = 0;
                         let bestPlayerId = 0;
                         let I = 0;
+                        let userScore = document.querySelectorAll('.player');
                         connectedUsers.sort((user1, user2) => user2.valueScore - user1.valueScore);
+                        getAchievements().then(() => {});
                         for (let i = 0; i < connectedUsers.length; i++){
                             info[i].innerText = connectedUsers[i]["userName"] + ': ' + connectedUsers[i]["valueScore"];
+                            userScore[i].classList.remove('hidden');
                             if (parseInt(connectedUsers[i]["userID"]) > 0){
                                 addScoreForUser(parseInt(connectedUsers[i]["userID"]), parseInt(connectedUsers[i]["valueScore"]));
                                 if (connectedUsers[i]["valueScore"] > bestPlayerScore){
@@ -316,7 +319,7 @@
             try {
                 let jsonData = JSON.parse(event.data);
                 if ("ExitingUser" in jsonData) {
-                    console.log("Удаляем пользователя на чёрт");
+                    console.log("Удаляем пользователя на чёрт", jsonData.ExitingUser);
                     removeUser(jsonData.ExitingUser);
                     return;
                 }

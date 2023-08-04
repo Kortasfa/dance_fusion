@@ -223,7 +223,10 @@ func exitFromGame(r *http.Request) (int, string, error) {
 		return 0, "", err
 	}
 	if containsInSlice(activeGameRooms, selectedRoomID) {
-		endGame(selectedRoomID)
+		if getConnectedUsersCount(selectedRoomID) < 1 {
+			fmt.Println("Сворачиваем игру: ", selectedRoomID)
+			endGame(selectedRoomID)
+		}
 		broadcastGameFieldWSMessage <- []string{selectedRoomID, string(messageData)}
 	}
 	return user.UserID, selectedRoomID, nil
@@ -328,7 +331,7 @@ func getDataSongJson(w http.ResponseWriter, r *http.Request) {
 		log.Println(err.Error())
 		return
 	}
-	fmt.Println(data.RoomID, data.MaxPoint, data.ColorID)
+	fmt.Println("Записываем color и maxPoint в broadcastGameFieldWSMessage", data.RoomID, data.MaxPoint, data.ColorID)
 	broadcastGameFieldWSMessage <- []string{data.RoomID, string(reqData)}
 	w.WriteHeader(200)
 }
@@ -562,7 +565,10 @@ func deletePlayerFromGame(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		if containsInSlice(activeGameRooms, selectedRoomID) {
-			endGame(selectedRoomID)
+			if getConnectedUsersCount(selectedRoomID) < 1 {
+				fmt.Println("Сворачиваем игру: ", selectedRoomID)
+				endGame(selectedRoomID)
+			}
 			broadcastGameFieldWSMessage <- []string{selectedRoomID, string(messageData)}
 		}
 		w.WriteHeader(http.StatusOK)
@@ -700,6 +706,7 @@ func checkForAchievements(db *sqlx.DB) http.HandlerFunc {
 		query := `
 			SELECT
 				user_achievement_id,
+				user_id,
 				progress,
 				max_progress
 			FROM
@@ -708,9 +715,10 @@ func checkForAchievements(db *sqlx.DB) http.HandlerFunc {
 				user_id = ? AND song_id = ? AND bot_id IN (?) AND boss_id = ?
 		`
 		var achievementProgressData []struct {
-			AchievementID int `db:"user_achievement_id"`
-			Progress      int `db:"progress"`
-			MaxProgress   int `db:"max_progress"`
+			UserAchievementID int `db:"user_achievement_id"`
+			UserID            int `db:"user_id"`
+			Progress          int `db:"progress"`
+			MaxProgress       int `db:"max_progress"`
 		}
 
 		err = db.Select(&achievementProgressData, query, data.UserID, data.SongID, data.BotIDs, data.BossID)
@@ -721,9 +729,15 @@ func checkForAchievements(db *sqlx.DB) http.HandlerFunc {
 		}
 
 		for _, progressInfo := range achievementProgressData {
-			achievementID := progressInfo.AchievementID
+			userAchievementID := progressInfo.UserAchievementID
 			progress := progressInfo.Progress
 			maxProgress := progressInfo.MaxProgress
+			err = addHasNewAchievement(db, progressInfo.UserID)
+			if err != nil {
+				http.Error(w, "Internal Server Error", 500)
+				log.Println(err)
+				return
+			}
 
 			if progress < maxProgress {
 				progress++
@@ -744,7 +758,7 @@ func checkForAchievements(db *sqlx.DB) http.HandlerFunc {
 				    user_achievement_id = ?
 			`
 
-			_, err = db.Exec(updateQuery, progress, completed, achievementID)
+			_, err = db.Exec(updateQuery, progress, completed, userAchievementID)
 			if err != nil {
 				http.Error(w, "user achievements table update error", 500)
 				log.Println(err.Error())
@@ -752,6 +766,84 @@ func checkForAchievements(db *sqlx.DB) http.HandlerFunc {
 			}
 		}
 
+		w.WriteHeader(http.StatusOK)
+	}
+}
+
+func earnPointsForAchievements(db *sqlx.DB) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		achievementID := r.FormValue("achievement_id")
+		achievementIDInt, err := strconv.Atoi(achievementID)
+		if err != nil {
+			http.Error(w, "invalid achievement id", 500)
+			log.Println(err.Error())
+			return
+		}
+		fmt.Println("Получил id ", achievementIDInt)
+		var user userInfo
+		err = getJsonCookie(r, "userInfoCookie", &user)
+		if err != nil {
+			http.Redirect(w, r, "/logIn", http.StatusFound)
+			log.Println(err.Error())
+			return
+		}
+		query := `
+			SELECT
+				user_achievement_id,
+				completed,
+				collected,
+				score
+			FROM
+				user_achievements
+			WHERE
+				user_id = ? AND achievement_id = ?
+		`
+		var achievementData struct {
+			UserAchievementID int `db:"user_achievement_id"`
+			Completed         int `db:"completed"`
+			Collected         int `db:"collected"`
+			Score             int `db:"score"`
+		}
+		err = db.QueryRow(query, user.UserID, achievementIDInt).Scan(&achievementData.UserAchievementID, &achievementData.Completed, &achievementData.Collected, &achievementData.Score)
+		if err != nil {
+			http.Error(w, "Database error", 500)
+			log.Println(err.Error())
+			return
+		}
+		fmt.Println("Получил информацию о ачивке ", achievementData)
+		if achievementData.Completed != 1 {
+			http.Error(w, "achievement not yet completed", 409)
+			return
+		}
+		if achievementData.Collected != 0 {
+			http.Error(w, "award already received", 409)
+			return
+		}
+		fmt.Println("Прошёл бэк проверку")
+		updateQuery := `
+				UPDATE
+				    user_achievements
+				SET
+					collected = 1
+				WHERE
+				    user_achievement_id = ?
+			`
+
+		_, err = db.Exec(updateQuery, achievementData.UserAchievementID)
+		if err != nil {
+			http.Error(w, "user achievements table update error", 500)
+			log.Println(err.Error())
+			return
+		}
+		fmt.Println("Поменял collected на 1", achievementData.UserAchievementID)
+
+		err = addUserScoreSQL(db, user.UserID, achievementData.Score)
+		if err != nil {
+			http.Error(w, "achievement scoring error", 500)
+			log.Println(err.Error())
+			return
+		}
+		fmt.Println("Добавил score пользователю", user.UserID, achievementData.Score)
 		w.WriteHeader(http.StatusOK)
 	}
 }

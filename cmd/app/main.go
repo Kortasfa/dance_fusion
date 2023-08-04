@@ -25,7 +25,7 @@ func main() {
 	dbx := sqlx.NewDb(db, dbDriverName)
 
 	r := mux.NewRouter()
-	r.HandleFunc("/join", joinPageHandler).Methods("GET")
+	r.HandleFunc("/join", joinPageHandler(dbx)).Methods("GET")
 	r.HandleFunc("/", homePageHandler)
 	r.HandleFunc("/home", homePageHandler)
 	r.HandleFunc("/room", handleCreateRoom)
@@ -62,6 +62,7 @@ func main() {
 	r.HandleFunc("/api/startGame", startGameAPI).Methods("POST")
 	r.HandleFunc("/api/endGame", endGameAPI).Methods("POST")
 	r.HandleFunc("/api/checkForAchievements", checkForAchievements(dbx)).Methods("POST")
+	r.HandleFunc("/api/earnPointsForAchievements", earnPointsForAchievements(dbx)).Methods("POST")
 
 	go handleRoomWSMessages()
 	go handleJoinPageWSMessages()

@@ -69,8 +69,7 @@ function sendMessage() {
         XHR.open("POST", "/api/joinToRoom");
         XHR.onload = function () {
             if (XHR.status === 200) {
-                user.style.pointerEvents='none'
-                menu.classList.add("menu-hidden");
+                user.style.pointerEvents='none';
                 entranceField.classList.add("hidden");
                 danceField.classList.remove("hidden");
                 emptyID.classList.add("hidden");
@@ -167,10 +166,23 @@ function joinRoom(userID) {
         } else if ("Exit" in receivedJSON) {
             console.log("Вас выгняли");
             // Тут надо делать всё то же самое, что в exitFromGame, но без зпроса
-            inGame = false;
             stop = 1;
+            user.style.pointerEvents='auto'
             btnLeaveRoom.classList.add("hidden");
             colorFlag.classList.add("hidden");
+            scale.style.height = 0 + 'px';
+            megaStar.classList.add("hidden");
+            stars.forEach(element => element.src = "/static/img/star_white.svg");
+            colorFlag.style.backgroundColor = "#BD63D4";
+            entranceField.classList.remove("hidden");
+            danceField.classList.add("hidden");
+            document.querySelector('.dance-block__connection').innerText = 'You are joined!'
+            if (inGame && socket !== undefined) {
+                console.log("Закрываем бобанный WS");
+                socket.close();
+                socket = undefined
+            }
+            inGame = false;
             entranceField.classList.remove("hidden");
             danceField.classList.add("hidden");
         } else {
@@ -182,6 +194,7 @@ function joinRoom(userID) {
             maxTheory = receivedJSON["maxPoint"];
             colorID = receivedJSON["color"];
             colorFlag.style.backgroundColor = colorID;
+            console.log("Получил json с движениями, отправляем color на game");
             sendSongJson(enterInRoom.value, maxTheory, colorID).then(() => {})
             scale.style.height = 0 + 'px';
             megaStar.classList.add("hidden");
@@ -230,6 +243,7 @@ async function exitFromGame() {
     colorFlag.style.backgroundColor = "#BD63D4";
     entranceField.classList.remove("hidden");
     danceField.classList.add("hidden");
+    document.querySelector('.dance-block__connection').innerText = 'You are joined!'
     const response = await fetch("/api/exitFromGame", {
         method: 'POST',
         headers: {
@@ -274,20 +288,21 @@ async function exitFromAccount() {
     }
 }
 
-let isOpen = false;
+//let isOpen = false;
+
+menu.classList.add("hidden");
 function userMenu() {
-    if (!isOpen) {
+        menu.classList.remove("hidden");
         menu.classList.remove("menu-hidden");
         menu.classList.add("menu-open");
-        isOpen = true;
-    }
-    else {
+
+}
+document.addEventListener('click', function(event) {
+        if (!user.contains(event.target)) {
         menu.classList.add("menu-hidden");
         menu.classList.remove("menu-open");
-        isOpen = false;
     }
-}
-
+});
 
 btnLogOut.addEventListener("click", exitFromAccount)
 btnGo.addEventListener("click", sendMessage);

@@ -179,7 +179,6 @@
 }
 
 .pop-up-box__start-btn{
-    margin: 0;
     width: 270px;
     height: 76px;
     border-radius: 10px;
@@ -238,6 +237,47 @@
     width: 86px;
     height: 90px;
 }
+
+.boss-container{
+    width: 200px;
+    height: 300px;
+    position: absolute;
+    top: 250px;
+    right: 35px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.boss__name{
+    font: 700 26px Roboto, sans-serif;
+    border-radius: 10px;
+    background: #FAFCF6;
+    padding: 5px;
+    margin-top: 10px;
+}
+
+.boss__head{
+    width: 180px;
+    height: 180px;
+}
+
+.boss__hp-bar{
+    margin-top: 10px;
+    height: 40px;
+    width: 192px;
+    border-radius: 10px;
+    background: #FAFCF6;
+    border: 5px dashed #BD63D4;
+}
+
+.hp-bar{
+    height: 40px;
+    width: 192px;
+    background-color: #ff5c5c;
+    border-radius: 5px;
+}
+
 
 .boss__body-img{
     width: 180px;

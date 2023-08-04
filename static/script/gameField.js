@@ -2,6 +2,8 @@ let isBtnClicked = false;
 let scoreGood = 20;
 let scoreOk = 3;
 let scorePerfect = 31;
+let bossHp;
+let bossHealth;
 
 const danceVideo = document.getElementById("video-dance");
 const modalElem = document.getElementById("pop-up");
@@ -12,6 +14,7 @@ const starThreeScale = document.getElementById("star-3");
 const starFourScale = document.getElementById("star-4");
 const starFiveScale = document.getElementById("star-5");
 const megaStarScale = document.getElementById("mega-star");
+const bossHpBar = document.querySelector('.hp-bar');
 
 function getUsersByCookie() {
     for (let i = 0; i < connectedUsers.length; i++) {
@@ -20,13 +23,11 @@ function getUsersByCookie() {
         let bodyImgSrc = connectedUsers[i]["bodyImgSrc"];
         let faceImgSrc = connectedUsers[i]["faceImgSrc"];
         let hatImgSrc = connectedUsers[i]["hatImgSrc"];
-        let userScore = document.getElementById('player-result' + (i + 1));
         let indexUser = document.getElementById('hero' + (i + 1));
         let indexUserName = indexUser.querySelector(".hero__name");
         let indexUserBodyImg = indexUser.querySelector(".body");
         let indexUserFaceImg = indexUser.querySelector(".face");
         let indexUserHatImg = indexUser.querySelector(".hat");
-        userScore.classList.remove('hidden');
         indexUser.classList.remove('hidden');
         indexUser.id = userID;
         let indexUserScale = document.getElementById("scale-" + (i + 1));
@@ -184,9 +185,12 @@ function addScore(userID, score, maxScore) {
     }
 }
 
+let hpBar;
 function playerDamage(score) {
-    let bossHPCount = document.querySelector(".boss__hp-bar");
-    bossHPCount.innerText = (parseInt(bossHPCount.innerText) - score).toString();
+    bossHp = bossHp - score;
+    hpBar =  190 * (bossHp / bossHealth);
+
+    bossHpBar.style.width = hpBar + 'px';
 }
 
 let btnExit = document.querySelector(".btn-exit");
@@ -208,10 +212,11 @@ function expelUsers() {
 if (mode == 'Boss') {
     document.querySelector(".boss-container").classList.remove("hidden");
     document.querySelector(".boss__name").innerText = bossInfo.name;
-    document.querySelector(".boss__hp-bar").innerText = (parseInt(bossInfo.healthPoint) * connectedUsers.length).toString();
     document.querySelector(".boss__body-img").src = bossInfo.bossBody;
     document.querySelector(".boss__face-img").src = bossInfo.bossFace;
     document.querySelector(".boss__hat-img").src = bossInfo.bossHat;
+    bossHealth = parseInt(bossInfo.healthPoint) * connectedUsers.length;
+    bossHp = bossHealth;
 }
 
 async function expelUser(userID) {
@@ -232,22 +237,39 @@ async function expelUser(userID) {
     }
 }
 
-
-
-async function getAchievements(userID, userScore) {
-    const response = await fetch("/api/addUserScore", {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-            "user_id": userID, // Integer
-            "score": userScore // Integer
-        }),
-    });
-    if (response.ok) {
-        console.log('Score пользователя обновлен');
-    } else {
-        console.log('Не удалось обновить score пользователя');
+async function getAchievements() {
+    for (let i = 0; i < connectedUsers.length; i++) {
+        if (connectedUsers[i]["userID"] > 0) {
+            let botsID = [];
+            for (let j = i + 1; j < connectedUsers.length; j++) {
+                if (connectedUsers[j]["userID"] < 0) {
+                    botsID.push(parseInt(connectedUsers[j]["userID"]) * (-1));
+                }
+            }
+            let bossID = 0;
+            if (bossInfo) {
+                let bossHPCount = document.querySelector(".boss__hp-bar");
+                if (bossHPCount <= 0) {
+                    bossID = bossInfo.bossId;
+                }
+            }
+            const response = await fetch("/api/checkForAchievements", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    "user_id": userID, // Integer
+                    "song_id": songId, // Integer
+                    "bot_ids": botsID,
+                    "boss_id": bossID
+                }),
+            });
+            if (response.ok) {
+                console.log('Данные на достижения отправлены');
+            } else {
+                console.log('Не удалось отправить данные');
+            }
+        }
     }
 }
