@@ -18,6 +18,6 @@ CREATE TABLE songs(
 INSERT INTO songs(song_name, author_name, image_src, video_src, preview_video_src, style_id, difficulty)
 VALUES
     ("Forget You", "Cee Lo Green", "static/img/forgetYou.jpg", "static/video/full/forgetYouFull.mp4", "static/video/previews/forgetYou.mp4", 1, 2),
-    ("Rasputin"," 'Boney M'", "static/img/rasputin.jpg", "static/video/full/rasputin.mp4", "static/video/previews/rasputin.mp4", 3, 2),
+    ("Rasputin"," 'Boney M'", "static/img/rasputin.jpg", "static/video/full/rasputin.mp4", "static/video/previews/rasputin.mp4", 2, 2),
     ("Mi Mi Mi"," 'Serebro'", "static/img/mimimi.jpg", "static/video/full/mimimi.mp4", "static/video/previews/mimimi.mp4", 2, 2);
 
