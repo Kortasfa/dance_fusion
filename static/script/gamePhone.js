@@ -166,10 +166,23 @@ function joinRoom(userID) {
         } else if ("Exit" in receivedJSON) {
             console.log("Вас выгняли");
             // Тут надо делать всё то же самое, что в exitFromGame, но без зпроса
-            inGame = false;
             stop = 1;
+            user.style.pointerEvents='auto'
             btnLeaveRoom.classList.add("hidden");
             colorFlag.classList.add("hidden");
+            scale.style.height = 0 + 'px';
+            megaStar.classList.add("hidden");
+            stars.forEach(element => element.src = "/static/img/star_white.svg");
+            colorFlag.style.backgroundColor = "#BD63D4";
+            entranceField.classList.remove("hidden");
+            danceField.classList.add("hidden");
+            document.querySelector('.dance-block__connection').innerText = 'You are joined!'
+            if (inGame && socket !== undefined) {
+                console.log("Закрываем бобанный WS");
+                socket.close();
+                socket = undefined
+            }
+            inGame = false;
             entranceField.classList.remove("hidden");
             danceField.classList.add("hidden");
         } else {
