@@ -418,3 +418,13 @@ function handleDanceData(danceDataJson) {
             (danceData['start_time']) * 1000);
     }
 }
+
+function checkForNewAchievement() {
+    let hasNewAchievement = parseInt(document.querySelector(".new-achievement__text").innerText);
+    if (hasNewAchievement) {
+        document.querySelector(".user__new-achievement").classList.add("active");
+        document.querySelector(".point__new-achievement").classList.add("active");
+    }
+}
+
+window.onload = checkForNewAchievement;

@@ -535,3 +535,29 @@ func removeHasNewAchievement(db *sqlx.DB, userID int) error {
 	_, err := db.Exec(query, userID)
 	return err
 }
+
+func getDifficultyByBotIDs(db *sqlx.DB, botIDs []int) ([]int, error) {
+	if len(botIDs) == 0 {
+		return []int{}, nil
+	}
+	query, args, err := sqlx.In(`
+		SELECT
+			difficulty
+		FROM
+			bots
+		WHERE
+			bot_id IN (?)
+	`, botIDs)
+	if err != nil {
+		return nil, err
+	}
+
+	var difficulties []int
+
+	err = db.Select(&difficulties, query, args...)
+	if err != nil {
+		return nil, err
+	}
+
+	return difficulties, nil
+}

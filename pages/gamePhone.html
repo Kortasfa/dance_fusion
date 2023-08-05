@@ -19,6 +19,12 @@
           <div class="head__hat"><img class="hat" alt=""></div>
         </div>
         <span class="user__name">Name 1</span>
+        <div class="user__new-achievement">
+          <div class="new-achievement__text hidden">
+            {{ .NewAchievement }}
+          </div>
+          <div class="new-achievement__notification">!</div>
+        </div>
       </div>
     </div>
     <div class="menu">
@@ -27,6 +33,7 @@
       </div>
       <div class="menu__point menu__point_border" id="achievements">
         <span class="point__text">Achievements</span>
+        <div class="point__new-achievement"></div>
       </div>
       <div class="menu__point" id="logout">
         <span class="point__text">Log Out</span>
