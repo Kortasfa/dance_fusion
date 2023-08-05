@@ -1,0 +1,312 @@
+{
+    "color": "black",
+    "maxPoint": 4500,
+    "motions":
+    [
+      {
+        "start_time": 9.2,
+        "duration":0.4,
+        "name": "yeeeeaaaaassssssss" 
+      },
+      {
+        "start_time": 9.7,
+        "duration":0.4,
+        "name": "yeeeeaaaaassssssss" 
+      },
+      {
+        "start_time": 10.2,
+        "duration":0.4,
+        "name": "yeeeeaaaaassssssss" 
+      },
+      {
+        "start_time": 10.7,
+        "duration":0.4,
+        "name": "yeeeeaaaaassssssss"
+      },
+      {
+        "start_time": 11.2,
+        "duration":0.4,
+        "name": "yeeeeaaaaassssssss"
+      },
+      {
+        "start_time": 11.7,
+        "duration":0.4,
+        "name": "yeeeeaaaaassssssss"
+      },
+      {
+        "start_time": 12.2,
+        "duration":0.4,
+        "name": "yeeeeaaaaassssssss"
+      },
+      {
+        "start_time": 12.7,
+        "duration":0.6,
+        "name": "hand-in-arc"
+      },
+      {
+        "start_time": 13.4,
+        "duration":0.6,
+        "name": "hand-in-arc"
+      },
+      {
+        "start_time": 14.1,
+        "duration":0.6,
+        "name": "hand-in-arc"
+      },
+      {
+        "start_time": 14.8,
+        "duration":0.6,
+        "name": "hand-in-arc"
+      },
+      {
+        "start_time": 15.5,
+        "duration":0.6,
+        "name": "hand-in-arc"
+      },
+      {
+        "start_time": 16.2,
+        "duration":0.6,
+        "name": "hand-in-arc"
+      },
+      {
+        "start_time": 16.9,
+        "duration":0.6,
+        "name": "hand-in-arc"
+      },
+      {
+        "start_time": 17.6,
+        "duration":0.6,
+        "name": "hand-in-arc"
+      },
+      {
+        "start_time": 18.3,
+        "duration":0.6,
+        "name": "hand-in-arc"
+      },
+      {
+        "start_time": 19.0,
+        "duration":0.6,
+        "name": "hand-in-arc"
+      },
+      {
+        "start_time": 14.1,
+        "duration":0.6,
+        "name": "hand-in-arc"
+      },
+      {
+        "start_time": 21.9,
+        "duration":1.4,
+        "name": "baraban"
+      },
+      {
+        "start_time": 23.4,
+        "duration":1.4,
+        "name": "baraban"
+      },
+      {
+        "start_time": 24.9,
+        "duration":1.4,
+        "name": "baraban"
+      },
+      {
+        "start_time": 29.3,
+        "duration":1.0,
+        "name": "laaaaaaaaaaaaaaaaa"
+      },
+      {
+        "start_time": 34.3,
+        "duration":1.0,
+        "name": "laaaaaaaaaaaaaaaaa"
+      },
+      {
+        "start_time": 38.2,
+        "duration":0.5,
+        "name": "yeeeeaaaaassssssss"
+      },
+      {
+        "start_time": 38.75,
+        "duration":0.5,
+        "name": "yeeeeaaaaassssssss"
+      },
+      {
+        "start_time": 39.3,
+        "duration":0.5,
+        "name": "yeeeeaaaaassssssss"
+      },
+      {
+        "start_time": 39.9,
+        "duration":0.5,
+        "name": "yeeeeaaaaassssssss"
+      },
+      {
+        "start_time": 42.2,
+        "duration":0.6,
+        "name": "hand-in-arc"
+      },
+      {
+        "start_time": 44.0,
+        "duration":0.6,
+        "name": "hand-in-arc"
+      },
+      {
+        "start_time": 45.8,
+        "duration":0.6,
+        "name": "hand-in-arc"
+      },
+      {
+        "start_time": 47.5,
+        "duration":0.6,
+        "name": "hand-in-arc"
+      },
+      {
+        "start_time": 51.6,
+        "duration":1.4,
+        "name": "baraban"
+      },
+      {
+        "start_time": 53.1,
+        "duration":1.4,
+        "name": "baraban"
+      },    
+      {
+        "start_time": 58.5,
+        "duration":1.0,
+        "name": "laaaaaaaaaaaaaaaaa"
+      },
+      {
+        "start_time": 64.4,
+        "duration":1.0,
+        "name": "laaaaaaaaaaaaaaaaa"
+      },
+      {
+        "start_time": 67.4,
+        "duration": 0.5,
+        "name": "fist"
+      },
+      {
+        "start_time": 68.0,
+        "duration": 0.5,
+        "name": "yeeeeaaaaassssssss"
+      },
+      {
+        "start_time": 68.6,
+        "duration": 0.5,
+        "name": "yeeeeaaaaassssssss"
+      },
+      {
+        "start_time": 69.1,
+        "duration": 0.5,
+        "name": "yeeeeaaaaassssssss"
+      },
+      {
+        "start_time": 69.7,
+        "duration": 0.5,
+        "name": "yeeeeaaaaassssssss"
+      },
+      {
+        "start_time": 71.8,
+        "duration": 0.5,
+        "name": "hand-in-arc"
+      },
+      {
+        "start_time": 73.4,
+        "duration": 0.5,
+        "name": "hand-in-arc"
+      },
+      {
+        "start_time": 75.1,
+        "duration": 0.5,
+        "name": "hand-in-arc"
+      },
+      {
+        "start_time": 77.1,
+        "duration": 0.5,
+        "name": "hand-in-arc"
+      },
+      {
+        "start_time": 80.6,
+        "duration":1.4,
+        "name": "baraban"
+      },
+      {
+        "start_time": 82.1,
+        "duration":1.4,
+        "name": "baraban"
+      },
+      {
+        "start_time": 83.8,
+        "duration":1.4,
+        "name": "baraban"
+      },
+      {
+        "start_time": 88.5,
+        "duration":1.0,
+        "name": "laaaaaaaaaaaaaaaaa"
+      },
+      {
+        "start_time": 93.9,
+        "duration":1.0,
+        "name": "laaaaaaaaaaaaaaaaa"
+      },
+      {
+        "start_time": 97.3,
+        "duration":1.5,
+        "name": "turn"
+      },
+      {
+        "start_time": 100.0,
+        "duration":0.9,
+        "name": "handshape"
+      },
+      {
+        "start_time": 101.0,
+        "duration":0.9,
+        "name": "handshape"
+      },
+      {
+        "start_time": 102.0,
+        "duration":0.9,
+        "name": "handshape"
+      },
+      {
+        "start_time": 104.4,
+        "duration": 0.5,
+        "name": "fist"
+      },
+      {
+        "start_time": 108.6,
+        "duration": 0.5,
+        "name": "yeeeeaaaaassssssss"
+      },
+      {
+        "start_time": 109.2,
+        "duration": 0.5,
+        "name": "yeeeeaaaaassssssss"
+      },
+      {
+        "start_time": 109.8,
+        "duration": 0.5,
+        "name": "yeeeeaaaaassssssss"
+      },
+      {
+        "start_time": 111.4,
+        "duration": 0.5,
+        "name": "yeeeeaaaaassssssss"
+      },
+      {
+        "start_time": 112.0,
+        "duration": 0.5,
+        "name": "yeeeeaaaaassssssss"
+      },
+      {
+        "start_time": 112.6,
+        "duration": 0.5,
+        "name": "yeeeeaaaaassssssss"
+      },
+      {
+        "start_time": 113.4,
+        "duration": 0.5,
+        "name": "yeeeeaaaaassssssss"
+      }
+    ]
+  }

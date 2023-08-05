@@ -14,4 +14,5 @@ VALUES
     ("Forget You", "static/motion_list/forgetYou.json", "static/motion_list/forgetYou.json", "static/motion_list/forgetYou.json", "static/motion_list/forgetYou.json"),
     ("Good 4 u", "static/motion_list/good_4_u.json" ,"static/motion_list/good_4_u.json", "static/motion_list/good_4_u.json", "static/motion_list/good_4_u.json"),
     ("Rasputin", "static/motion_list/rasputin.json" ,"static/motion_list/rasputin.json", "static/motion_list/rasputin.json", "static/motion_list/rasputin.json"),
-    ("Mi Mi Mi", "static/motion_list/mimimi-man.json" ,"static/motion_list/mimimi-woman.json", "static/motion_list/mimimi-man.json", "static/motion_list/mimimi-woman.json");
+    ("Mi Mi Mi", "static/motion_list/mimimi-man.json" ,"static/motion_list/mimimi-woman.json", "static/motion_list/mimimi-man.json", "static/motion_list/mimimi-woman.json"),
+    ("There is nothing better", "static/motion_list/bremenskye-man.json" ,"static/motion_list/bremenskye-dog.json", "static/motion_list/bremenskye-cat.json", "static/motion_list/bremenskye-rooster.json");

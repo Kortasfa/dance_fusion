@@ -158,25 +158,19 @@
                   "score": userScore // Integer
               }),
           });
-          if (response.ok) {
-              console.log('Score пользователя обновлен');
-          } else {
-              console.log('Не удалось обновить score пользователя');
+          if (!response.ok) {
+             console.log('Не удалось обновить score пользователя');
           }
       }
 
       function getReferenceUser() {
-          console.log(connectedUsers);
           for (let userInfo of connectedUsers) {
-              console.log(userInfo["userID"]);
               if (parseInt(userInfo["userID"]) > 0) {
-                  console.log("Новый эталон: ", userInfo["userID"]);
                   return userInfo["userID"];
               }
           }
       }
       function removeUser(userID) {
-          console.log('Пользователь вышел: ' + userID);
           let i;
           for (i = 0; i < connectedUsers.length; i++) {
               if (connectedUsers[i]["userID"] === userID) {
@@ -204,7 +198,6 @@
               }
           }
           if (lastUser) {
-              console.log("Сворачиваем игру, так как все вышли");
               window.location.href = "/room";
           } else {
               referenceUser = getReferenceUser();
@@ -222,9 +215,7 @@
                   "point": point,
               }),
           });
-          if (response.ok) {
-              console.log('Балл отправлен');
-          } else {
+          if (!response.ok) {
               console.log('Не удалось отправить балл:', response.status);
           }
       }
@@ -294,9 +285,7 @@
                 body: JSON.stringify(data)
             })
                 .then(response => {
-                    if (response.ok) {
-                        console.log('Best User Info updated successfully.');
-                    } else {
+                    if (!response.ok) {
                         console.error('Error updating Best User Info', response.statusText);
                     }
                 })
@@ -308,29 +297,21 @@
 
         (async () => {
             let socket = new WebSocket("wss://" + window.location.hostname + "/neuralWS/" + WssURL.split("/").pop().trim());
-
-          socket.onopen = function (event) {
-              console.log("WebSocket connection established.");
-          };
-
         let maxPoint;
         let colorID;
         socket.onmessage = function (event) {
             try {
                 let jsonData = JSON.parse(event.data);
                 if ("ExitingUser" in jsonData) {
-                    console.log("Удаляем пользователя на чёрт", jsonData.ExitingUser);
                     removeUser(jsonData.ExitingUser);
                     return;
                 }
                 if ("maxPoint" in jsonData) {
                   maxPoint = jsonData["maxPoint"];
-                  console.log("MaxPoint = ", jsonData["maxPoint"]);
                   return;
                 }
                 if ("color" in jsonData) {
                   colorID = jsonData["color"];
-                  console.log("color = ", jsonData["color"]);
                   return;
                 }
                 let moveName = jsonData.name;
@@ -364,9 +345,6 @@
                       let res = classifier.classify(features); // результат оценки нейросетью JSON
                       let score = 0;
                       score = scoreGrade(res, score, moveName, songName)
-                      console.log("Пользователь с ID", userID);
-                      console.log(res["results"]);
-                      console.log("Наименование движения ", moveName, ". Очки за движение", score);
                       let point = 0;
                       if (score >= 0.4 && score <= 1) {
                           point = 50;
@@ -408,7 +386,6 @@
                                         maxScore = bot.botScores["maxScore"];
                                         chanceZero = bot.botScores["chanceZero"];
                                         stdDeviationRatio = bot.botScores["stdDeviationRatio"];
-                                        console.log(minScore,maxScore, chanceZero, stdDeviationRatio);
                                         botScore = Math.floor(getRandomNumber(minScore, maxScore, chanceZero, stdDeviationRatio));
                                          addScore(userInfo["userID"], botScore, maxPoint);
                                         break;
@@ -424,7 +401,6 @@
 
             socket.onclose = function (event) {
                 window.location.href = "/room";
-                console.log("WebSocket connection closed.");
             };
         })();
       function getRandomNumber(min, max, chanceZero, stdDeviationRatio) {
