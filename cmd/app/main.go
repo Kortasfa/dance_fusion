@@ -25,7 +25,7 @@ func main() {
 	dbx := sqlx.NewDb(db, dbDriverName)
 
 	r := mux.NewRouter()
-	r.HandleFunc("/join", joinPageHandler).Methods("GET")
+	r.HandleFunc("/join", joinPageHandler(dbx)).Methods("GET")
 	r.HandleFunc("/", homePageHandler)
 	r.HandleFunc("/home", homePageHandler)
 	r.HandleFunc("/room", handleCreateRoom)
@@ -35,6 +35,7 @@ func main() {
 	r.HandleFunc("/signUp", signUp)
 	r.HandleFunc("/logIn", logIn)
 	r.HandleFunc("/custom", customPageHandler(dbx))
+	r.HandleFunc("/achievements", achievementsPageHandler(dbx))
 
 	r.HandleFunc("/roomWS/{id}", roomWSHandler(dbx))
 	r.HandleFunc("/ws/joinToRoom/{id}", joinPageWSHandler)
@@ -47,9 +48,25 @@ func main() {
 	r.HandleFunc("/api/exitFromGame", exitFromGameAPI)
 	r.HandleFunc("/api/exitFromAccount", exitFromAccount)
 	r.HandleFunc("/api/custom", getUserAvatar(dbx)).Methods("POST")
+	r.HandleFunc("/api/sendPoint", sendPointToJoin).Methods("POST")
+	r.HandleFunc("/api/sendDataSongJson", getDataSongJson).Methods("POST")
+	r.HandleFunc("/api/getBestPlayer", getBestPlayer(dbx)).Methods("POST")
+	r.HandleFunc("/api/updateBestPlayer", updateBestPlayer(dbx)).Methods("POST")
+	r.HandleFunc("/api/changeUserName", changeUserName(dbx)).Methods("POST")
+	r.HandleFunc("/api/changeUserPassword", changeUserPassword(dbx)).Methods("POST")
+	r.HandleFunc("/api/getBotPath", getBotPath(dbx)).Methods("POST")
+	r.HandleFunc("/api/deletePlayerFromGame", deletePlayerFromGame).Methods("POST")
+	r.HandleFunc("/api/addUserScore", addUserScore(dbx)).Methods("POST")
+	r.HandleFunc("/api/addBot", addBot).Methods("POST")
+	r.HandleFunc("/api/removeBot", removeBot).Methods("POST")
+	r.HandleFunc("/api/startGame", startGameAPI).Methods("POST")
+	r.HandleFunc("/api/endGame", endGameAPI).Methods("POST")
+	r.HandleFunc("/api/checkForAchievements", checkForAchievements(dbx)).Methods("POST")
+	r.HandleFunc("/api/earnPointsForAchievements", earnPointsForAchievements(dbx)).Methods("POST")
 
 	go handleRoomWSMessages()
 	go handleJoinPageWSMessages()
+	go danceInfoHandleMessages()
 
 	r.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir("./static"))))
 
@@ -58,7 +75,6 @@ func main() {
 		Handler: r,
 		Addr:    port,
 	}
-
 	log.Fatal(srv.ListenAndServe())
 }
 

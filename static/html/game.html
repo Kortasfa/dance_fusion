@@ -1,298 +1,447 @@
-<html lang="en">
-<head>
-    <title>Dance Fusion</title>
+<div>
     <link rel="stylesheet" href="/static/css/gameField.css"/>
     <script src="/static/script/gameField.js" defer></script>
-</head>
-<body class="main">
-<div class="rank">
-    <div class="rank__hero" id="hero1">
+  <div class="rank">
+      <div class="rank__hero" id="hero1">
         <img class="hero__rating-good hidden" src="/static/img/good.gif" alt="">
         <img class="hero__rating-perfect hidden" src="/static/img/perfect.gif" alt="">
         <img class="hero__rating-ok hidden" src="/static/img/OK.gif" alt="">
         <img class="hero__rating-x hidden" src="/static/img/X.png" alt="">
-        <img class="hero__avatar" id="heroImg1" src="" alt="">
-        <span class="hero__name" id="heroName1">Name 1</span>
-        <span class="hero__score">0</span>
+        <div  class="user__head">
+            <div class="head__body"><img class="body" id="bodyImg1" alt=""></div>
+            <div class="head__face"><img class="face" id="faceImg1" alt=""></div>
+            <div class="head__hat"><img class="hat" id="hatImg1" alt=""></div>
+        </div>
+        <span class="hero__name hero__name_user-one">Name 1</span>
+        <div class="hero__score" id="hero-score-1">
+          <img class="score__star" src="/static/img/star_white.svg">
+          <img class="score__star" src="/static/img/star_white.svg">
+          <img class="score__star" src="/static/img/star_white.svg">
+          <img class="score__star" src="/static/img/star_white.svg">
+          <img class="score__star" src="/static/img/star_white.svg">
+          <img class="score__star score__star_mega  hidden" src="/static/img/mega_star.svg">
+        </div>
     </div>
     <div class="rank__hero hidden" id="hero2">
-        <img class="hero__avatar" id="heroImg2" src="" alt="">
+        <div  class="user__head">
+            <div class="head__body"><img class="body" id="bodyImg2" alt=""></div>
+            <div class="head__face"><img class="face" id="faceImg2" alt=""></div>
+            <div class="head__hat"><img class="hat" id="hatImg2" alt=""></div>
+        </div>
         <img class="hero__rating-good hidden" src="/static/img/good.gif" alt="">
         <img class="hero__rating-perfect hidden" src="/static/img/perfect.gif" alt="">
         <img class="hero__rating-ok hidden" src="/static/img/OK.gif" alt="">
         <img class="hero__rating-x hidden" src="/static/img/X.png" alt="">
-        <span class="hero__name" id="heroName2">Name 2</span>
-        <span class="hero__score">0</span>
+        <span class="hero__name hero__name_user-two">Name 2</span>
+        <div class="hero__score" id="hero-score-2">
+          <img class="score__star" src="/static/img/star_white.svg">
+          <img class="score__star" src="/static/img/star_white.svg">
+          <img class="score__star" src="/static/img/star_white.svg">
+          <img class="score__star" src="/static/img/star_white.svg">
+          <img class="score__star" src="/static/img/star_white.svg">
+          <img class="score__star score__star_mega  hidden" src="/static/img/mega_star.svg">
+        </div>
     </div>
     <div class="rank__hero hidden" id="hero3">
-        <img class="hero__avatar" id="heroImg3" src="" alt="">
+        <div  class="user__head">
+            <div class="head__body"><img class="body" id="bodyImg3" alt=""></div>
+            <div class="head__face"><img class="face" id="faceImg3" alt=""></div>
+            <div class="head__hat"><img class="hat" id="hatImg3" alt=""></div>
+        </div>
         <img class="hero__rating-good hidden" src="/static/img/good.gif" alt="">
         <img class="hero__rating-perfect hidden" src="/static/img/perfect.gif" alt="">
         <img class="hero__rating-ok hidden" src="/static/img/OK.gif" alt="">
         <img class="hero__rating-x hidden" src="/static/img/X.png" alt="">
-        <span class="hero__name" id="heroName3">Name 3</span>
-        <span class="hero__score">0</span>
+        <span class="hero__name hero__name_user-three">Name 3</span>
+        <div class="hero__score" id="hero-score-3">
+          <img class="score__star" src="/static/img/star_white.svg">
+          <img class="score__star" src="/static/img/star_white.svg">
+          <img class="score__star" src="/static/img/star_white.svg">
+          <img class="score__star" src="/static/img/star_white.svg">
+          <img class="score__star" src="/static/img/star_white.svg">
+          <img class="score__star score__star_mega  hidden" src="/static/img/mega_star.svg">
+        </div>
     </div>
-    <div class="rank__hero hidden" id="hero4">
-        <img class="hero__avatar" id="heroImg4" src="" alt="">
+    <div class="rank__hero hidden hero__name_user-four" id="hero4">
+        <div  class="user__head">
+            <div class="head__body"><img class="body" id="bodyImg4" alt=""></div>
+            <div class="head__face"><img class="face" id="faceImg4" alt=""></div>
+            <div class="head__hat"><img class="hat" id="hatImg4" alt=""></div>
+        </div>
         <img class="hero__rating-good hidden" src="/static/img/good.gif" alt="">
         <img class="hero__rating-perfect hidden" src="/static/img/perfect.gif" alt="">
         <img class="hero__rating-ok hidden" src="/static/img/OK.gif" alt="">
         <img class="hero__rating-x hidden" src="/static/img/X.png" alt="">
-        <span class="hero__name" id="heroName4">Name 4</span>
-        <span class="hero__score">0</span>
+        <span class="hero__name">Name 4</span>
+        <div class="hero__score" id="hero-score-4">
+          <img class="score__star" src="/static/img/star_white.svg">
+          <img class="score__star" src="/static/img/star_white.svg">
+          <img class="score__star" src="/static/img/star_white.svg">
+          <img class="score__star" src="/static/img/star_white.svg">
+          <img class="score__star" src="/static/img/star_white.svg">
+          <img class="score__star score__star_mega  hidden" src="/static/img/mega_star.svg">
+        </div>
     </div>
-</div>
-<a class="btn-exit" href="/room">
+  </div>
+  <div class="boss-container boss hidden">
+    <div  class="boss__head user__head">
+      <div class="boss__body head__body"><img class="boss__body-img" alt=""></div>
+      <div class="boss__face head__face"><img class="boss__face-img" alt=""></div>
+      <div class="boss__hat head__hat"><img class="boss__hat-img" alt=""></div>
+    </div>
+    <div class="boss__name"></div>
+    <div class="boss__hp-bar"><div class="hp-bar"></div></div>
+  </div>
+  <div class="rating-scales">
+    <div class="rating-scales__user-scale rating-scales__user-scale_scale-1" id="scale-1"></div>
+    <div class="rating-scales__user-scale rating-scales__user-scale_scale-2 hidden" id="scale-2"></div>
+    <div class="rating-scales__user-scale rating-scales__user-scale_scale-3 hidden" id="scale-3"></div>
+    <div class="rating-scales__user-scale rating-scales__user-scale_scale-4" id="scale-4"></div>
+    <div class="rating-scales__rating-stars">
+      <img class="rating-stars__star hidden rating-stars__star_mega-star" id="mega-star" src="/static/img/mega_star.svg">
+      <img class="rating-stars__star" id="star-5" src="/static/img/star_white.svg" alt="">
+      <img class="rating-stars__star" id="star-4" src="/static/img/star_white.svg" alt="">
+      <img class="rating-stars__star" id="star-3" src="/static/img/star_white.svg" alt="">
+      <img class="rating-stars__star" id="star-2" src="/static/img/star_white.svg" alt="">
+      <img class="rating-stars__star" id="star-1" src="/static/img/star_white.svg" alt="">
+    </div>
+  </div>
+  <a class="btn-exit" href="/room">
     <img src="/static/img/log_out.svg" alt="">
-</a>
-<video id="video-dance" class="video-dance" type="video/mp4" width="100%" autoplay="autoplay">
+  </a>
+  <video id="video-dance" class="video-dance" type="video/mp4" width="100%" autoplay="autoplay">
     <source id="video-src" src="../video/previews/americanGirl.mp4">
-</video>
-<div class="pop-up hidden" id="pop-up">
-    <div class="pop-up__pop-up-box">
-        <span class="pop-up-box__question">Total score</span>
-        <span id="user-score1" class="pop-up-box__user-score hidden">User 1: 0</span>
-        <span id="user-score2" class="pop-up-box__user-score hidden">User 2: 0</span>
-        <span id="user-score3" class="pop-up-box__user-score hidden">User 3: 0</span>
-        <span id="user-score4" class="pop-up-box__user-score hidden">User 4: 0</span>
-        <button id="btn-continue" class="pop-up-box__start-btn" type="button">Continue</button>
-    </div>
-</div>
-<script>
-    function removeUser(userID) {
-        console.log('Пользователь вышел: ' + userID);
-        const usersBlock = document.querySelector(".rank");
-        let index = 0;
-        for (const userBlock of usersBlock.children) {
-            index += 1;
-            if (userBlock.id === userID.toString()) {
-                userBlock.id = "0";
-                let userScore = document.getElementById('user-score' + index);
-                userScore.classList.add('hidden');
-                userBlock.classList.add('hidden');
-                break
-            }
+  </video>
+  <div class="pop-up hidden" id="pop-up">
+      <div class="rating">
+          <div class="rating__title">
+              <div class="title__item">Total Score</div>
+          </div>
+          <div class="rating__list">
+              <div class="best-player">
+                  <img class="best-player__crown" src="../static/img/crown.png" alt="">
+                  <div class="best-player__score">Kirill: 1000</div>
+              </div>
+              <div class="list">
+                  <ol class="list__players">
+                      <li id="player-result1" class="player hidden">
+                          <div class="player__place">1</div>
+                          <span id="user-score1" class="player-score">User 1: 0</span>
+                      </li>
+                      <li id="player-result2" class="player hidden">
+                          <div class="player__place">2</div>
+                          <span id="user-score2" class="player-score">User 2: 0</span>
+                      </li>
+                      <li  id="player-result3" class="player hidden">
+                          <div class="player__place">3</div>
+                          <span id="user-score3" class="player-score">User 3: 0</span>
+                      </li>
+                      <li id="player-result4" class="player hidden">
+                          <div class="player__place">4</div>
+                          <span id="user-score4" class="player-score">User 4: 0</span>
+                      </li>
+                  </ol>
+              </div>
+          </div>
+          <button id="btn-continue" class="pop-up-box__start-btn" type="button">Continue</button>
+      </div>
+  </div>
+  <script>
+      async function addScoreForUser(userID, userScore) {
+          const response = await fetch("/api/addUserScore", {
+              method: 'POST',
+              headers: {
+                  'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                  "user_id": userID, // Integer
+                  "score": userScore // Integer
+              }),
+          });
+          if (response.ok) {
+              console.log('Score пользователя обновлен');
+          } else {
+              console.log('Не удалось обновить score пользователя');
+          }
+      }
+
+      function getReferenceUser() {
+          console.log(connectedUsers);
+          for (let userInfo of connectedUsers) {
+              console.log(userInfo["userID"]);
+              if (parseInt(userInfo["userID"]) > 0) {
+                  console.log("Новый эталон: ", userInfo["userID"]);
+                  return userInfo["userID"];
+              }
+          }
+      }
+      function removeUser(userID) {
+          console.log('Пользователь вышел: ' + userID);
+          let i;
+          for (i = 0; i < connectedUsers.length; i++) {
+              if (connectedUsers[i]["userID"] === userID) {
+                  connectedUsers.splice(i, 1);
+                  break;
+              }
+          }
+          let lastUser = true;
+          for (let i = 0; i < connectedUsers.length; i++) {
+              if (parseInt(connectedUsers[i]["userID"]) > 0) {
+                  lastUser = false
+                  break;
+              }
+          }
+          const usersBlock = document.querySelector(".rank");
+          let index = 0;
+          for (const userBlock of usersBlock.children) {
+              index += 1;
+              if (userBlock.id === userID.toString()) {
+                  userBlock.id = "0";
+                  // let userScore = document.getElementById('user-score' + index);
+                  // userScore.classList.add('hidden');
+                  userBlock.classList.add('hidden');
+                  break
+              }
+          }
+          if (lastUser) {
+              console.log("Сворачиваем игру, так как все вышли");
+              window.location.href = "/room";
+          } else {
+              referenceUser = getReferenceUser();
+          }
+      }
+
+      async function sendPoint(userID, point) {
+          const response = await fetch("/api/sendPoint", {
+              method: 'POST',
+              headers: {
+                  'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                  "UserID": userID,
+                  "point": point,
+              }),
+          });
+          if (response.ok) {
+              console.log('Балл отправлен');
+          } else {
+              console.log('Не удалось отправить балл:', response.status);
+          }
+      }
+
+        function getBestPlayer(songID) {
+            fetch("../api/getBestPlayer", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: `song_id=${songID}`,
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Server Error');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.UserInfo) {
+                        let bestUserScore = document.querySelector('.best-player__score');
+                        let info = document.querySelectorAll('.player-score');
+                        let bestPlayerScore = 0;
+                        let bestPlayerId = 0;
+                        let I = 0;
+                        let userScore = document.querySelectorAll('.player');
+                        connectedUsers.sort((user1, user2) => user2.valueScore - user1.valueScore);
+                        getAchievements().then(() => {});
+                        for (let i = 0; i < connectedUsers.length; i++){
+                            info[i].innerText = connectedUsers[i]["userName"] + ': ' + connectedUsers[i]["valueScore"];
+                            userScore[i].classList.remove('hidden');
+                            if (parseInt(connectedUsers[i]["userID"]) > 0){
+                                addScoreForUser(parseInt(connectedUsers[i]["userID"]), parseInt(connectedUsers[i]["valueScore"]));
+                                if (connectedUsers[i]["valueScore"] > bestPlayerScore){
+                                    bestPlayerId = connectedUsers[i]["userID"];
+                                    bestPlayerScore = connectedUsers[i]["valueScore"];
+                                    I = i;
+                                }
+                            }
+                        }
+                        if ((bestPlayerScore > data.BestScore)){
+                            bestUserScore.innerText = info[I].innerText;
+                            updateBestUserInfo(parseInt(songId), parseInt(bestPlayerId), parseInt(bestPlayerScore));
+                        } else{
+                          bestUserScore.innerText = data.UserInfo.UserName + ': ' + data.BestScore;
+                        }
+                    } else {
+                        console.log('Best Player Info not available for this song.');
+                    }
+                })
+                .catch(error => {
+                    console.log('Error:', error);
+                });
         }
-    }
+        function updateBestUserInfo(songID, userID, score) {
+            const data = {
+                song_id: songID,
+                user_id: userID,
+                score: score
+            };
 
-    (async () => {
-        let classifier = new EdgeImpulseClassifier();
-        await classifier.init();
-        let project = classifier.getProjectInfo();
-        console.log(project.owner + ' / ' + project.name + ' (version ' + project.deploy_version + ')');
+            fetch('../api/updateBestPlayer', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            })
+                .then(response => {
+                    if (response.ok) {
+                        console.log('Best User Info updated successfully.');
+                    } else {
+                        console.error('Error updating Best User Info', response.statusText);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+        }
+        let referenceUser = getReferenceUser();
 
-        let socket = new WebSocket("wss://" + window.location.hostname + "/neuralWS/" + WssURL.split("/").pop().trim());
+        (async () => {
+            let socket = new WebSocket("wss://" + window.location.hostname + "/neuralWS/" + WssURL.split("/").pop().trim());
 
-        socket.onopen = function (event) {
-            console.log("WebSocket connection established.");
-        };
+          socket.onopen = function (event) {
+              console.log("WebSocket connection established.");
+          };
 
+        let maxPoint;
+        let colorID;
         socket.onmessage = function (event) {
             try {
                 let jsonData = JSON.parse(event.data);
                 if ("ExitingUser" in jsonData) {
-                    console.log("Удаляем пользователя на чёрт");
+                    console.log("Удаляем пользователя на чёрт", jsonData.ExitingUser);
                     removeUser(jsonData.ExitingUser);
                     return;
+                }
+                if ("maxPoint" in jsonData) {
+                  maxPoint = jsonData["maxPoint"];
+                  console.log("MaxPoint = ", jsonData["maxPoint"]);
+                  return;
+                }
+                if ("color" in jsonData) {
+                  colorID = jsonData["color"];
+                  console.log("color = ", jsonData["color"]);
+                  return;
                 }
                 let moveName = jsonData.name;
                 let motionString = jsonData.motionString;
                 let userID = jsonData.userID;
                 let features = motionString.split(',').map(x => Number(x.trim()));
+                const infelicityPhoneLay= 5
 
-                let deviationCount = 0;
-                let startValues = [0, 0, 0];
-                let indexInOneRecord = 0;
-                for (let value of features) {
-                    if (value !== 0 && (indexInOneRecord > 2)) {
-                        if (startValues[5 - indexInOneRecord] === 0) {
-                            startValues[5 - indexInOneRecord] = value;
-                        } else if (Math.abs(Math.abs(value) - Math.abs(startValues[5 - indexInOneRecord])) > 20) {
-                            deviationCount += 1;
+
+                  let deviationCount = 0;
+                  let startValues = [0, 0, 0];
+                  let indexInOneRecord = 0;
+                  for (let value of features) {
+                      if (value !== 0 && (indexInOneRecord > 2)) {
+                          if (startValues[5 - indexInOneRecord] === 0) {
+                              startValues[5 - indexInOneRecord] = value;
+                          } else if (Math.abs(Math.abs(value) - Math.abs(startValues[5 - indexInOneRecord])) > 20) {
+                              deviationCount += 1;
+                          }
+                          if (deviationCount > infelicityPhoneLay) {
+                              break;
+                          }
+                      }
+                      indexInOneRecord += 1;
+                      if (indexInOneRecord === 6) {
+                          indexInOneRecord = 0;
+                      }
+                  }
+
+                  if (deviationCount > infelicityPhoneLay) {
+                      let res = classifier.classify(features); // результат оценки нейросетью JSON
+                      let score = 0;
+                      score = scoreGrade(res, score, moveName, songName)
+                      console.log("Пользователь с ID", userID);
+                      console.log(res["results"]);
+                      console.log("Наименование движения ", moveName, ". Очки за движение", score);
+                      let point = 0;
+                      if (score >= 0.4 && score <= 1) {
+                          point = 50;
+                      }
+                      if (score >= 0.3 && score < 0.4) {
+                          point = Math.round(score * 400 / 4) + 3;
+
+                      }
+                      if (score >= 0.2 && score < 0.3) {
+                          point = Math.round(score * 100) + 5;
+
                         }
-                        if (deviationCount > 5) {
-                            break;
+                        if (score > 0.1 && score < 0.2) {
+                            point = Math.round(score * 100) + 7;
+                        }
+                        if (score <= 0.1 && score > 0) {
+                            point = Math.round(score * 100) + 9;
+                        }
+                        if (score === 2) {
+                            point = 200;
+                        }
+                        addScore(userID.toString(), point, maxPoint);
+                        sendPoint(userID, point).then(() => {
+                        })
+                    } else {
+                        addScore(userID.toString(), 0, maxPoint);
+                    }
+                    if (referenceUser === userID.toString()) {
+                        let botScore = 0;
+                        let minScore = 0;
+                        let maxScore = 0;
+                        let chanceZero = 0;
+                        let stdDeviationRatio = 0;
+                        for (userInfo of connectedUsers) {
+                            if (parseInt(userInfo["userID"]) < 0) {
+                                for (let bot of connectedBots) {
+                                    if (bot.botID === userInfo["userID"]) {
+                                        minScore = bot.botScores["minScore"];
+                                        maxScore = bot.botScores["maxScore"];
+                                        chanceZero = bot.botScores["chanceZero"];
+                                        stdDeviationRatio = bot.botScores["stdDeviationRatio"];
+                                        console.log(minScore,maxScore, chanceZero, stdDeviationRatio);
+                                        botScore = Math.floor(getRandomNumber(minScore, maxScore, chanceZero, stdDeviationRatio));
+                                         addScore(userInfo["userID"], botScore, maxPoint);
+                                        break;
+                                    }
+                                }
+                            }
                         }
                     }
-                    indexInOneRecord += 1;
-                    if (indexInOneRecord === 6) {
-                        indexInOneRecord = 0;
-                    }
+                } catch (ex) {
+                    console.log(ex);
                 }
+            };
 
-                if (deviationCount > 5) {
-                    let res = classifier.classify(features); // результат оценки нейросетью JSON
-                    let score = -1;
-                    console.log(res["results"]);
-                    for (let motionDict of res["results"]) {
-                        if (motionDict["label"] === moveName) {
-                            score = motionDict["value"];
-                            if (moveName === "up-down-click") {
-                                let sameMoveOne = res["results"].find(item => item.label === "hands-up-and-down");
-                                let sameMoveTwo = res["results"].find(item => item.label === "up-down-hands");
-                                score = Math.max(motionDict["value"], sameMoveOne.value, sameMoveTwo.value);
-                                if (score > 0.01 && score < 0.1) {
-                                    score = 0.2;
-                                }
-                            }
-                            if (moveName === "up-down-hands") {
-                                let sameMoveOne = res["results"].find(item => item.label === "hands-up-and-down");
-                                score = Math.max(motionDict["value"], sameMoveOne.value);
-                                if (score > 0.001 && score < 0.1) {
-                                    score = 0.2;
-                                }
-                            }
-                            if (moveName === "collapsing-breeding-locks") {
-                                if (score > 0.001 && score < 0.005) {
-                                    score = 0.2
-                                }
-                                if (score >= 0.005 && score < 0.01) {
-                                    score = 0.3;
-                                }
-                                if (score >= 0.01) {
-                                    score = 0.4;
-                                }
-
-                            }
-                            if (moveName === "going-to-the-side-with-clapping") {
-                                if (score > 0.001 && score < 0.05) {
-                                    score = 0.2;
-                                }
-                                if (score >= 0.05 & score < 0.1) {
-                                    score = 0.3;
-                                }
-                                if (score >= 0.1) {
-                                    score = 0.4;
-                                }
-
-                            }
-                            if (moveName === "hands-up-and-down") {
-                                let sameMoveOne = res["results"].find(item => item.label === "up-down-click");
-                                let sameMoveTwo = res["results"].find(item => item.label === "up-down-hands");
-                                score = Math.max(motionDict["value"], sameMoveOne.value - 0.1, sameMoveTwo.value - 0.1);
-                                if (score > 0.01 && score < 0.1) {
-                                    score = 0.2;
-                                }
-                            }
-                            if (moveName === "hands-up-down-sideways") {
-                                if (score > 0.001 && score < 0.05) {
-                                    score = 0.2;
-                                }
-                                if (score >= 0.05 && score < 0.1) {
-                                    score = 0.3;
-                                }
-                                if (score >= 0.1) {
-                                    score = 0.4;
-                                }
-
-                            }
-                            if (moveName === "side-hit") {
-                                let sameMoveOne = res["results"].find(item => item.label === "hands-up-and-down");
-                                score = Math.max(motionDict["value"], sameMoveOne.value);
-                                if (score > 0.01 && score < 0.05) {
-                                    score = 0.2;
-                                }
-                                if (score >= 0.05 & score < 0.1) {
-                                    score = 0.3;
-                                }
-                                if (score >= 0.1) {
-                                    score = 0.4;
-
-                                }
-                            }
-                            if (moveName === "down-from-the-middle-in-arc") {
-                                let sameMoveOne = res["results"].find(item => item.label === "hands-up-and-down");
-                                score = Math.max(motionDict["value"], sameMoveOne.value);
-                                if (score > 0.01 && score < 0.1) {
-                                    score = 0.1;
-                                }
-                            }
-                            if (moveName === "collapsing-breeding-locks") {
-                                let sameMoveOne = res["results"].find(item => item.label === "up-down-hands");
-                                score = Math.max(motionDict["value"], sameMoveOne.value);
-                                if (score > 0.01 && score < 0.1) {
-                                    score = 0.1;
-                                }
-                            }
-                            if (moveName === "draw-circle") {
-                                let sameMoveOne = res["results"].find(item => item.label === "hands-up-and-down");
-                                let sameMoveTwo = res["results"].find(item => item.label === "up-down-hands");
-                                score = Math.max(motionDict["value"], sameMoveOne.value, sameMoveTwo.value);
-                                if (score > 0.01 && score < 0.1) {
-                                    score = 0.1;
-                                }
-                            }
-                            if (moveName === "i-am-strong") {
-                                let sameMoveOne = res["results"].find(item => item.label === "gold-turn");
-                                let sameMoveTwo = res["results"].find(item => item.label === "gold-circle");
-                                let sameMoveThree = res["results"].find(item => item.label === "hands-up-and-down");
-                                score = Math.max(motionDict["value"], sameMoveOne.value, sameMoveTwo.value, sameMoveThree.value);
-                                if (score > 0.01 && score < 0.1) {
-                                    score = 0.1;
-                                }
-                            }
-                            if (moveName === "broad-back") {
-                                let sameMoveOne = res["results"].find(item => item.label === "hands-up-and-down");
-                                score = Math.max(motionDict["value"], sameMoveOne.value);
-                                if (score > 0.01 && score < 0.1) {
-                                    score = 0.1;
-                                }
-                            }
-                            if (moveName === "like-a-chicken") {
-                                let sameMoveOne = res["results"].find(item => item.label === "hands-up-and-down");
-                                score = Math.max(motionDict["value"], sameMoveOne.value);
-                                if (score > 0.01 && score < 0.1) {
-                                    score = 0.1;
-                                }
-                            }
-                            if (moveName === "gold-circle") {
-                                let sameMoveOne = res["results"].find(item => item.label === "up-down-click");
-                                score = Math.max(motionDict["value"], sameMoveOne.value);
-                                if (score > 0.01 && score < 0.1) {
-                                    score = 0.1;
-                                }
-                            }
-                            if (moveName === "gold-turn") {
-                                let sameMoveOne = res["results"].find(item => item.label === "down-from-the-middle-in-arc");
-                                let sameMoveTwo = res["results"].find(item => item.label === "gold-circle");
-                                score = Math.max(motionDict["value"], sameMoveOne.value, sameMoveTwo.value);
-                                if (score > 0.01 && score < 0.1) {
-                                    score = 0.1;
-                                }
-                            }
-                        }
-                    }
-                    console.log(moveName);
-                    console.log(score);
-                    if (score >= 0.4) {
-                        AddScore(userID.toString(), 40);
-                    }
-                    if (score >= 0.3 && score < 0.4) {
-                        AddScore(userID.toString(), Math.round(score * 400 / 4));
-                    }
-                    if (score >= 0.2 && score < 0.3) {
-                        AddScore(userID.toString(), Math.round(score * 100) + 5);
-                    }
-                    if (score > 0.1 && score < 0.2) {
-                        AddScore(userID.toString(), Math.round(score * 100) + 7);
-                    }
-                    if (score <= 0.1 && score > 0) {
-                        AddScore(userID.toString(), Math.round(score * 100) + 9);
-                    }
-                } else {
-                    console.log('Лежит', deviationCount);
-                    AddScore(userID.toString(), 0);
-                }
-            } catch (ex) {
-                console.log(ex);
-            }
-        };
-
-        socket.onclose = function (event) {
-            console.log("WebSocket connection closed.");
-        };
-    })();
-</script>
-</body>
-</html>
+            socket.onclose = function (event) {
+                window.location.href = "/room";
+                console.log("WebSocket connection closed.");
+            };
+        })();
+      function getRandomNumber(min, max, chanceZero, stdDeviationRatio) {
+          if (Math.random() < chanceZero) {
+              return 0;
+          } else {
+              const mean = (min + max) / 2;
+              const stdDeviation = (max - min) / stdDeviationRatio;
+              let randomNumber;
+              do {
+                  const u1 = Math.random();
+                  const u2 = Math.random();
+                  const z0 = Math.sqrt(-2 * Math.log(u1)) * Math.cos(2 * Math.PI * u2);
+                  randomNumber = Math.round(mean + z0 * stdDeviation);
+              } while (randomNumber < min || randomNumber > max);
+              return randomNumber;
+          }
+      }
+    </script>
+</div>

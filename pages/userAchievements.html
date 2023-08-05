@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <title>Achievements</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://fonts.googleapis.com/css2?family=Cherry+Bomb+One&family=Roboto&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="../static/css/userAchievements.css " type="text/css" rel="stylesheet"/>
+  <script src="../static/script/userAchievements.js" defer></script>
+</head>
+<body class="page">
+  <div class="logo">
+    <span style="--i:1" class="logo__item">A</span>
+    <span style="--i:2" class="logo__item">c</span>
+    <span style="--i:3" class="logo__item">h</span>
+    <span style="--i:4" class="logo__item">i</span>
+    <span style="--i:5" class="logo__item">e</span>
+    <span style="--i:6" class="logo__item">v</span>
+    <span style="--i:7" class="logo__item">e</span>
+    <span style="--i:8" class="logo__item">m</span>
+    <span style="--i:9" class="logo__item">e</span>
+    <span style="--i:10" class="logo__item">n</span>
+    <span style="--i:11" class="logo__item">t</span>
+    <span style="--i:12" class="logo__item">s</span>
+  </div>
+  <img class="btn-leave-room" src="/static/img/log_out.svg">
+  <div class="achievements">
+    <div class="achievements__achieve-type">
+      <div class="achieve-type__type type-selected" id="in-progress">In progress</div>
+      <div class="achieve-type__type" id="completed">Completed</div>
+    </div>
+    <div class="achievements__achieve-items">
+      {{ range .Achievements }}
+      <div class="achieve-items__positions" data-complete = "{{ .Completed }}" id="{{ .AchievementID }}" data-collect="{{ .Collected }}">
+        <span class="positions__position-name">{{ .AchievementName }}</span>
+        <span class="positions__part-complete">{{ .Progress }}/{{ .MaxProgress }}</span>
+      </div>
+      {{ end }}
+    </div>
+  </div>
+</body>
+</html>
