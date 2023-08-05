@@ -209,7 +209,6 @@ function gameStart() {
                     classifier = new EdgeImpulseClassifier();
                     await classifier.init();
                     let project = classifier.getProjectInfo();
-                    console.log(project.owner + ' / ' + project.name + ' (version ' + project.deploy_version + ')');
 
                     contentContainer.load(thirdComponent, function() {
                         const video = $('#video-dance')[0];
@@ -219,7 +218,6 @@ function gameStart() {
                         video.addEventListener('loadeddata', function() {
                             video.play();
                             socket.send(songName);
-                            console.log(songName);
                             socket.close(); // Закрываем вебсокет mainRoom
                         });
                     });
@@ -289,7 +287,6 @@ function addBot(botName) {
                 }
                 readJSONFromURL("../" + data.BotScoresPath).then(jsonData => {
                     connectedBots.push({"botID": "-" + data.BotId,  "botScores":  jsonData});
-                    console.log(connectedBots);
                 });
                 fetch("/api/addBot", { // Добавление бота на бэке
                     method: 'POST',
@@ -302,9 +299,7 @@ function addBot(botName) {
                     })
                 })
                     .then(function (response) {
-                        if (response.ok) {
-                            console.log('Бот добавлен на бэке');
-                        } else {
+                        if (!response.ok) {
                             console.log('Ошибка при добавлении бота на бэке. Статус:', response.status);
                         }
                     })
@@ -331,7 +326,6 @@ function bossGame(bossBlock) {
     let bossHat = bossBlock.querySelector(".hat").src;
     let bossId = bossBlock.id;
     if (!gameStart()) {
-        console.log("Игра не готова")
         return;
     }
     bossInfo = {"bossId": bossId, "name": name, "healthPoint": healthPoint, "bossBody": bossBody, "bossFace": bossFace, "bossHat": bossHat};
@@ -352,10 +346,6 @@ function addColor(song) {
 }
 
 let socket = new WebSocket(WssURL);
-
-socket.onopen = function (event) {
-    console.log("WebSocket mainRoom connection established.");
-};
 
 socket.onmessage = function (event) {
     let message = event.data;
@@ -378,26 +368,20 @@ socket.onclose = function (event) {
     if (!startedGame) {
         window.location.href = "/room";
     }
-    console.log("WebSocket mainRoom connection closed.");
 };
 
 function addUser(userID, userName, hatImgSrc, faceImgSrc, bodyImgSrc) {
     for (let userInfo of connectedUsers) {
         if (userInfo["userID"] === userID) {
-            if(userID > 0){
-                console.log('Пользователь уже присоединён: ' + userID);
-            } else {
+            if(userID <= 0){
                 removeUser(userID);
-                console.log('Бот удалён: ' + userID);
             }
             return false;
         }
     }
     if (connectedUsers.length >= 4) {
-        console.log('Пользователь не может присоединиться, так как комната переполнена: ' + userID);
         return false;
     }
-    console.log('Пользователь присоединился: ' + userID);
     connectedUsers.push({"userID": userID, "userName": userName, "valueScore": 0, "bodyImgSrc": bodyImgSrc, "faceImgSrc": faceImgSrc, "hatImgSrc": hatImgSrc});
 
     let userMessage = document.getElementById('needUser');
@@ -423,8 +407,6 @@ function addUser(userID, userName, hatImgSrc, faceImgSrc, bodyImgSrc) {
 
 
 function removeUser(userID) {
-    console.log('Пользователь вышел: ' + userID);
-
     let removedUserIndex = 0;
     for (let i = 0; i < connectedUsers.length; i++) {
         if (connectedUsers[i]["userID"] === userID) {
@@ -468,9 +450,7 @@ function removeUser(userID) {
             })
         })
             .then(function (response) {
-                if (response.ok) {
-                    console.log('Бот удалён на бэке');
-                } else {
+                if (!response.ok) {
                     console.log('Ошибка при удалении бота на бэке. Статус:', response.status);
                 }
             })
@@ -513,9 +493,7 @@ async function sendGameStartInfoToServer() {
         },
         body: `room_id=${window.location.pathname.split('/').pop()}`,
     });
-    if (response.ok) {
-        console.log('Отправил сообщение о начале игры');
-    } else {
+    if (!response.ok) {
         console.log('Не получилось отправить сообщение о начале', response.status);
     }
 }
@@ -528,9 +506,7 @@ async function sendGameEndInfoToServer() {
         },
         body: `room_id=${window.location.pathname.split('/').pop()}`,
     });
-    if (response.ok) {
-        console.log('Отправил сообщение о конце игры');
-    } else {
-        console.log('Не получилось отправить сообщение о конче игры', response.status);
+    if (!response.ok) {
+        console.log('Не получилось отправить сообщение о конце игры', response.status);
     }
 }

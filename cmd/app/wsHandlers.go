@@ -141,7 +141,6 @@ func neuralWSHandler(w http.ResponseWriter, r *http.Request) {
 	for {
 		_, _, err := conn.ReadMessage()
 		if err != nil {
-			log.Println(err)
 			delete(gameFieldWSDict, conn)
 			break
 		}

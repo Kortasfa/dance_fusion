@@ -82,13 +82,11 @@ function sendMessage() {
                 warningID.classList.remove("hidden");
                 fullID.classList.add("hidden");
                 enterInRoom.classList.add("entrance-id-room__field_warning");
-                console.log("Room ID not found!");
             } else if (XHR.status === 409) {
                 emptyID.classList.add("hidden");
                 fullID.classList.remove("hidden");
                 warningID.classList.add("hidden");
                 enterInRoom.classList.add("entrance-id-room__field_warning");
-                console.log("The room is full!");
             } else {
                 alert("Failed to send room id");
             }
@@ -113,33 +111,22 @@ const megaStar = document.getElementById("mega-star");
 const stars = document.querySelectorAll(".rating-stars__star");
 function joinRoom(userID) {
     socket = new WebSocket("wss://" + window.location.hostname + "/ws/joinToRoom/" + userID);
-    socket.onopen = function(event) {
-        console.log("WebSocket connection established.");
-    };
 
     socket.onmessage = function(event) {
         let maxPractice = maxTheory - maxTheory * 0.2; //4480
         let receivedData = event.data;
         let receivedJSON = JSON.parse(receivedData);
-        console.log(receivedJSON);
         if ("point" in receivedJSON) {
             let score = receivedJSON["point"];
-            console.log("score: " + score);
             if (value > 5600) return
             value += score;
-            console.log("value: " + value);
             if (value <= maxTheory) {
-                console.log("value: " + value);
                 percentage = (value / maxPractice);
-                console.log("percentage: " + percentage);
                 pix = 250 * percentage;
-                console.log("pix: " + pix);
             }
             if (value > maxTheory) {
                 percentage = (value / maxTheory);
-                console.log("percentage: " + percentage);
                 pix = 50 * percentage;
-                console.log("pix: " + pix);
             }
             scale.style.height = pix + 'px';
             if (value >= 0.2 * maxPractice) {
@@ -162,7 +149,6 @@ function joinRoom(userID) {
                 megaStar.classList.remove("hidden");
             }
         } else if ("Exit" in receivedJSON) {
-            console.log("Вас выгняли");
             // Тут надо делать всё то же самое, что в exitFromGame, но без зпроса
             stop = 1;
             user.style.pointerEvents='auto'
@@ -176,7 +162,6 @@ function joinRoom(userID) {
             danceField.classList.add("hidden");
             document.querySelector('.dance-block__connection').innerText = 'You are joined!'
             if (socket !== undefined) {
-                console.log("Закрываем бобанный WS");
                 socket.close();
                 socket = undefined
             }
@@ -192,7 +177,6 @@ function joinRoom(userID) {
             maxTheory = receivedJSON["maxPoint"];
             colorID = receivedJSON["color"];
             colorFlag.style.backgroundColor = colorID;
-            console.log("Получил json с движениями, отправляем color на game");
             sendSongJson(enterInRoom.value, maxTheory, colorID).then(() => {})
             scale.style.height = 0 + 'px';
             megaStar.classList.add("hidden");
@@ -204,7 +188,6 @@ function joinRoom(userID) {
 
     socket.onclose = function(event) {
         window.location.reload();
-        console.log("WebSocket connection closed.");
     };
 }
 
@@ -220,9 +203,7 @@ async function sendSongJson(roomID, maxTheory, colorID) {
             "colorID": colorID
         }),
     });
-    if (response.ok) {
-        console.log('Максимальный балл отправлен');
-    } else {
+    if (!response.ok) {
         console.log('Не удалось отправить максимальный балл');
     }
 }
@@ -253,12 +234,10 @@ async function exitFromGame() {
         console.log('Не удалось выйти из игры');
     } else {
         if (socket !== undefined) {
-            console.log("Закрываем бобанный WS");
             socket.close();
             socket = undefined
         }
         inGame = false;
-        console.log('Вышел из игры');
         entranceField.classList.remove("hidden");
         danceField.classList.add("hidden");
     }
@@ -281,7 +260,6 @@ async function exitFromAccount() {
         }
         console.log('Не удалось выйти из аккаунта');
     } else {
-        console.log('Вышел из аккаунта');
         window.location.href = '/logIn';
     }
 }
@@ -386,23 +364,13 @@ function sendDataToServer(data) {
             body: data
         })
             .then(function (response) {
-                if (response.ok) {
-                    console.log('Данные успешно отправлены.');
-                } else {
+                if (!response.ok) {
                     console.log('Ошибка при отправке данных. Статус:', response.status);
-                    /*if (response.status === 409) {
-                        stop = 1;
-                        exitFromGame().then(r => {})// При закрытии игры не надо выходить из комнаты. Надо оставлять пользователя в комнате. Просто пишем ""
-                        document.querySelector('.dance-block__connection').innerText = "The room was closed";
-                        window.location.replace("/join")
-                    }*/
                 }
             })
             .catch(function (error) {
                 console.log('Ошибка при отправке данных: ', error);
             });
-    } else {
-        console.log('игра остановлена');
     }
 }
 
