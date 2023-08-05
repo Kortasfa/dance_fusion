@@ -90,7 +90,7 @@ VALUES
 	('Dance "Forget You" 3 times', 3, 1, 0, 0, 4000),
 	('Dance "Forget You" 5 times', 5, 1, 0, 0, 5400),
 	('Win the easy bot', 1, 0, 1, 0, 2000),
-	('Win the medium bot', 1, 2, 0, 0, 3000),
+	('Win the medium bot', 1, 0, 2, 0, 3000),
     ('Win the hard bot', 1, 0, 3, 0, 4000),
     ('Win the extreme bot', 1, 0, 4, 0, 5000),
     ('Finish off Rhythmo', 1, 0, 0, 4, 2000),

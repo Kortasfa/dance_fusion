@@ -701,9 +701,15 @@ func checkForAchievements(db *sqlx.DB) http.HandlerFunc {
 			return
 		}
 
-		data.BotIDs = append(data.BotIDs, 0)
+		botDifficulties, err := getDifficultyByBotIDs(db, data.BotIDs)
+		if err != nil {
+			http.Error(w, "Getting difficulties error", 500)
+			log.Println(err.Error())
+			return
+		}
+		botDifficulties = append(botDifficulties, 0)
 
-		query := `
+		query, args, err := sqlx.In(`
 			SELECT
 				user_achievement_id,
 				user_id,
@@ -712,8 +718,14 @@ func checkForAchievements(db *sqlx.DB) http.HandlerFunc {
 			FROM
 				user_achievements
 			WHERE
-				user_id = ? AND song_id = ? AND bot_id IN (?) AND boss_id = ?
-		`
+				user_id = ? AND song_id IN (?) AND bot_difficulty IN (?) AND boss_id = ?
+		`, data.UserID, []int{data.SongID, 0}, botDifficulties, data.BossID)
+		if err != nil {
+			http.Error(w, "Ошибка базы данных", 500)
+			log.Println(err.Error())
+			return
+		}
+
 		var achievementProgressData []struct {
 			UserAchievementID int `db:"user_achievement_id"`
 			UserID            int `db:"user_id"`
@@ -721,7 +733,7 @@ func checkForAchievements(db *sqlx.DB) http.HandlerFunc {
 			MaxProgress       int `db:"max_progress"`
 		}
 
-		err = db.Select(&achievementProgressData, query, data.UserID, data.SongID, data.BotIDs, data.BossID)
+		err = db.Select(&achievementProgressData, query, args...)
 		if err != nil {
 			http.Error(w, "Database error", 500)
 			log.Println(err.Error())
@@ -729,15 +741,10 @@ func checkForAchievements(db *sqlx.DB) http.HandlerFunc {
 		}
 
 		for _, progressInfo := range achievementProgressData {
+			fmt.Println("Новая ачивка:", progressInfo)
 			userAchievementID := progressInfo.UserAchievementID
 			progress := progressInfo.Progress
 			maxProgress := progressInfo.MaxProgress
-			err = addHasNewAchievement(db, progressInfo.UserID)
-			if err != nil {
-				http.Error(w, "Internal Server Error", 500)
-				log.Println(err)
-				return
-			}
 
 			if progress < maxProgress {
 				progress++
@@ -746,6 +753,12 @@ func checkForAchievements(db *sqlx.DB) http.HandlerFunc {
 			completed := 0
 			if progress >= maxProgress {
 				completed = 1
+				err = addHasNewAchievement(db, progressInfo.UserID)
+				if err != nil {
+					http.Error(w, "Internal Server Error", 500)
+					log.Println(err)
+					return
+				}
 			}
 
 			updateQuery := `

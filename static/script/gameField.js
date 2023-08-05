@@ -248,22 +248,23 @@ async function getAchievements() {
             }
             let bossID = 0;
             if (bossInfo) {
-                let bossHPCount = document.querySelector(".boss__hp-bar");
-                if (bossHPCount <= 0) {
-                    bossID = bossInfo.bossId;
+                if (bossHp <= 0) {
+                    bossID = parseInt(bossInfo.bossId);
                 }
             }
+            let jsonData = JSON.stringify({
+                "user_id": parseInt(connectedUsers[i]["userID"]), // Integer
+                "song_id": parseInt(songId), // Integer
+                "bot_ids": botsID,
+                "boss_id": bossID
+            })
+            console.log("Json для достижений", jsonData);
             const response = await fetch("/api/checkForAchievements", {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({
-                    "user_id": userID, // Integer
-                    "song_id": songId, // Integer
-                    "bot_ids": botsID,
-                    "boss_id": bossID
-                }),
+                body: jsonData,
             });
             if (response.ok) {
                 console.log('Данные на достижения отправлены');
