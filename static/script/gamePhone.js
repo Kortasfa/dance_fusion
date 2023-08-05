@@ -57,7 +57,6 @@ function sendMessage() {
     }
     else {
         if (userInfo === null) {
-            console.log("Login to your account!");
             return
         }
         let postInfo = {
@@ -77,7 +76,6 @@ function sendMessage() {
                 warningID.classList.add("hidden");
                 btnLeaveRoom.classList.remove("hidden");
                 colorFlag.classList.remove("hidden");
-                console.log("Connected to the room!");
                 joinRoom(userInfo.UserID)
             } else if (XHR.status === 404) {
                 emptyID.classList.add("hidden");
