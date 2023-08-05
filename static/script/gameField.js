@@ -57,7 +57,6 @@ function showStats() {
     addStats();
     modalElem.classList.remove("hidden");
     modalElem.classList.add("open");
-    console.log("end video")
 }
 
 function addStats(){
@@ -96,7 +95,6 @@ function addScore(userID, score, maxScore) {
         }
     }
     if (valueScore === undefined) {
-        console.log("пользователь не найден с таким id")
         return;
     }
     valueScore += score;
@@ -201,7 +199,6 @@ window.onbeforeunload = function (){
 }
 
 function expelUsers() {
-    console.log('Выгоняем всех челов из игры');
     for (let user of connectedUsers) {
         if (parseInt(user["userID"]) > 0) {
             expelUser(user["userID"]).then(() => {});
@@ -227,10 +224,8 @@ async function expelUser(userID) {
         },
         body: `user_id=${userID}`,
     });
-    if (response.ok) {
-        console.log('Отправил сообщение о выходе', userID);
-    } else {
-        console.log('Не получилось отправить сообзение о выходе ', userID);
+    if (!response.ok) {
+        console.log('Не получилось отправить сообщение о выходе ', userID);
     }
     if (socket) {
         socket.close();
@@ -258,7 +253,6 @@ async function getAchievements() {
                 "bot_ids": botsID,
                 "boss_id": bossID
             })
-            console.log("Json для достижений", jsonData);
             const response = await fetch("/api/checkForAchievements", {
                 method: 'POST',
                 headers: {
@@ -266,10 +260,8 @@ async function getAchievements() {
                 },
                 body: jsonData,
             });
-            if (response.ok) {
-                console.log('Данные на достижения отправлены');
-            } else {
-                console.log('Не удалось отправить данные');
+            if (!response.ok) {
+                console.log('Не удалось отправить данные для проверки на достижение');
             }
         }
     }

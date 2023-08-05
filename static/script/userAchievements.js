@@ -14,9 +14,7 @@ async function earnPointsForAchievements(achievementID) {
       },
       body: `achievement_id=${achievementID}`,
    });
-   if (response.ok) {
-      console.log('Получил очки за ачивку');
-   } else {
+   if (!response.ok) {
       console.log('Не получилось получить баллы за ачивку', response.status);
    }
 }

@@ -43,7 +43,6 @@ function signUp() {
         XHR.onload = function () {
             if (XHR.status === 200) {
                 window.location.href = "/logIn";
-                console.log("Successfully registered!");
             } else if (XHR.status === 409) {
                 console.clear();
                 usernameEmpty.classList.add("hidden")
@@ -51,7 +50,6 @@ function signUp() {
                 warningUsername.classList.remove("hidden");
                 passwordField.classList.remove("warning-input");
                 passwordEmpty.classList.add("hidden");
-                console.log("Username is taken!");
             } else {
                 alert("Failed to register!");
             }
@@ -61,7 +59,6 @@ function signUp() {
 }
 
 function changeEye(){
-    console.log(passwordField.type);
     if (passwordField.type === "password") {
         passwordField.type = "text";
         passwordEye.src = "/static/img/eye.svg";

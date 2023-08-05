@@ -186,13 +186,12 @@ func getMotion(w http.ResponseWriter, r *http.Request) {
 }
 
 func exitFromGameAPI(w http.ResponseWriter, r *http.Request) {
-	userID, roomID, err := exitFromGame(r)
+	_, _, err := exitFromGame(r)
 	if err != nil {
 		http.Error(w, "Internal Server Error", 500)
 		log.Println(err.Error())
 		return
 	}
-	fmt.Println("User", userID, "left the room", roomID)
 	w.WriteHeader(200)
 }
 
@@ -224,7 +223,6 @@ func exitFromGame(r *http.Request) (int, string, error) {
 	}
 	if containsInSlice(activeGameRooms, selectedRoomID) {
 		if getConnectedUsersCount(selectedRoomID) < 1 {
-			fmt.Println("Сворачиваем игру: ", selectedRoomID)
 			endGame(selectedRoomID)
 		}
 		broadcastGameFieldWSMessage <- []string{selectedRoomID, string(messageData)}
@@ -233,7 +231,7 @@ func exitFromGame(r *http.Request) (int, string, error) {
 }
 
 func exitFromAccount(w http.ResponseWriter, r *http.Request) {
-	userID, _, err := exitFromGame(r)
+	_, _, err := exitFromGame(r)
 	if err != nil {
 		http.Error(w, "Internal Server Error", 500)
 		log.Println(err.Error())
@@ -244,7 +242,6 @@ func exitFromAccount(w http.ResponseWriter, r *http.Request) {
 		Path:    "/",
 		Expires: time.Now().AddDate(0, 0, -1),
 	})
-	fmt.Println(userID, "logged out")
 }
 
 func getUserAvatar(db *sqlx.DB) func(w http.ResponseWriter, r *http.Request) {
@@ -331,7 +328,6 @@ func getDataSongJson(w http.ResponseWriter, r *http.Request) {
 		log.Println(err.Error())
 		return
 	}
-	fmt.Println("Записываем color и maxPoint в broadcastGameFieldWSMessage", data.RoomID, data.MaxPoint, data.ColorID)
 	broadcastGameFieldWSMessage <- []string{data.RoomID, string(reqData)}
 	w.WriteHeader(200)
 }
@@ -362,7 +358,6 @@ func getBestPlayer(db *sqlx.DB) func(w http.ResponseWriter, r *http.Request) {
 			}
 			return
 		}
-		fmt.Println(bestPlayerData.UserID)
 		userData, err := getUserInfo(db, bestPlayerData.UserID)
 		if err != nil {
 			http.Error(w, "Error getting user information", http.StatusInternalServerError)
@@ -511,7 +506,6 @@ func getBotPath(db *sqlx.DB) func(w http.ResponseWriter, r *http.Request) {
 			log.Println(err.Error())
 			return
 		}
-		fmt.Println(botData)
 		response := struct {
 			BotId         string
 			BotScoresPath string
@@ -566,7 +560,6 @@ func deletePlayerFromGame(w http.ResponseWriter, r *http.Request) {
 		}
 		if containsInSlice(activeGameRooms, selectedRoomID) {
 			if getConnectedUsersCount(selectedRoomID) < 1 {
-				fmt.Println("Сворачиваем игру: ", selectedRoomID)
 				endGame(selectedRoomID)
 			}
 			broadcastGameFieldWSMessage <- []string{selectedRoomID, string(messageData)}
@@ -741,7 +734,6 @@ func checkForAchievements(db *sqlx.DB) http.HandlerFunc {
 		}
 
 		for _, progressInfo := range achievementProgressData {
-			fmt.Println("Новая ачивка:", progressInfo)
 			userAchievementID := progressInfo.UserAchievementID
 			progress := progressInfo.Progress
 			maxProgress := progressInfo.MaxProgress
@@ -792,7 +784,6 @@ func earnPointsForAchievements(db *sqlx.DB) http.HandlerFunc {
 			log.Println(err.Error())
 			return
 		}
-		fmt.Println("Получил id ", achievementIDInt)
 		var user userInfo
 		err = getJsonCookie(r, "userInfoCookie", &user)
 		if err != nil {
@@ -823,7 +814,6 @@ func earnPointsForAchievements(db *sqlx.DB) http.HandlerFunc {
 			log.Println(err.Error())
 			return
 		}
-		fmt.Println("Получил информацию о ачивке ", achievementData)
 		if achievementData.Completed != 1 {
 			http.Error(w, "achievement not yet completed", 409)
 			return
@@ -832,7 +822,6 @@ func earnPointsForAchievements(db *sqlx.DB) http.HandlerFunc {
 			http.Error(w, "award already received", 409)
 			return
 		}
-		fmt.Println("Прошёл бэк проверку")
 		updateQuery := `
 				UPDATE
 				    user_achievements
@@ -848,7 +837,6 @@ func earnPointsForAchievements(db *sqlx.DB) http.HandlerFunc {
 			log.Println(err.Error())
 			return
 		}
-		fmt.Println("Поменял collected на 1", achievementData.UserAchievementID)
 
 		err = addUserScoreSQL(db, user.UserID, achievementData.Score)
 		if err != nil {
@@ -856,7 +844,6 @@ func earnPointsForAchievements(db *sqlx.DB) http.HandlerFunc {
 			log.Println(err.Error())
 			return
 		}
-		fmt.Println("Добавил score пользователю", user.UserID, achievementData.Score)
 		w.WriteHeader(http.StatusOK)
 	}
 }
