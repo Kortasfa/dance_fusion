@@ -9,6 +9,7 @@ const gameMode = document.getElementById('gameMode');
 const bots = document.getElementById('bots');
 const botsMenu = document.getElementById('botMenu');
 const boss = document.getElementById('boss');
+const difficultyList = document.querySelector('.game-menu__difficulty');
 
 let readyGame = false;
 let readyPlayer = false;
@@ -36,7 +37,10 @@ function changeButton() {
     readyGame = readyPlayer && readySong;
     if (readyGame) {
         playBtn.classList.add('button_ready');
+    }  else {
+        playBtn.classList.remove('button_ready');
     }
+
 }
 
 function openSong(styleButtonBlock) {
@@ -80,6 +84,10 @@ function toggleBots(){
 function closeList() {
     if (listSong.classList.contains('none')){
         audio.play();
+        videoPlayer.src = '';
+        readySong = false;
+        changeButton()
+        difficultyList.classList.add('none');
         returnBtn.classList.toggle('hide');
         listGenre.classList.add('none');
         gameMode.classList.remove('none');
@@ -145,11 +153,10 @@ function onImageClick(element) {
     const fullVideo = document.getElementById('full' + videoSrcID);
 
     audio.pause();
-    let difficultyList = document.querySelector('.game-menu__difficulty');
     let difficultySegment = difficultyList.querySelectorAll('.segment')
 
     difficulty  =  document.getElementById('difficulty' + videoSrcID).innerText;
-    difficultyList.classList.remove('none')
+    difficultyList.classList.remove('none');
     for (let i = 0; i < 4; i++) {
         if (i < difficulty) {
             difficultySegment[i].classList.add('segment_on')
@@ -195,6 +202,7 @@ playButton.addEventListener('click', gameStart);
 function gameStart() {
     const contentContainer = $('#content');
     if (readyGame) {
+        document.getElementsByClassName('loading')[0].style.display= 'flex';
         startedGame = true;
         sendGameStartInfoToServer().then(() => {})
         numb = (Math.round(Math.random()*1000)).toString();
@@ -204,7 +212,6 @@ function gameStart() {
         $.getScript(firstComponent, function() {
             $.getScript(secondComponent, function() {
                 (async () => {
-                    document.getElementsByClassName('loading')[0].style.display= 'flex';
                     videoPlayer.src = '';
                     classifier = new EdgeImpulseClassifier();
                     await classifier.init();

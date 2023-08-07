@@ -298,6 +298,37 @@
     margin: -130px 6px;
 }
 
+.boss-container__boss-thought {
+    position: absolute;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 10px;
+    left: -140px;
+    top: -40px;
+    opacity: 0;
+    transition: opacity 0.5s, transform 0.5s;
+    transform-origin: 100% 100%;
+}
+
+.boss-thought__thought-bubble {
+    width: 150px;
+    height: 160px;
+}
+
+.boss-thought__sticker {
+    position: absolute;
+    top: 29px;
+    left: 33px;
+    width: 80px;
+    height: 80px;
+}
+
+.boss-container.boss-show-thought .boss-container__boss-thought {
+    opacity: 1;
+    transform: scale(1);
+}
+
 .boss__hat-img{
     width: 172px;
     height: 180px;
@@ -449,6 +480,31 @@
 
 .player-score{
     margin: 2px;
+}
+
+.defeated{
+    position: relative;
+}
+
+.defeated::before,
+.defeated::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    z-index: 2;
+    width: 165%;
+    height: 5px;
+    background-color: #ff1111;
+    border-radius: 2px;
+}
+
+.defeated::before {
+    transform: translate(-50%, -50%) rotate(52deg);
+}
+
+.defeated::after {
+    transform: translate(-50%, -50%) rotate(-52deg);
 }
 
 .hidden {

@@ -178,17 +178,32 @@ function addScore(userID, score, maxScore) {
     }
 
     connectedUsers[userIndex]["valueScore"] = valueScore;
-    if (bossInfo) {
+    if (mode == 'Boss') {
         playerDamage(score);
     }
 }
 
 let hpBar;
+let bossStage = 1;
 function playerDamage(score) {
-    bossHp = bossHp - score;
-    hpBar =  190 * (bossHp / bossHealth);
+    const hpPercentage = (bossHp / bossHealth) * 100;
+    if (hpPercentage > 66) {
+        bossStage = 1;
+    } else if (hpPercentage > 33) {
+        bossStage = 2;
+    } else {
+        bossStage = 3;
+    }
 
+    bossHp = bossHp - score;
+    hpBar =  192 * (bossHp / bossHealth);
     bossHpBar.style.width = hpBar + 'px';
+
+    if (bossHp < 0) {
+        mode = 'Classic';
+        bossHpBar.classList.add('none');
+        document.querySelector('.boss__head').classList.add('defeated')
+    }
 }
 
 let btnExit = document.querySelector(".btn-exit");
@@ -265,4 +280,45 @@ async function getAchievements() {
             }
         }
     }
+}
+
+let bossContainer;
+let bossThought;
+let bossSticker;
+let bossEmotionJSON;
+if (bossInfo) {
+    bossContainer = document.querySelector('.boss-container');
+    bossThought = document.querySelector('.boss-container__boss-thought');
+    bossSticker = bossThought.querySelector('.boss-thought__sticker');
+    readJSONFromURL("../static/boss_emotions/boss_emotion_list.json").then(jsonData => {
+        bossEmotionJSON = jsonData;
+        for (let bossEmotionDict of bossEmotionJSON) {
+            if (bossEmotionDict["stage"] === bossStage) {
+                bossSticker.src = "../" + bossEmotionDict["emotions"][Math.floor(Math.random() * bossEmotionDict["emotions"].length)];
+                break;
+            }
+        }
+        showBossThought();
+    });
+}
+
+function showBossThought() {
+    if (bossHp < 0) {
+        return;
+    }
+    setTimeout(function() {
+        bossContainer.classList.add('boss-show-thought');
+        setTimeout(function() {
+            bossContainer.classList.remove('boss-show-thought');
+            setTimeout(function() {
+                for (let bossEmotionDict of bossEmotionJSON) {
+                    if (bossEmotionDict["stage"] === bossStage) {
+                        bossSticker.src = "../" + bossEmotionDict["emotions"][Math.floor(Math.random() * bossEmotionDict["emotions"].length)];
+                        break;
+                    }
+                }
+                setTimeout(showBossThought, 1000);
+            }, 1000);
+        }, 2000);
+    }, Math.floor(Math.random() * (8000 - 2000 + 1)) + 2000);
 }
