@@ -1,0 +1,160 @@
+* {
+    box-sizing: border-box;
+}
+
+.page {
+    margin: 0;
+    background: #FFE973;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.logo {
+    display: flex;
+    margin-top: 60px;
+}
+
+.logo__item {
+    font: 400 30px Cherry Bomb One, cursive;
+    color: #BD63D4;
+
+    animation: wavy 1s infinite;
+    animation-delay: calc(.1s * var(--i));;
+}
+
+.btn-leave-room {
+    position: absolute;
+    top: 20px;
+    right: 10px;
+    background: #BD63D4;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.achievements {
+    width: 375px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 20px;
+}
+
+.achievements__achieve-type {
+    display: flex;
+    gap: 40px;
+    padding: 10px;
+}
+
+.achieve-type__type {
+    width: 130px;
+    height: 40px;
+    border-radius: 10px;
+    background-color: #BD63D4;
+    font: 400 20px Roboto, sans-serif;
+    color: #1E1C1C;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-style: dashed;
+    border-width: 5px;
+    border-color: #8c06ab;
+}
+
+.type-selected {
+    background-color: #8c06ab;
+    border-style: solid;
+    border-width: 5px;
+    border-color: #670080;
+    color: #FAFCF6;
+}
+
+.achievements__achieve-items {
+    height: 60vh;
+    padding: 10px 0 10px 0;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    overflow-y: scroll;
+}
+
+.achieve-items__positions {
+    width: 320px;
+    background-color: #AEF26D;
+    border-radius: 10px;
+    border-style: dashed;
+    border-width: 5px;
+    border-color: #BD63D4;
+    display: flex;
+    align-items: center;
+    padding: 5px 10px 5px 10px;
+}
+
+.positions__position-name {
+    flex-grow: 1;
+    font: 400 20px Roboto, sans-serif;
+    color: #1E1C1C;
+    word-break: break-all;
+    margin-right: 10px;
+}
+
+.positions__part-complete {
+    font: 700 20px Roboto, sans-serif;
+    color: #670080;
+}
+
+.achievements__positions__completed {
+    background-color: #00eaff;
+    border-style: solid;
+    border-width: 5px;
+    border-color: #670080;
+}
+
+.achievements__positions__collected {
+    background-color: #BD63D4;
+    border-style: solid;
+    border-width: 5px;
+    border-color: #670080;
+}
+
+.hidden {
+    display: none;
+}
+
+@keyframes wavy {
+    0%, 40%, 100% {
+        transform: translateY(0)
+    }
+    20% {
+        transform: translateY(-20px)
+    }
+}
+
+@media screen and (min-width: 370px) {
+    .achieve-items__positions {
+        width: 350px;
+    }
+}
+
+@media screen and (min-height: 600px) {
+    .achievements__achieve-items {
+        height: 65vh;
+    }
+}
+
+@media screen and (min-height: 650px) {
+    .achievements__achieve-items {
+        height: 70vh;
+    }
+}
+
+@media screen and (min-height: 750px) {
+    .achievements__achieve-items {
+        height: 75vh;
+    }
+}

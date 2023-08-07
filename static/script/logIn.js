@@ -38,7 +38,6 @@ function logIn() {
         XHR.open("POST", "/api/logIn");
         XHR.onload = function () {
             if (XHR.status === 200) {
-                console.log("Successfully logged in!");
                 window.location.href = '/join';
             } else if (XHR.status === 409) {
                 warningMessage.forEach(element => element.classList.remove("hidden"));
@@ -46,7 +45,6 @@ function logIn() {
                 passwordField.classList.add("warning-input");
                 usernameEmpty.classList.add("hidden");
                 passwordEmpty.classList.add("hidden");
-                console.log("Wrong username or password!");
             } else {
                 alert("Failed to log in!");
             }
@@ -56,7 +54,6 @@ function logIn() {
 }
 
 function changeEye() {
-    console.log(passwordField.type);
     if (passwordField.type === "password") {
         passwordField.type = "text";
         passwordEye.src = "/static/img/eye.svg";
