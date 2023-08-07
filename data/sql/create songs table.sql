@@ -21,8 +21,8 @@ VALUES
     ("Rasputin"," 'Boney M'", "static/img/rasputin.jpg", "static/video/full/rasputin.mp4", "static/video/previews/rasputin.mp4", 2, 2),
     ("Mi Mi Mi"," 'Serebro'", "static/img/mimimi.jpg", "static/video/full/mimimi.mp4", "static/video/previews/mimimi.mp4", 2, 2),
     ("There is nothing better","Bremenskye Muzykanty", "static/img/bremen.jpg", "static/video/full/bremen.mp4", "static/video/previews/bremen.mp4", 3, 1);
-    
-    
+
+
 
 
 
