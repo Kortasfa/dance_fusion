@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"github.com/gorilla/mux"
 	"github.com/gorilla/websocket"
 	"github.com/jmoiron/sqlx"
@@ -35,7 +34,6 @@ func roomWSHandler(db *sqlx.DB) func(w http.ResponseWriter, r *http.Request) {
 			delete(roomWSDict, conn)
 			return
 		}
-		fmt.Println("Надо отправить название: ", string(message))
 
 		motionListPaths, err := getMotionListPath(db, string(message))
 		if err != nil {
@@ -60,11 +58,10 @@ func roomWSHandler(db *sqlx.DB) func(w http.ResponseWriter, r *http.Request) {
 						return
 					}
 					if userIDInt < 0 {
+						i++
 						continue
 					}
 					motionListPath := motionListPaths[i]
-					fmt.Println("Надо отправить JSON этому", userID)
-					fmt.Println("Надо отправить motionListPath этому", userID, "вот json", motionListPath)
 					fileContent, err := ioutil.ReadFile(motionListPath)
 					if err != nil {
 						http.Error(w, "Внутренняя ошибка сервера", http.StatusInternalServerError)
@@ -141,11 +138,9 @@ func neuralWSHandler(w http.ResponseWriter, r *http.Request) {
 		}
 	}(conn)
 	gameFieldWSDict[conn] = gameFieldID
-	fmt.Println(len(gameFieldWSDict))
 	for {
 		_, _, err := conn.ReadMessage()
 		if err != nil {
-			log.Println(err)
 			delete(gameFieldWSDict, conn)
 			break
 		}

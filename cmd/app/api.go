@@ -186,13 +186,12 @@ func getMotion(w http.ResponseWriter, r *http.Request) {
 }
 
 func exitFromGameAPI(w http.ResponseWriter, r *http.Request) {
-	userID, roomID, err := exitFromGame(r)
+	_, _, err := exitFromGame(r)
 	if err != nil {
 		http.Error(w, "Internal Server Error", 500)
 		log.Println(err.Error())
 		return
 	}
-	fmt.Println("User", userID, "left the room", roomID)
 	w.WriteHeader(200)
 }
 
@@ -223,14 +222,16 @@ func exitFromGame(r *http.Request) (int, string, error) {
 		return 0, "", err
 	}
 	if containsInSlice(activeGameRooms, selectedRoomID) {
-		endGame(selectedRoomID)
+		if getConnectedUsersCount(selectedRoomID) < 1 {
+			endGame(selectedRoomID)
+		}
 		broadcastGameFieldWSMessage <- []string{selectedRoomID, string(messageData)}
 	}
 	return user.UserID, selectedRoomID, nil
 }
 
 func exitFromAccount(w http.ResponseWriter, r *http.Request) {
-	userID, _, err := exitFromGame(r)
+	_, _, err := exitFromGame(r)
 	if err != nil {
 		http.Error(w, "Internal Server Error", 500)
 		log.Println(err.Error())
@@ -241,7 +242,6 @@ func exitFromAccount(w http.ResponseWriter, r *http.Request) {
 		Path:    "/",
 		Expires: time.Now().AddDate(0, 0, -1),
 	})
-	fmt.Println(userID, "logged out")
 }
 
 func getUserAvatar(db *sqlx.DB) func(w http.ResponseWriter, r *http.Request) {
@@ -328,7 +328,6 @@ func getDataSongJson(w http.ResponseWriter, r *http.Request) {
 		log.Println(err.Error())
 		return
 	}
-	fmt.Println(data.RoomID, data.MaxPoint, data.ColorID)
 	broadcastGameFieldWSMessage <- []string{data.RoomID, string(reqData)}
 	w.WriteHeader(200)
 }
@@ -359,7 +358,6 @@ func getBestPlayer(db *sqlx.DB) func(w http.ResponseWriter, r *http.Request) {
 			}
 			return
 		}
-		fmt.Println(bestPlayerData.UserID)
 		userData, err := getUserInfo(db, bestPlayerData.UserID)
 		if err != nil {
 			http.Error(w, "Error getting user information", http.StatusInternalServerError)
@@ -508,7 +506,6 @@ func getBotPath(db *sqlx.DB) func(w http.ResponseWriter, r *http.Request) {
 			log.Println(err.Error())
 			return
 		}
-		fmt.Println(botData)
 		response := struct {
 			BotId         string
 			BotScoresPath string
@@ -562,7 +559,9 @@ func deletePlayerFromGame(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		if containsInSlice(activeGameRooms, selectedRoomID) {
-			endGame(selectedRoomID)
+			if getConnectedUsersCount(selectedRoomID) < 1 {
+				endGame(selectedRoomID)
+			}
 			broadcastGameFieldWSMessage <- []string{selectedRoomID, string(messageData)}
 		}
 		w.WriteHeader(http.StatusOK)
@@ -695,25 +694,39 @@ func checkForAchievements(db *sqlx.DB) http.HandlerFunc {
 			return
 		}
 
-		data.BotIDs = append(data.BotIDs, 0)
+		botDifficulties, err := getDifficultyByBotIDs(db, data.BotIDs)
+		if err != nil {
+			http.Error(w, "Getting difficulties error", 500)
+			log.Println(err.Error())
+			return
+		}
+		botDifficulties = append(botDifficulties, 0)
 
-		query := `
+		query, args, err := sqlx.In(`
 			SELECT
 				user_achievement_id,
+				user_id,
 				progress,
 				max_progress
 			FROM
 				user_achievements
 			WHERE
-				user_id = ? AND song_id = ? AND bot_id IN (?) AND boss_id = ?
-		`
+				user_id = ? AND song_id IN (?) AND bot_difficulty IN (?) AND boss_id = ?
+		`, data.UserID, []int{data.SongID, 0}, botDifficulties, data.BossID)
+		if err != nil {
+			http.Error(w, "Ошибка базы данных", 500)
+			log.Println(err.Error())
+			return
+		}
+
 		var achievementProgressData []struct {
 			UserAchievementID int `db:"user_achievement_id"`
+			UserID            int `db:"user_id"`
 			Progress          int `db:"progress"`
 			MaxProgress       int `db:"max_progress"`
 		}
 
-		err = db.Select(&achievementProgressData, query, data.UserID, data.SongID, data.BotIDs, data.BossID)
+		err = db.Select(&achievementProgressData, query, args...)
 		if err != nil {
 			http.Error(w, "Database error", 500)
 			log.Println(err.Error())
@@ -732,6 +745,12 @@ func checkForAchievements(db *sqlx.DB) http.HandlerFunc {
 			completed := 0
 			if progress >= maxProgress {
 				completed = 1
+				err = addHasNewAchievement(db, progressInfo.UserID)
+				if err != nil {
+					http.Error(w, "Internal Server Error", 500)
+					log.Println(err)
+					return
+				}
 			}
 
 			updateQuery := `
@@ -758,13 +777,73 @@ func checkForAchievements(db *sqlx.DB) http.HandlerFunc {
 
 func earnPointsForAchievements(db *sqlx.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		var _ = r.FormValue("achievement_id")
+		achievementID := r.FormValue("achievement_id")
+		achievementIDInt, err := strconv.Atoi(achievementID)
+		if err != nil {
+			http.Error(w, "invalid achievement id", 500)
+			log.Println(err.Error())
+			return
+		}
 		var user userInfo
-		err := getJsonCookie(r, "userInfoCookie", &user)
+		err = getJsonCookie(r, "userInfoCookie", &user)
 		if err != nil {
 			http.Redirect(w, r, "/logIn", http.StatusFound)
 			log.Println(err.Error())
 			return
 		}
+		query := `
+			SELECT
+				user_achievement_id,
+				completed,
+				collected,
+				score
+			FROM
+				user_achievements
+			WHERE
+				user_id = ? AND achievement_id = ?
+		`
+		var achievementData struct {
+			UserAchievementID int `db:"user_achievement_id"`
+			Completed         int `db:"completed"`
+			Collected         int `db:"collected"`
+			Score             int `db:"score"`
+		}
+		err = db.QueryRow(query, user.UserID, achievementIDInt).Scan(&achievementData.UserAchievementID, &achievementData.Completed, &achievementData.Collected, &achievementData.Score)
+		if err != nil {
+			http.Error(w, "Database error", 500)
+			log.Println(err.Error())
+			return
+		}
+		if achievementData.Completed != 1 {
+			http.Error(w, "achievement not yet completed", 409)
+			return
+		}
+		if achievementData.Collected != 0 {
+			http.Error(w, "award already received", 409)
+			return
+		}
+		updateQuery := `
+				UPDATE
+				    user_achievements
+				SET
+					collected = 1
+				WHERE
+				    user_achievement_id = ?
+			`
+
+		_, err = db.Exec(updateQuery, achievementData.UserAchievementID)
+		if err != nil {
+			http.Error(w, "user achievements table update error", 500)
+			log.Println(err.Error())
+			return
+		}
+
+		err = addUserScoreSQL(db, user.UserID, achievementData.Score)
+		if err != nil {
+			http.Error(w, "achievement scoring error", 500)
+			log.Println(err.Error())
+			return
+		}
+		w.WriteHeader(http.StatusOK)
 	}
 }

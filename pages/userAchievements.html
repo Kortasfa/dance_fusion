@@ -25,15 +25,15 @@
     <span style="--i:11" class="logo__item">t</span>
     <span style="--i:12" class="logo__item">s</span>
   </div>
-  <img class="btn-leave-room hidden" src="/static/img/log_out.svg">
+  <img class="btn-leave-room" src="/static/img/log_out.svg">
   <div class="achievements">
     <div class="achievements__achieve-type">
-      <div class="achieve-type__type type-selected">In progress</div>
-      <div class="achieve-type__type">Completed</div>
+      <div class="achieve-type__type type-selected" id="in-progress">In progress</div>
+      <div class="achieve-type__type" id="completed">Completed</div>
     </div>
     <div class="achievements__achieve-items">
       {{ range .Achievements }}
-      <div class="achieve-items__positions" data-complete = "{{ .Completed }}" id="{{ .AchievementID }}">
+      <div class="achieve-items__positions" data-complete = "{{ .Completed }}" id="{{ .AchievementID }}" data-collect="{{ .Collected }}">
         <span class="positions__position-name">{{ .AchievementName }}</span>
         <span class="positions__part-complete">{{ .Progress }}/{{ .MaxProgress }}</span>
       </div>

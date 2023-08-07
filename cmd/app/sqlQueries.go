@@ -488,3 +488,76 @@ func getUserAchievements(db *sqlx.DB, userID int) ([]userAchievement, error) {
 
 	return data, nil
 }
+
+func hasNewAchievement(db *sqlx.DB, userID int) (int, error) {
+	const query = `
+		SELECT
+			new_achievement
+		FROM
+			users
+		WHERE
+			id = ?
+	`
+
+	var newAchievement int
+	err := db.QueryRow(query, userID).Scan(&newAchievement)
+	if err != nil {
+		return 0, err
+	}
+
+	return newAchievement, nil
+}
+
+func addHasNewAchievement(db *sqlx.DB, userID int) error {
+	const query = `
+		UPDATE
+		    users
+		SET
+		    new_achievement = 1
+		WHERE
+		    id = ?
+	`
+
+	_, err := db.Exec(query, userID)
+	return err
+}
+
+func removeHasNewAchievement(db *sqlx.DB, userID int) error {
+	const query = `
+		UPDATE
+		    users
+		SET
+		    new_achievement = 0
+		WHERE
+		    id = ?
+	`
+
+	_, err := db.Exec(query, userID)
+	return err
+}
+
+func getDifficultyByBotIDs(db *sqlx.DB, botIDs []int) ([]int, error) {
+	if len(botIDs) == 0 {
+		return []int{}, nil
+	}
+	query, args, err := sqlx.In(`
+		SELECT
+			difficulty
+		FROM
+			bots
+		WHERE
+			bot_id IN (?)
+	`, botIDs)
+	if err != nil {
+		return nil, err
+	}
+
+	var difficulties []int
+
+	err = db.Select(&difficulties, query, args...)
+	if err != nil {
+		return nil, err
+	}
+
+	return difficulties, nil
+}

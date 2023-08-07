@@ -4,8 +4,22 @@ import (
 	"encoding/json"
 	"net/http"
 	"net/url"
+	"strconv"
 	"time"
 )
+
+func delCookieIfExists(w http.ResponseWriter, r *http.Request, name string) {
+	_, err := r.Cookie(name)
+	if err != nil {
+		return
+	}
+	http.SetCookie(w, &http.Cookie{
+		Name:    name,
+		Value:   "",
+		Path:    "/",
+		Expires: time.Now().AddDate(0, 0, -1),
+	})
+}
 
 func setJsonCookie(w http.ResponseWriter, name string, value interface{}, expiration time.Duration) error {
 	cookieValue, err := json.Marshal(value)
@@ -68,4 +82,15 @@ func containsInSlice(s []string, item string) bool {
 		}
 	}
 	return false
+}
+
+func getConnectedUsersCount(roomID string) int {
+	count := 0
+	for _, user := range roomIDDict[roomID] {
+		userID, _ := strconv.Atoi(user)
+		if userID > 0 {
+			count++
+		}
+	}
+	return count
 }

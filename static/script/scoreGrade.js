@@ -4,6 +4,8 @@ function scoreGrade(res, score, moveName, songName) {
             return scoreGradeForgetYou(res, score, moveName);
         case "Rasputin":
             return scoreGradeRasputin(res, score, moveName);
+        case "There is nothing better":
+            return scoreGradeThereIsNothingBetter(res, score, moveName);
         default:
             return scoreGradeForgetYou(res, score, moveName);
     }
@@ -182,6 +184,14 @@ function scoreGradeRasputin(res, score, moveName) {
             {
                 score = score * 10;
             }
+        }
+    }
+    return score;
+}
+function scoreGradeThereIsNothingBetter(res, score, moveName) {
+    for (let motionDict of res["results"]) {
+        if (motionDict["label"] === moveName) {
+            score = motionDict["value"];
         }
     }
     return score;
