@@ -215,9 +215,6 @@ function scoreGradeThereIsNothingBetter(res, score, moveName) {
         }
 
     };
-    console.log(res["results"]);
-    console.log(moveName);
-    console.log(score);
     return score;
 }
 window.scoreGrade = scoreGrade;

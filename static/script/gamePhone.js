@@ -145,7 +145,7 @@ function joinRoom(userID) {
                 starFive.src = "/static/img/star_blue.svg"
             }
             if (value >= 0.9 * maxTheory) {
-                megaStar.src = "/static/img/mega-star.svg"
+                megaStar.src = "/static/img/mega_star.svg"
                 megaStar.classList.remove("hidden");
             }
         } else if ("Exit" in receivedJSON) {
@@ -183,6 +183,7 @@ function joinRoom(userID) {
             stars.forEach(element => element.src = "/static/img/star_white.svg");
             handleDanceData(receivedJSON["motions"]);
             document.querySelector('.dance-block__connection').innerText = 'Dance!';
+            document.querySelector('.dance-block__rating-stars').classList.remove('hidden');
         }
     };
 

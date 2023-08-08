@@ -13,7 +13,7 @@ COLLATE utf8mb4_unicode_ci;
 
 INSERT INTO bosses(boss_name, boss_health_point, img_hat, img_body, img_face)
 VALUES
-    ('Tempo Titan', 4500, 'static/img/hat/bigHat.png', 'static/img/body/89e7dc.png', '../static/img/face/pickUpFace.png'),
-    ('Funk Fusionist', 4000, 'static/img/hat/beretHat.png', 'static/img/body/ff9f55.png', '../static/img/face/badFace.png'),
-    ('Electric Maestro', 3600, 'static/img/hat/sherlokHat.png', 'static/img/body/7cf79c.png', '../static/img/face/deadInsideFace.png'),
-    ('Rhythmo', 3200, 'static/img/hat/withoutHat.png', 'static/img/body/ce63ff.png', '../static/img/face/stupidFace.png');
+    ('Tempo Titan', 4100, 'static/img/hat/bigHat.png', 'static/img/body/89e7dc.png', '../static/img/face/pickUpFace.png'),
+    ('Funk Fusionist', 3600, 'static/img/hat/beretHat.png', 'static/img/body/ff9f55.png', '../static/img/face/badFace.png'),
+    ('Electric Maestro', 3000, 'static/img/hat/sherlokHat.png', 'static/img/body/7cf79c.png', '../static/img/face/deadInsideFace.png'),
+    ('Rhythmo', 2400, 'static/img/hat/withoutHat.png', 'static/img/body/ce63ff.png', '../static/img/face/stupidFace.png');

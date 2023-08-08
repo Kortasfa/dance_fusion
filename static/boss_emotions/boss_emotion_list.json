@@ -1,0 +1,26 @@
+[
+    {
+        "stage": 1,
+        "emotions": [
+            "static/boss_emotions/flowers.png",
+            "static/boss_emotions/finger.png",
+            "static/boss_emotions/laugh.png"
+        ]
+    },
+    {
+        "stage": 2,
+        "emotions": [
+            "static/boss_emotions/tongue.png",
+            "static/boss_emotions/wonder.png",
+            "static/boss_emotions/pensive.png"
+        ]
+    },
+    {
+        "stage": 3,
+        "emotions": [
+            "static/boss_emotions/angry.png",
+            "static/boss_emotions/excitement.png",
+            "static/boss_emotions/fear.png"
+        ]
+    }
+]

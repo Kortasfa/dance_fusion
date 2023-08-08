@@ -79,7 +79,7 @@
     display: flex;
     height: 26px;
     width: 68px;
-    margin: 10px 0 0 280px;
+    margin: 5px 0 0 280px;
     border-radius: 10px;
     background-color: #BD63D4;
     justify-content: space-evenly;
@@ -393,7 +393,7 @@
 }
 
 .section__name {
-    margin: 24px 24px 24px 134px;
+    margin: 24px auto 24px 125px;
 }
 
 .btn-back{
@@ -505,6 +505,10 @@
     background-color: #f4f4f4;
     margin: 10px;
     box-shadow: 0 6px 4px -4px rgba(0, 0, 0, .2);
+}
+
+.boss__button:hover{
+    background: #AEF26D;
 }
 
 .boss__head{

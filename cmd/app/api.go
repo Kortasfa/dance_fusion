@@ -738,19 +738,26 @@ func checkForAchievements(db *sqlx.DB) http.HandlerFunc {
 			progress := progressInfo.Progress
 			maxProgress := progressInfo.MaxProgress
 
+			completed := 0
+			if progress == maxProgress {
+				completed = 1
+			}
+
 			if progress < maxProgress {
 				progress++
 			}
-
-			completed := 0
-			if progress >= maxProgress {
-				completed = 1
+			if progress == maxProgress && completed != 1 {
 				err = addHasNewAchievement(db, progressInfo.UserID)
 				if err != nil {
 					http.Error(w, "Internal Server Error", 500)
 					log.Println(err)
 					return
 				}
+			}
+
+			completed = 0
+			if progress >= maxProgress {
+				completed = 1
 			}
 
 			updateQuery := `
