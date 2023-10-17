@@ -203,6 +203,7 @@ function gameStart() {
     const contentContainer = $('#content');
     if (readyGame) {
         document.getElementsByClassName('loading')[0].style.display= 'flex';
+        videoPlayer.src = '';
         startedGame = true;
         sendGameStartInfoToServer().then(() => {})
         numb = (Math.round(Math.random()*1000)).toString();
@@ -212,7 +213,6 @@ function gameStart() {
         $.getScript(firstComponent, function() {
             $.getScript(secondComponent, function() {
                 (async () => {
-                    videoPlayer.src = '';
                     classifier = new EdgeImpulseClassifier();
                     await classifier.init();
                     let project = classifier.getProjectInfo();

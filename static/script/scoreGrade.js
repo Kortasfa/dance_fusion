@@ -119,6 +119,8 @@ function scoreGradeForgetYou(res, score, moveName) {
                         score = 0.1;
                     }
             }
+
+
         }
 
     }
@@ -192,8 +194,30 @@ function scoreGradeThereIsNothingBetter(res, score, moveName) {
     for (let motionDict of res["results"]) {
         if (motionDict["label"] === moveName) {
             score = motionDict["value"];
+            if (moveName === "hand-in-arc") {
+                let sameMoveOne = res["results"].find(item => item.label === "yeeeeaaaaassssssss");
+                let sameMoveTwo = res["results"].find(item => item.label === "fist");
+                score = Math.max(motionDict["value"], sameMoveOne.value ,sameMoveTwo.value);
+            }
+            if (moveName === "scissors") {
+                let sameMoveOne = res["results"].find(item => item.label === "yeeeeaaaaassssssss");
+                let sameMoveTwo = res["results"].find(item => item.label === "fist");
+                score = Math.max(motionDict["value"], sameMoveOne.value), sameMoveTwo.value;
+            }
+            if (moveName === "baraban-move") {
+                let sameMoveOne = res["results"].find(item => item.label === "yeeeeaaaaassssssss");
+                score = Math.max(motionDict["value"], sameMoveOne.value);
+            }
+            if (moveName === "laaaaaaaaaaaaaaaaa") {
+                let sameMoveOne = res["results"].find(item => item.label === "fist");
+                score = Math.max(motionDict["value"], sameMoveOne.value);
+            }
         }
-    }
+
+    };
+    console.log(res["results"]);
+    console.log(moveName);
+    console.log(score);
     return score;
 }
 window.scoreGrade = scoreGrade;
